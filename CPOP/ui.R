@@ -9,16 +9,20 @@ shinyUI(navbarPage("CPOP",
  tabPanel("CPP -Page2"),
  tabPanel("CPP - Page3",
   fluidPage(
-    absolutePanel(fixed = FALSE, draggable = FALSE, top = "40px", left = 0, right = 0,
-                  bottom = "10px", width = "100%", height = "0px", 
-        wellPanel(
+    fluidRow(
+      column(6,
       selectInput("LA", "Select A Local Authority", c("Aberdeen City", "Some Other Council"))
-        )
+      ),
+      column(6,
+             selectInput("CompLA", "Comparator", c("Edinburgh", "Glasgow")
+              )
+             )
     ),
+    hr(),
     # Show a plot of the generated distribution
     fluidRow(
     mainPanel(
-       p("PUT A PLOT HERE!")
+       p("PUT PLOT(S) HERE!")
       )
     )
   )
