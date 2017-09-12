@@ -1,0 +1,11 @@
+library(shiny)
+library(tidyverse)
+library(plyr)
+library(shinythemes)
+library(RColorBrewer)
+library(DT)
+library(data.table)
+
+CPPdta <- read_csv("C:/Users/connachan.cara/Documents/CommunityPlanningOutcomesProfiler/CPPcleandata.csv")
+IGZdta <- read_csv("C:/Users/connachan.cara/Documents/CommunityPlanningOutcomesProfiler/IGZcleandata.csv")
+DZdta <- read_csv("C:/Users/connachan.cara/Documents/CommunityPlanningOutcomesProfiler/DZcleandata.csv")
