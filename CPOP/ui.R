@@ -2,16 +2,17 @@ library(shiny)
 
 shinyUI(navbarPage("CPOP",
  tabPanel("Cover Page/Contents",
-          includeHTML("C:/Users/cassidy.nicholas/OneDrive - IS/CommunityPlanningOutcomesProfiler/CoverPage.html"),
+          includeHTML("C:/Users/connachan.cara/Documents/CommunityPlanningOutcomesProfiler/CoverPage.html"),
           img(src = "http://www.improvementservice.org.uk/benchmarking/images/islogo.png", align = "top")),
  tabPanel("CPP - Page1",
           fluidPage(
             fluidRow(
               column(6,
-                     selectInput("LA1", "Select A Local Authority", c("Aberdeen City", "Some Other Council"))
+                     selectInput("LA1", "Select A Local Authority", unique(filter(CPPdta, CPP != "Scotland"))[[1]], 
+                                 selected = "Aberdeen City")
               ),
               column(6,
-                     selectInput("CompLA1", "Comparator", c("Edinburgh", "Glasgow")
+                     selectInput("CompLA1", "Select Comparator", unique(CPPdta$CPP), selected = "Scotland"
                      )
               )
             ),
