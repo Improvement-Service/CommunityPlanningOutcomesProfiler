@@ -1,17 +1,15 @@
-library(shiny)
-
-# Define server logic required to draw a histogram
 shinyServer(function(input, output) {
    
-  output$distPlot <- renderPlot({
-    
-    # generate bins based on input$bins from ui.R
-    x    <- faithful[, 2] 
-    bins <- seq(min(x), max(x), length.out = input$bins + 1)
-    
-    # draw the histogram with the specified number of bins
-    hist(x, breaks = bins, col = 'darkgray', border = 'white')
-    
-  })
+output$Plot2 <- renderPlot({
+  dat <- filter(CPPdta, Indicator == "Unplanned Hospital Attendances" & Year == "2016/17")
+  dat$slct <- ifelse(dat$CPP == input$LA2, "Sel1", "Other") 
+  cmp <- filter(dat, CPP == input$CompLA2)$value
+ 
+  ggplot(data = dat) +
+    geom_bar(aes(x = reorder(CPP,-value), y = value, fill = slct), stat = "identity", position = "dodge") +
+    scale_fill_manual(values = c("blue","red"), breaks = c("Other", "Sel1")) +
+    guides(fill = FALSE) +
+    geom_hline(aes(yintercept = cmp))
+})
   
 })

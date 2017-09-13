@@ -1,5 +1,3 @@
-library(shiny)
-
 shinyUI(navbarPage("CPOP",
  tabPanel("Cover Page/Contents",
           includeHTML("C:/Users/nickm/Documents/CommunityPlanningOutcomesProfiler/CoverPage.html"),
@@ -38,7 +36,7 @@ shinyUI(navbarPage("CPOP",
             hr(),
             fluidRow(
               mainPanel(
-                p("PUT PLOT(S) HERE!")
+                plotOutput("Plot2")
               )
             )
           )),
@@ -57,7 +55,7 @@ shinyUI(navbarPage("CPOP",
     hr(),
     fluidRow(
     mainPanel(
-       p("PUT PLOT(S) HERE!")
+      
       )
     )
   )
