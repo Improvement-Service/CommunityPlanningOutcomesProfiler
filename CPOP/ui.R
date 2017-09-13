@@ -43,20 +43,19 @@ shinyUI(navbarPage("CPOP",
  tabPanel("CPP - Page3",
   fluidPage(
     fluidRow(
-      column(6,
+      column(4,
       selectInput("LA3", "Select A Local Authority", unique(filter(CPPdta, CPP != "Scotland")[[1]]), 
                   selected = "Aberdeen City")
       ),
-      column(6,
+      column(4,
              selectInput("CompLA3", "Select Comparator", unique(CPPdta$CPP), selected = "Scotland"
               )
-             )
+             ),
+      column(4,
+             checkboxGroupInput("grphs3","", 1:12)
     ),
     hr(),
-    fluidRow(
-    mainPanel(
-      
-      )
+    uiOutput("uiPage3")
     )
   )
  )
