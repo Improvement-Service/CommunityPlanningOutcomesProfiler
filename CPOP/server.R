@@ -14,4 +14,39 @@ shinyServer(function(input, output) {
     
   })
   
+##Create Ui ouputs for page 1=============
+ 
+#Create a reactive function to store data for both LA's selected  
+  selectedDta1 <- reactive({
+    dta <- filter(CPPdta, CPP %in% c(input$LA1, input$CompLA1))
+    #dta$CPP <- as.factor(dta$CPP)
+    #dta$Type <- as.factor(dta$Type)
+  })
+  
+  
+#Create a list of all the indicators 
+  Indicators1 <- unique(CPPdta$Indicator)
+  
+#add new column to data so that line type can be specified
+  CPPdta <- CPPdta %>% mutate(Grouping=  paste(CPP, Type))
+  
+#Create a loop that creates a plot for the indicators selected  
+  for(i in seq_along(Indicators1)){
+    local({
+      my.i <- i
+      plotname <- paste("plot", my.i, sep ="_")
+      output[[plotname]] <- renderPlot({
+        selectedDta1 <- selectedDta1()
+        ggplot(subset(selectedDta1, selectedDta1$Indicator == Indicators1[my.i]),
+               aes(x = Year, y = value, group = Grouping, colour = CPP, linetype = Type))+
+          geom_line()+
+          
+          ggtitle(Indicators1[my.i])+
+          theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
+                axis.text.x = element_text(angle = 90, hjust = 1.0, vjust = 0.3))
+      })
+   
+    })  
+  }
+  
 })

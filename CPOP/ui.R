@@ -7,21 +7,48 @@ shinyUI(navbarPage("CPOP",
  tabPanel("CPP - Page1",
           fluidPage(
             fluidRow(
-              column(6,
+              column(4,
                      selectInput("LA1", "Select A Local Authority", unique(filter(CPPdta, CPP != "Scotland"))[[1]], 
                                  selected = "Aberdeen City")
               ),
-              column(6,
+              column(4,
                      selectInput("CompLA1", "Select Comparator", unique(CPPdta$CPP), selected = "Scotland"
                      )
-              )
+              ),
+              column(4,
+                     selectInput("Indi1", "Select Indicator", c("All", unique(CPPdta$Indicator)), selected = "All")
+                     )
             ),
             hr(),
+              fluidRow(
+                column(3, plotOutput("plot_1")),
+                column(3, plotOutput("plot_2")),
+                column(3, plotOutput("plot_3")),
+                column(3, plotOutput("plot_4"))
+              ),
             fluidRow(
-              mainPanel(
-                p("PUT PLOT(S) HERE!")
-              )
+              column(3, plotOutput("plot_5")),
+              column(3, plotOutput("plot_6")),
+              column(3, plotOutput("plot_7")),
+              column(3, plotOutput("plot_8"))
+            ),
+            fluidRow(
+              column(3, plotOutput("plot_9")),
+              column(3, plotOutput("plot_10")),
+              column(3, plotOutput("plot_11")),
+              column(3, plotOutput("plot_12"))
+            ),
+            fluidRow(
+              column(3, plotOutput("plot_13")),
+              column(3, plotOutput("plot_14")),
+              column(3, plotOutput("plot_15")),
+              column(3, plotOutput("plot_16"))
+            ),
+            fluidRow(
+              column(3, plotOutput("plot_17")),
+              column(3, plotOutput("plot_18"))
             )
+            
           )),
  tabPanel("CPP -Page2",
           fluidPage(
