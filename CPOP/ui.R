@@ -20,6 +20,8 @@ shinyUI(navbarPage("CPOP",
                      )
             ),
             hr(),
+            conditionalPanel(
+              condition = "input.Indi1 == 'All'",
               fluidRow(
                 column(3, plotOutput("plot_1")),
                 column(3, plotOutput("plot_2")),
@@ -48,7 +50,13 @@ shinyUI(navbarPage("CPOP",
               column(3, plotOutput("plot_17")),
               column(3, plotOutput("plot_18"))
             )
-            
+            ),
+            conditionalPanel(
+              condition = "input.Indi1 != 'All'",
+              mainPanel(
+              plotOutput("Indi1Plot")
+              )
+            )
           )),
  tabPanel("CPP -Page2",
           fluidPage(

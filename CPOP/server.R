@@ -19,8 +19,6 @@ shinyServer(function(input, output) {
 #Create a reactive function to store data for both LA's selected  
   selectedDta1 <- reactive({
     dta <- filter(CPPdta, CPP %in% c(input$LA1, input$CompLA1))
-    #dta$CPP <- as.factor(dta$CPP)
-    #dta$Type <- as.factor(dta$Type)
   })
   
   
@@ -39,14 +37,26 @@ shinyServer(function(input, output) {
         selectedDta1 <- selectedDta1()
         ggplot(subset(selectedDta1, selectedDta1$Indicator == Indicators1[my.i]),
                aes(x = Year, y = value, group = Grouping, colour = CPP, linetype = Type))+
-          geom_line()+
-          
+          geom_line(show.legend = FALSE)+
           ggtitle(Indicators1[my.i])+
           theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
+                panel.background = element_blank(), axis.line = element_line(colour="black"),
                 axis.text.x = element_text(angle = 90, hjust = 1.0, vjust = 0.3))
       })
    
     })  
   }
+  
+#create single plot based on what indicator is selected
+  output$Indi1Plot <- renderPlot({
+    selectedDta1 <- selectedDta1()
+    ggplot(selectedDta1[selectedDta1$Indicator == input$Indi1,],
+           aes(x = Year, y= value, group = Grouping, colour = CPP, linetype = Type))+
+      geom_line(show.legend = FALSE)+
+      ggtitle(input$Indi1)+
+      theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
+            panel.background = element_blank(), axis.line = element_line(colour="black"),
+            axis.text.x = element_text(angle = 90, hjust = 1.0, vjust = 0.3))
+  })
   
 })
