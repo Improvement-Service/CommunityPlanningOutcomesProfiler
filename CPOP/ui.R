@@ -1,6 +1,6 @@
 shinyUI(navbarPage("CPOP",
  tabPanel("Cover Page/Contents",
-          includeHTML("C:/Users/nickm/Documents/CommunityPlanningOutcomesProfiler/CoverPage.html"),
+          includeHTML("C:/Users/cassidy.nicholas/OneDrive - IS/CommunityPlanningOutcomesProfiler/CoverPage.html"),
           img(src = "http://www.improvementservice.org.uk/benchmarking/images/islogo.png", align = "top")),
  tabPanel("CPP - Page1",
           fluidPage(
@@ -52,11 +52,13 @@ shinyUI(navbarPage("CPOP",
               )
              ),
       column(4,
-             checkboxGroupInput("grphs3","", 1:12)
+             div(style = "column-count:2;-webkit-column-count:2; -moz-column-count:2",
+             checkboxGroupInput("grphs3","", 1:18)
+             )
+      )
     ),
     hr(),
     uiOutput("uiPage3")
-    )
   )
  )
 ))

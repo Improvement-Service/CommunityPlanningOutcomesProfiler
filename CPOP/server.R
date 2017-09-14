@@ -22,7 +22,6 @@ for(i in 1:18){
   })  
 }
 
-
 ##Render a UI with a certain number of rows and columns based on selected graphs
 output$uiPage3 <- renderUI({
   slctd <- length(input$grphs3)
@@ -32,21 +31,57 @@ output$uiPage3 <- renderUI({
   pctCols <- paste0(pctCols, "%")
 #number of rows is the number of graphs divided by 4 and rounded up eg 7 = 2 rows
   rows <- ceiling(slctd/4)
-  for(i in 1: cls){
-    column((12/cls),
-   plot_output_list<- lapply(seq(i,length(input$grphs3),cls), function(x){
-             plotname <- paste("plot", x, sep = "_")
-           plotOutput(plotname)
-     }) 
+##Dynamically create plot height  
+  pltheight <- paste0(800/rows, "px")
+##Create however many
+  fluidRow(
+    column(12/cls,map(1, function(nc){
+             plot_output_list1<- map(seq(from = 1,to = slctd,by = cls), function(x){
+               plotname <- paste("plot", x, sep = "_")
+               plotOutput(plotname, height = pltheight)
+             })
+             do.call(tagList, plot_output_list1)         
+    }) ),  
+    column(12/cls,map(2, function(nc){
+      plot_output_list2<- tryCatch(map(seq(from = nc,to = slctd,by = cls), function(x){
+        plotname <- paste("plot", x, sep = "_")
+        plotOutput(plotname, height = )
+      }), 
+      error=function(cond) {
+        
+        return(list())
+      }
+      )
+      do.call(tagList, plot_output_list2)         
+    })
+    ),
+    column(12/cls,map(3, function(nc){
+      plot_output_list3<- tryCatch(map(seq(from = nc,to = slctd,by = cls), function(x){
+        plotname <- paste("plot", x, sep = "_")
+        plotOutput(plotname, height = "200px")
+      }), 
+      error=function(cond) {
+        
+        return(list())
+      }
+      )
+      do.call(tagList, plot_output_list3)         
+    })
+    ),
+    column(12/cls,map(4, function(nc){
+      plot_output_list4<- tryCatch(map(seq(from = nc,to = slctd,by = cls), function(x){
+        plotname <- paste("plot", x, sep = "_")
+        plotOutput(plotname, height = "200px")
+      }), 
+      error=function(cond) {
+        
+        return(list())
+      }
+      )
+      do.call(tagList, plot_output_list4)         
+    })
     )
-    do.call(tagList, plot_output_list)
-           
- #          for(j in rows){
-#             pnum <- i+(j*cls)
-#             plotOutput(paste("plot", pnum, sep = "_"))
- #          })
-  }
+   
+  )  
   })
-  
-  
 })
