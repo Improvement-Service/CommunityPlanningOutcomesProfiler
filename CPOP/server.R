@@ -16,9 +16,17 @@ for(i in 1:18){
   local({
     my.i <- i
     plotname <- paste("plot", my.i, sep ="_")
-    output[[plotname]] <- renderPlot(
-      plot(x = my.i, y = 6, main = plotname)
-    )
+    output[[plotname]] <- renderPlot({
+      indis <- unique(CPPdta$Indicator)
+      dat <- filter(CPPdta, Indicator == indis[[my.i]] & Year == "2016/17")
+      dat$slct <- ifelse(dat$CPP == input$LA3, "Sel1", "Other") 
+      cmp <- filter(dat, CPP == input$CompLA3)$value
+      ggplot(data = dat) +
+        geom_bar(aes(x = reorder(CPP,-value), y = value, fill = slct), stat = "identity", position = "dodge") +
+        scale_fill_manual(values = c("blue","red"), breaks = c("Other", "Sel1")) +
+        guides(fill = FALSE) +
+        geom_hline(aes(yintercept = cmp))
+    })
   })  
 }
 
