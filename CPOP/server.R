@@ -39,9 +39,9 @@ shinyServer(function(input, output) {
         dtaRaw <- selectedDta1[selectedDta1$Type == "Raw data",]
         ggplot()+
           geom_line(data = subset(dtaAll, dtaAll$Indicator == Indicators1[my.i]),
-                  aes(x = Year, y = value, group = CPP, colour = CPP, linetype = "2"), show.legend = FALSE)+
+                  aes(x = Year, y = value, group = CPP, colour = CPP, linetype = "2"), lwd = 1, show.legend = FALSE)+
           geom_line(data = subset(dtaRaw, dtaRaw$Indicator == Indicators1[my.i]),
-                  aes(x = Year, y = value, group = CPP, colour = CPP, linetype = "1"), show.legend = FALSE)+
+                  aes(x = Year, y = value, group = CPP, colour = CPP, linetype = "1"), lwd = 1, show.legend = FALSE)+
           ggtitle(Indicators1[my.i])+
           theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
                 panel.background = element_blank(), axis.line = element_line(colour="black"),
@@ -58,9 +58,9 @@ shinyServer(function(input, output) {
     dtaRaw <- selectedDta1[selectedDta1$Type == "Raw data",]
     ggplot()+
       geom_line(data = dtaAll[dtaAll$Indicator == input$Indi1,],
-                aes(x = Year, y = value, group = CPP, colour = CPP, linetype = "2"), show.legend = FALSE)+
+                aes(x = Year, y = value, group = CPP, colour = CPP, linetype = "2"), lwd = 1, show.legend = FALSE)+
       geom_line(data = dtaRaw[dtaRaw$Indicator == input$Indi1,],
-                aes(x = Year, y = value, group = CPP, colour = CPP, linetype = "1"), show.legend = FALSE)+
+                aes(x = Year, y = value, group = CPP, colour = CPP, linetype = "1"), lwd = 1, show.legend = FALSE)+
       ggtitle(input$Indi1)+
       theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
             panel.background = element_blank(), axis.line = element_line(colour="black"),
