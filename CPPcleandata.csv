@@ -2624,31 +2624,31 @@ South Lanarkshire,CO2 Emissions,Imputed,2004/05,8.008
 Stirling,CO2 Emissions,Imputed,2004/05,10.664
 West Dunbartonshire,CO2 Emissions,Imputed,2004/05,6.633
 West Lothian,CO2 Emissions,Imputed,2004/05,9.191
-Aberdeen City,CO2 Emissions,CO2 Emissions,Raw data,8.69
-Aberdeenshire,CO2 Emissions,CO2 Emissions,Raw data,9.85
-Angus,CO2 Emissions,CO2 Emissions,Raw data,9.53
-Clackmannanshire,CO2 Emissions,CO2 Emissions,Raw data,12.466
-Dundee City,CO2 Emissions,CO2 Emissions,Raw data,7.471
-East Ayrshire,CO2 Emissions,CO2 Emissions,Raw data,6.819
-East Dunbartonshire,CO2 Emissions,CO2 Emissions,Raw data,6.076
-East Lothian,CO2 Emissions,CO2 Emissions,Raw data,15.624
-East Renfrewshire,CO2 Emissions,CO2 Emissions,Raw data,6.45
-Falkirk,CO2 Emissions,CO2 Emissions,Raw data,23.34
-Fife,CO2 Emissions,CO2 Emissions,Raw data,11.981
-Highland,CO2 Emissions,CO2 Emissions,Raw data,7.712
-Inverclyde,CO2 Emissions,CO2 Emissions,Raw data,6.521
-Midlothian,CO2 Emissions,CO2 Emissions,Raw data,6.754
-Moray,CO2 Emissions,CO2 Emissions,Raw data,8.667
-North Ayrshire,CO2 Emissions,CO2 Emissions,Raw data,10.67
-North Lanarkshire,CO2 Emissions,CO2 Emissions,Raw data,8.02
-Renfrewshire,CO2 Emissions,CO2 Emissions,Raw data,9.086
-Scotland,CO2 Emissions,CO2 Emissions,Raw data,9.032
-Scottish Borders,CO2 Emissions,CO2 Emissions,Raw data,9.314
-South Ayrshire,CO2 Emissions,CO2 Emissions,Raw data,7.141
-South Lanarkshire,CO2 Emissions,CO2 Emissions,Raw data,7.745
-Stirling,CO2 Emissions,CO2 Emissions,Raw data,10.246
-West Dunbartonshire,CO2 Emissions,CO2 Emissions,Raw data,6.429
-West Lothian,CO2 Emissions,CO2 Emissions,Raw data,8.883
+Aberdeen City,CO2 Emissions,Raw data,2005/06,8.69
+Aberdeenshire,CO2 Emissions,Raw data,2005/06,9.85
+Angus,CO2 Emissions,Raw data,2005/06,9.53
+Clackmannanshire,CO2 Emissions,Raw data,2005/06,12.466
+Dundee City,CO2 Emissions,Raw data,2005/06,7.471
+East Ayrshire,CO2 Emissions,Raw data,2005/06,6.819
+East Dunbartonshire,CO2 Emissions,Raw data,2005/06,6.076
+East Lothian,CO2 Emissions,Raw data,2005/06,15.624
+East Renfrewshire,CO2 Emissions,Raw data,2005/06,6.45
+Falkirk,CO2 Emissions,Raw data,2005/06,23.34
+Fife,CO2 Emissions,Raw data,2005/06,11.981
+Highland,CO2 Emissions,Raw data,2005/06,7.712
+Inverclyde,CO2 Emissions,Raw data,2005/06,6.521
+Midlothian,CO2 Emissions,Raw data,2005/06,6.754
+Moray,CO2 Emissions,Raw data,2005/06,8.667
+North Ayrshire,CO2 Emissions,Raw data,2005/06,10.67
+North Lanarkshire,CO2 Emissions,Raw data,2005/06,8.02
+Renfrewshire,CO2 Emissions,Raw data,2005/06,9.086
+Scotland,CO2 Emissions,Raw data,2005/06,9.032
+Scottish Borders,CO2 Emissions,Raw data,2005/06,9.314
+South Ayrshire,CO2 Emissions,Raw data,2005/06,7.141
+South Lanarkshire,CO2 Emissions,Raw data,2005/06,7.745
+Stirling,CO2 Emissions,Raw data,2005/06,10.246
+West Dunbartonshire,CO2 Emissions,Raw data,2005/06,6.429
+West Lothian,CO2 Emissions,Raw data,2005/06,8.883
 Aberdeen City,CO2 Emissions,Raw data,2006/07,8.692
 Aberdeenshire,CO2 Emissions,Raw data,2006/07,10.435
 Angus,CO2 Emissions,Raw data,2006/07,9.447
@@ -5149,56 +5149,56 @@ South Lanarkshire,Emergency Admissions Rate,Raw data, 2012,26937.97
 Stirling,Emergency Admissions Rate,Raw data, 2012,22149.84
 West Dunbartonshire,Emergency Admissions Rate,Raw data, 2012,29919.46
 West Lothian,Emergency Admissions Rate,Raw data, 2012,26827.43
-Aberdeen City,Emergency Admissions Rate,Imputed, data 2013,22712.31
-Aberdeenshire,Emergency Admissions Rate,Imputed, data 2013,17902.21
-Angus,Emergency Admissions Rate,Imputed, data 2013,20052.08
-Clackmannanshire,Emergency Admissions Rate,Imputed, data 2013,20767.27
-Dundee City,Emergency Admissions Rate,Imputed, data 2013,25547.3
-East Ayrshire,Emergency Admissions Rate,Imputed, data 2013,28880.99
-East Dunbartonshire,Emergency Admissions Rate,Imputed, data 2013,23273.04
-East Lothian,Emergency Admissions Rate,Imputed, data 2013,22633.51
-East Renfrewshire,Emergency Admissions Rate,Imputed, data 2013,23076.92
-Falkirk,Emergency Admissions Rate,Imputed, data 2013,24244.32
-Fife,Emergency Admissions Rate,Imputed, data 2013,22997.57
-Highland,Emergency Admissions Rate,Imputed, data 2013,20878.37
-Inverclyde,Emergency Admissions Rate,Imputed, data 2013,29591.7
-Midlothian,Emergency Admissions Rate,Imputed, data 2013,25667.11
-Moray,Emergency Admissions Rate,Imputed, data 2013,16811.86
-North Ayrshire,Emergency Admissions Rate,Imputed, data 2013,27846.69
-North Lanarkshire,Emergency Admissions Rate,Imputed, data 2013,29035.94
-Renfrewshire,Emergency Admissions Rate,Imputed, data 2013,29440.35
-Scotland,Emergency Admissions Rate,Imputed, data 2013,24905.85
-Scottish Borders,Emergency Admissions Rate,Imputed, data 2013,25437.71
-South Ayrshire,Emergency Admissions Rate,Imputed, data 2013,27761
-South Lanarkshire,Emergency Admissions Rate,Imputed, data 2013,26819.06
-Stirling,Emergency Admissions Rate,Imputed, data 2013,22415.87
-West Dunbartonshire,Emergency Admissions Rate,Imputed, data 2013,26881.93
-West Lothian,Emergency Admissions Rate,Imputed, data 2013,25427.99
-Aberdeen City,Emergency Admissions Rate,Imputed, data 2014,22071.74
-Aberdeenshire,Emergency Admissions Rate,Imputed, data 2014,18153.23
-Angus,Emergency Admissions Rate,Imputed, data 2014,20376.08
-Clackmannanshire,Emergency Admissions Rate,Imputed, data 2014,21995.93
-Dundee City,Emergency Admissions Rate,Imputed, data 2014,27143.74
-East Ayrshire,Emergency Admissions Rate,Imputed, data 2014,29157.51
-East Dunbartonshire,Emergency Admissions Rate,Imputed, data 2014,24717.11
-East Lothian,Emergency Admissions Rate,Imputed, data 2014,21655.72
-East Renfrewshire,Emergency Admissions Rate,Imputed, data 2014,23828.37
-Falkirk,Emergency Admissions Rate,Imputed, data 2014,25081.36
-Fife,Emergency Admissions Rate,Imputed, data 2014,23830.97
-Highland,Emergency Admissions Rate,Imputed, data 2014,20312.4
-Inverclyde,Emergency Admissions Rate,Imputed, data 2014,31215.35
-Midlothian,Emergency Admissions Rate,Imputed, data 2014,24825.47
-Moray,Emergency Admissions Rate,Imputed, data 2014,17147.37
-North Ayrshire,Emergency Admissions Rate,Imputed, data 2014,28989.12
-North Lanarkshire,Emergency Admissions Rate,Imputed, data 2014,30245.29
-Renfrewshire,Emergency Admissions Rate,Imputed, data 2014,30610.06
-Scotland,Emergency Admissions Rate,Imputed, data 2014,25049.95
-Scottish Borders,Emergency Admissions Rate,Imputed, data 2014,25525.05
-South Ayrshire,Emergency Admissions Rate,Imputed, data 2014,28313.62
-South Lanarkshire,Emergency Admissions Rate,Imputed, data 2014,26003.33
-Stirling,Emergency Admissions Rate,Imputed, data 2014,21800.19
-West Dunbartonshire,Emergency Admissions Rate,Imputed, data 2014,28664
-West Lothian,Emergency Admissions Rate,Imputed, data 2014,25366.75
+Aberdeen City,Emergency Admissions Rate,Imputed, 2013,22712.31
+Aberdeenshire,Emergency Admissions Rate,Imputed, 2013,17902.21
+Angus,Emergency Admissions Rate,Imputed, 2013,20052.08
+Clackmannanshire,Emergency Admissions Rate,Imputed, 2013,20767.27
+Dundee City,Emergency Admissions Rate,Imputed, 2013,25547.3
+East Ayrshire,Emergency Admissions Rate,Imputed, 2013,28880.99
+East Dunbartonshire,Emergency Admissions Rate,Imputed, 2013,23273.04
+East Lothian,Emergency Admissions Rate,Imputed, 2013,22633.51
+East Renfrewshire,Emergency Admissions Rate,Imputed, 2013,23076.92
+Falkirk,Emergency Admissions Rate,Imputed, 2013,24244.32
+Fife,Emergency Admissions Rate,Imputed, 2013,22997.57
+Highland,Emergency Admissions Rate,Imputed, 2013,20878.37
+Inverclyde,Emergency Admissions Rate,Imputed, 2013,29591.7
+Midlothian,Emergency Admissions Rate,Imputed, 2013,25667.11
+Moray,Emergency Admissions Rate,Imputed, 2013,16811.86
+North Ayrshire,Emergency Admissions Rate,Imputed, 2013,27846.69
+North Lanarkshire,Emergency Admissions Rate,Imputed, 2013,29035.94
+Renfrewshire,Emergency Admissions Rate,Imputed, 2013,29440.35
+Scotland,Emergency Admissions Rate,Imputed, 2013,24905.85
+Scottish Borders,Emergency Admissions Rate,Imputed, 2013,25437.71
+South Ayrshire,Emergency Admissions Rate,Imputed, 2013,27761
+South Lanarkshire,Emergency Admissions Rate,Imputed, 2013,26819.06
+Stirling,Emergency Admissions Rate,Imputed, 2013,22415.87
+West Dunbartonshire,Emergency Admissions Rate,Imputed, 2013,26881.93
+West Lothian,Emergency Admissions Rate,Imputed, 2013,25427.99
+Aberdeen City,Emergency Admissions Rate,Imputed,2014,22071.74
+Aberdeenshire,Emergency Admissions Rate,Imputed,2014,18153.23
+Angus,Emergency Admissions Rate,Imputed,2014,20376.08
+Clackmannanshire,Emergency Admissions Rate,Imputed,2014,21995.93
+Dundee City,Emergency Admissions Rate,Imputed,2014,27143.74
+East Ayrshire,Emergency Admissions Rate,Imputed,2014,29157.51
+East Dunbartonshire,Emergency Admissions Rate,Imputed,2014,24717.11
+East Lothian,Emergency Admissions Rate,Imputed,2014,21655.72
+East Renfrewshire,Emergency Admissions Rate,Imputed,2014,23828.37
+Falkirk,Emergency Admissions Rate,Imputed,2014,25081.36
+Fife,Emergency Admissions Rate,Imputed,2014,23830.97
+Highland,Emergency Admissions Rate,Imputed,2014,20312.4
+Inverclyde,Emergency Admissions Rate,Imputed,2014,31215.35
+Midlothian,Emergency Admissions Rate,Imputed,2014,24825.47
+Moray,Emergency Admissions Rate,Imputed,2014,17147.37
+North Ayrshire,Emergency Admissions Rate,Imputed,2014,28989.12
+North Lanarkshire,Emergency Admissions Rate,Imputed,2014,30245.29
+Renfrewshire,Emergency Admissions Rate,Imputed,2014,30610.06
+Scotland,Emergency Admissions Rate,Imputed,2014,25049.95
+Scottish Borders,Emergency Admissions Rate,Imputed,2014,25525.05
+South Ayrshire,Emergency Admissions Rate,Imputed,2014,28313.62
+South Lanarkshire,Emergency Admissions Rate,Imputed,2014,26003.33
+Stirling,Emergency Admissions Rate,Imputed,2014,21800.19
+West Dunbartonshire,Emergency Admissions Rate,Imputed,2014,28664
+West Lothian,Emergency Admissions Rate,Imputed,2014,25366.75
 Aberdeen City,Emergency Admissions Rate,Projected, 2015,22226.29188262032
 Aberdeenshire,Emergency Admissions Rate,Projected, 2015,17978.60795552509
 Angus,Emergency Admissions Rate,Projected, 2015,20401.668658948653
