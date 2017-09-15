@@ -11,20 +11,23 @@ output$Plot2 <- renderPlot({
     guides(fill = FALSE) +
     geom_hline(aes(yintercept = cmp))
 })
-
+ 
 for(i in 1:18){
   local({
     my.i <- i
     plotname <- paste("plot", my.i, sep ="_")
     output[[plotname]] <- renderPlot({
       indis <- unique(CPPdta$Indicator)
-      dat <- filter(CPPdta, Indicator == indis[[my.i]] & Year == "2016/17")
+      slInd <- indis[[my.i]]
+  ##Need to get this to select most recent year, rather than 2015/16    
+      dat <- filter(CPPdta, Indicator == slInd & Year == "2015/16")
       dat$slct <- ifelse(dat$CPP == input$LA3, "Sel1", "Other") 
       cmp <- filter(dat, CPP == input$CompLA3)$value
       ggplot(data = dat) +
         geom_bar(aes(x = reorder(CPP,-value), y = value, fill = slct), stat = "identity", position = "dodge") +
         scale_fill_manual(values = c("blue","red"), breaks = c("Other", "Sel1")) +
         guides(fill = FALSE) +
+        ggtitle(slInd)+
         geom_hline(aes(yintercept = cmp))
     })
   })  
@@ -53,7 +56,7 @@ output$uiPage3 <- renderUI({
     column(12/cls,map(2, function(nc){
       plot_output_list2<- tryCatch(map(seq(from = nc,to = slctd,by = cls), function(x){
         plotname <- paste("plot", x, sep = "_")
-        plotOutput(plotname, height = )
+        plotOutput(plotname, height = pltheight)
       }), 
       error=function(cond) {
         
@@ -66,7 +69,7 @@ output$uiPage3 <- renderUI({
     column(12/cls,map(3, function(nc){
       plot_output_list3<- tryCatch(map(seq(from = nc,to = slctd,by = cls), function(x){
         plotname <- paste("plot", x, sep = "_")
-        plotOutput(plotname, height = "200px")
+        plotOutput(plotname, height = pltheight)
       }), 
       error=function(cond) {
         
@@ -79,7 +82,7 @@ output$uiPage3 <- renderUI({
     column(12/cls,map(4, function(nc){
       plot_output_list4<- tryCatch(map(seq(from = nc,to = slctd,by = cls), function(x){
         plotname <- paste("plot", x, sep = "_")
-        plotOutput(plotname, height = "200px")
+        plotOutput(plotname, height = pltheight)
       }), 
       error=function(cond) {
         
