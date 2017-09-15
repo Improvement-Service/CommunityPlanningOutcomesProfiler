@@ -53,7 +53,7 @@ shinyUI(navbarPage("CPOP",
              ),
       column(4,
              div(style = "column-count:2;-webkit-column-count:2; -moz-column-count:2",
-             checkboxGroupInput("grphs3","", 1:18)
+             checkboxGroupInput("grphs3","", unique(CPPdta$Indicator))
              )
       )
     ),

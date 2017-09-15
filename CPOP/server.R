@@ -15,12 +15,13 @@ output$Plot2 <- renderPlot({
 for(i in 1:18){
   local({
     my.i <- i
-    plotname <- paste("plot", my.i, sep ="_")
+    nms <- gsub(" ", "",unique(CPPdta$Indicator))[[my.i]]
+    plotname <- paste("plot", nms, sep ="_")
     output[[plotname]] <- renderPlot({
       indis <- unique(CPPdta$Indicator)
       slInd <- indis[[my.i]]
-  ##Need to get this to select most recent year, rather than 2015/16    
-      dat <- filter(CPPdta, Indicator == slInd & Year == "2015/16")
+##Need to get this to select most recent year, since indicators have different periods  
+      dat <- filter(CPPdta, Indicator == slInd & Year %in% c("2014/15", "2015", "2014/15 - 2016/17", "2014/15 - 2016/17"))
       dat$slct <- ifelse(dat$CPP == input$LA3, "Sel1", "Other") 
       cmp <- filter(dat, CPP == input$CompLA3)$value
       ggplot(data = dat) +
@@ -44,18 +45,21 @@ output$uiPage3 <- renderUI({
   rows <- ceiling(slctd/4)
 ##Dynamically create plot height  
   pltheight <- paste0(800/rows, "px")
+  inptLst <- as.list(gsub(" ", "",input$grphs3))
 ##Create however many
   fluidRow(
     column(12/cls,map(1, function(nc){
-             plot_output_list1<- map(seq(from = 1,to = slctd,by = cls), function(x){
-               plotname <- paste("plot", x, sep = "_")
-               plotOutput(plotname, height = pltheight)
+      plot_output_list1<- map(seq(from = nc,to = slctd,by = cls), function(x){
+        tstNm1 <- inptLst[[x]]
+        plotname <- paste("plot", tstNm1, sep = "_")
+        plotOutput(plotname, height = pltheight)
              })
              do.call(tagList, plot_output_list1)         
     }) ),  
     column(12/cls,map(2, function(nc){
       plot_output_list2<- tryCatch(map(seq(from = nc,to = slctd,by = cls), function(x){
-        plotname <- paste("plot", x, sep = "_")
+        tstNm2 <- inptLst[[x]]
+        plotname <- paste("plot", tstNm2, sep = "_")
         plotOutput(plotname, height = pltheight)
       }), 
       error=function(cond) {
@@ -68,7 +72,8 @@ output$uiPage3 <- renderUI({
     ),
     column(12/cls,map(3, function(nc){
       plot_output_list3<- tryCatch(map(seq(from = nc,to = slctd,by = cls), function(x){
-        plotname <- paste("plot", x, sep = "_")
+        tstNm3 <- inptLst[[x]]
+        plotname <- paste("plot", tstNm3, sep = "_")
         plotOutput(plotname, height = pltheight)
       }), 
       error=function(cond) {
@@ -81,7 +86,8 @@ output$uiPage3 <- renderUI({
     ),
     column(12/cls,map(4, function(nc){
       plot_output_list4<- tryCatch(map(seq(from = nc,to = slctd,by = cls), function(x){
-        plotname <- paste("plot", x, sep = "_")
+        tstNm4 <- inptLst[[x]]
+        plotname <- paste("plot", tstNm4, sep = "_")
         plotOutput(plotname, height = pltheight)
       }), 
       error=function(cond) {
