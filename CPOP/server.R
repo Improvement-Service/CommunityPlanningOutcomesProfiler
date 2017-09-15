@@ -15,12 +15,12 @@ shinyServer(function(input, output) {
   })
   
 ##Create Ui ouputs for page 1=============
- 
+
 #Create a reactive function to store data for both LA's selected  
   selectedDta1 <- reactive({
-    dta <- filter(CPPdta, CPP %in% c(input$LA1, input$CompLA1))
+    dta <- filter(CPPdta, CPP %in% c(input$LA1, input$CompLA1) & Type != "Projected")
   })
-  
+
   
 #Create a list of all the indicators 
   Indicators1 <- unique(CPPdta$Indicator)
@@ -35,9 +35,13 @@ shinyServer(function(input, output) {
       plotname <- paste("plot", my.i, sep ="_")
       output[[plotname]] <- renderPlot({
         selectedDta1 <- selectedDta1()
-        ggplot(subset(selectedDta1, selectedDta1$Indicator == Indicators1[my.i]),
-               aes(x = Year, y = value, group = Grouping, colour = CPP, linetype = Type))+
-          geom_line(show.legend = FALSE)+
+        dtaAll <- selectedDta1[selectedDta1$Type != "Projected",]
+        dtaRaw <- selectedDta1[selectedDta1$Type == "Raw data",]
+        ggplot()+
+          geom_line(data = subset(dtaAll, dtaAll$Indicator == Indicators1[my.i]),
+                  aes(x = Year, y = value, group = CPP, colour = CPP, linetype = "2"), show.legend = FALSE)+
+          geom_line(data = subset(dtaRaw, dtaRaw$Indicator == Indicators1[my.i]),
+                  aes(x = Year, y = value, group = CPP, colour = CPP, linetype = "1"), show.legend = FALSE)+
           ggtitle(Indicators1[my.i])+
           theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
                 panel.background = element_blank(), axis.line = element_line(colour="black"),
@@ -50,13 +54,24 @@ shinyServer(function(input, output) {
 #create single plot based on what indicator is selected
   output$Indi1Plot <- renderPlot({
     selectedDta1 <- selectedDta1()
-    ggplot(selectedDta1[selectedDta1$Indicator == input$Indi1,],
-           aes(x = Year, y= value, group = Grouping, colour = CPP, linetype = Type))+
-      geom_line(show.legend = FALSE)+
+    dtaAll<- selectedDta1[selectedDta1$Type != "Projected",]
+    dtaRaw <- selectedDta1[selectedDta1$Type == "Raw data",]
+    ggplot()+
+      geom_line(data = dtaAll[dtaAll$Indicator == input$Indi1,],
+                aes(x = Year, y = value, group = CPP, colour = CPP, linetype = "2"), show.legend = FALSE)+
+      geom_line(data = dtaRaw[dtaRaw$Indicator == input$Indi1,],
+                aes(x = Year, y = value, group = CPP, colour = CPP, linetype = "1"), show.legend = FALSE)+
       ggtitle(input$Indi1)+
       theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
             panel.background = element_blank(), axis.line = element_line(colour="black"),
             axis.text.x = element_text(angle = 90, hjust = 1.0, vjust = 0.3))
   })
+  
+ 
+  
+  
+  
+  
+  
   
 })
