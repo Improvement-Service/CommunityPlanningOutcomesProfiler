@@ -17,6 +17,10 @@ shinyUI(navbarPage("CPOP",
               ),
               column(4,
                      selectInput("Indi1", "Select Indicator", c("All", unique(CPPdta$Indicator)), selected = "All")
+                     ),
+              column(4, icon("minus")
+              ),
+              column(4, icon("minus")
                      )
             ),
             hr(),
@@ -72,7 +76,7 @@ shinyUI(navbarPage("CPOP",
             hr(),
             fluidRow(
               mainPanel(
-                p("PUT PLOT(S) HERE!")
+                
               )
             )
           )),
