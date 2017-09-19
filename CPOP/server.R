@@ -28,6 +28,9 @@ shinyServer(function(input, output) {
 #add new column to data so that line type can be specified
   CPPdta <- CPPdta %>% mutate(Grouping=  paste(CPP, Type))
   
+ xmax1 <- Inf - 1
+ ymax1 <- Inf -1 
+  
 #Create a loop that creates a plot for the indicators selected  
   for(i in seq_along(Indicators1)){
     local({
@@ -43,6 +46,7 @@ shinyServer(function(input, output) {
           geom_line(data = subset(dtaRaw, dtaRaw$Indicator == Indicators1[my.i]),
                   aes(x = Year, y = value, group = CPP, colour = CPP, linetype = "1"), lwd = 1, show.legend = FALSE)+
           ggtitle(Indicators1[my.i])+
+          annotate("text", x = Inf, y = Inf, label = sprintf('\U25CF'), size = 10, colour = "Red", hjust = 1, vjust = 1) +
           theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
                 panel.background = element_blank(), axis.line = element_line(colour="black"),
                 axis.text.x = element_text(angle = 90, hjust = 1.0, vjust = 0.3))

@@ -6,6 +6,7 @@ library(shinythemes)
 library(RColorBrewer)
 library(DT)
 library(data.table)
+library(Unicode)
 
 CPPdta <- read_csv("C:/Users/connachan.cara/Documents/CommunityPlanningOutcomesProfiler/CPPcleandata.csv")
 IGZdta <- read_csv("C:/Users/connachan.cara/Documents/CommunityPlanningOutcomesProfiler/IGZcleandata.csv")

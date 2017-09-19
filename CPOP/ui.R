@@ -9,7 +9,7 @@ shinyUI(navbarPage("CPOP",
             fluidRow(
               column(4,
                      selectInput("LA1", "Select A Local Authority", unique(filter(CPPdta, CPP != "Scotland"))[[1]], 
-                                 selected = "Aberdeen City")
+                                 selected = 1)
                      ),
               column(4,
                      selectInput("CompLA1", "Select Comparator", unique(CPPdta$CPP), selected = "Scotland")
@@ -17,11 +17,11 @@ shinyUI(navbarPage("CPOP",
               column(4,
                      selectInput("Indi1", "Select Indicator", c("All", unique(CPPdta$Indicator)), selected = "All")
                      ),
-              column(2, tags$hr(style="border-color: #48CCCD;")
+              column(2, tags$hr(style="border-color: red;")
               ),
               column(2
                      ),
-              column(2, tags$hr(style="border-color: red;")
+              column(2, tags$hr(style="border-color: #48CCCD;")
                      )
             ),
             hr(),
