@@ -17,10 +17,10 @@ shinyServer(function(input, output) {
 ##Create Ui ouputs for page 1=============
   
 #add new column to data so that line type can be specified
-  CPPdtaCurrent <- CPPdtaCurrent %>% mutate(Grouping=  paste(CPP, Type))  
+  CPPdtaCurrent <- CPPdta %>% mutate(Grouping=  paste(CPP, Type))  
   
 #add new column to show rate of improvement 
-  CPPdtaCurrent <- filter(CPPdta, Type != "Projected")
+  CPPdtaCurrent <- filter(CPPdtaCurrent, Type != "Projected")
   CPPdtaCurrent <- ddply(CPPdtaCurrent,. (CPP, Indicator), transform, Diff = (last(value) - first(value)))
   CPPdtaCurrent <- ddply(CPPdtaCurrent,. (CPP, Indicator), transform, Improvement_Rate = ((Diff/first(value))*100))
   CPPdtaCurrent <- select(CPPdtaCurrent, -Diff)
