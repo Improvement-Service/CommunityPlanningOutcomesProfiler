@@ -83,7 +83,7 @@ shinyServer(function(input, output) {
   output$Indi1Plot <- renderPlot({
     selectedDta1 <- selectedDta1()
     dtaAll<- selectedDta1
-    dtaRaw <- selectedDta1[selectedDta1$Type == "Raw data",]
+    
     
     dtasubset <- dtaAll[dtaAll$Indicator == input$Indi1,]
     #split this data into the two LAs selected
@@ -105,17 +105,48 @@ shinyServer(function(input, output) {
                                                   "red",
                                                   "black"))))
  
+    #add new "year" column to the data to store numeirc values for year
+    dtasubset <- arrange(dtasubset, CPP)
+    
+    dtasubset <- ddply(dtasubset,. (CPP), transform, Year2 = (seq(1 : length(Year))))
+    
+    dtasubset <- ddply(dtasubset,. (CPP), transform, Year3 = Year)
+    
+    dtasubset$Year3 <- as.character(dtasubset$Year3)
+    
+    Years2 <- unique(dtasubset$Year2)
+    dtasubset$Year3[dtasubset$Year2 > 1 & dtasubset$Year2 < last(Years2)] <- ""
+    
+    Years3 <- filter(dtasubset, CPP == input$LA1)
+    Years3 <- Years3$Year3    
+   
+    
+    dtaRaw <- dtasubset[dtasubset$Type == "Raw data",]
+    
+    
     ggplot()+
-      geom_line(data = dtaAll[dtaAll$Indicator == input$Indi1,],
-                aes(x = Year, y = value, group = CPP, colour = CPP, linetype = "2"), lwd = 1, show.legend = FALSE)+
-      geom_line(data = dtaRaw[dtaRaw$Indicator == input$Indi1,],
-                aes(x = Year, y = value, group = CPP, colour = CPP, linetype = "1"), lwd = 1, show.legend = FALSE)+
+      geom_line(data = dtasubset,
+                aes(x = Year2, y = value, group = CPP, colour = CPP, linetype = "2"), lwd = 1, show.legend = FALSE)+
+      geom_line(data = dtaRaw,
+                aes(x = Year2, y = value, group = CPP, colour = CPP, linetype = "1"), lwd = 1, show.legend = FALSE)+
       ggtitle(input$Indi1)+
       annotate("text", x = Inf, y = Inf, label = sprintf('\U25CF'), size = 10, colour = coloursDot, hjust = 1, vjust = 1)+
+      scale_x_continuous(breaks = c(1: length(Years2)), labels = Years3)+
+      xlab("Year")+
       theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
             panel.background = element_blank(), axis.line = element_line(colour="black"),
-            axis.text.x = element_text(angle = 90, hjust = 1.0, vjust = 0.3))
+            axis.text.x = element_text(hjust = 1.0, vjust = 0.3))
   })
+
+  
+  
+ 
+  
+    
+
+
+ 
+  
   
  
   
