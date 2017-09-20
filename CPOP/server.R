@@ -43,9 +43,13 @@ shinyServer(function(input, output) {
         selectedDta1 <- selectedDta1()
         dtaAll <- selectedDta1
         dtaRaw <- selectedDta1[selectedDta1$Type == "Raw data",]
+    #create a subset of the data for the particular indicator in the loop
         loopdata <- subset(dtaAll, dtaAll$Indicator == Indicators1[my.i])
+    #split this data into the two LAs selected
         loopdataCPP1 <- filter(loopdata, CPP == input$LA1)
         loopdataCPP2 <- filter(loopdata, CPP == input$CompLA1)
+    #create an if statement to determine the colour of the dot
+    #compares whether the value of the authority is higher than the comparator and whether the improvement rate is higher
         coloursDot <- if_else(((last(loopdataCPP1$value)) > (last(loopdataCPP2$value)) & 
                          (last(loopdataCPP1$Improvement_Rate)) > (last(loopdataCPP2$Improvement_Rate))),
         "green",
@@ -78,14 +82,36 @@ shinyServer(function(input, output) {
 #create single plot based on what indicator is selected
   output$Indi1Plot <- renderPlot({
     selectedDta1 <- selectedDta1()
-    dtaAll<- selectedDta1[selectedDta1$Type != "Projected",]
+    dtaAll<- selectedDta1
     dtaRaw <- selectedDta1[selectedDta1$Type == "Raw data",]
+    
+    dtasubset <- dtaAll[dtaAll$Indicator == input$Indi1,]
+    #split this data into the two LAs selected
+    dtasubsetCPP1 <- filter(dtasubset, CPP == input$LA1)
+    dtasubsetCPP2 <- filter(dtasubset, CPP == input$CompLA1)
+    #create an if statement to determine the colour of the dot
+    #compares whether the value of the authority is higher than the comparator and whether the improvement rate is higher
+    coloursDot <- if_else(((last(dtasubsetCPP1$value)) > (last(dtasubsetCPP2$value)) & 
+                             (last(dtasubsetCPP1$Improvement_Rate)) > (last(dtasubsetCPP2$Improvement_Rate))),
+                          "green",
+                          if_else(((last(dtasubsetCPP1$value)) > (last(dtasubsetCPP2$value)) &
+                                     (last(dtasubsetCPP1$Improvement_Rate)) < (last(dtasubsetCPP2$Improvement_Rate))),
+                                  "yellow",
+                                  if_else(((last(dtasubsetCPP1$value)) < (last(dtasubsetCPP2$value)) &
+                                             (last(dtasubsetCPP1$Improvement_Rate)) > (last(dtasubsetCPP2$Improvement_Rate))),
+                                          "yellow",
+                                          if_else(((last(dtasubsetCPP1$value)) < (last(dtasubsetCPP2$value)) &
+                                                     (last(dtasubsetCPP1$Improvement_Rate)) < (last(dtasubsetCPP2$Improvement_Rate))),
+                                                  "red",
+                                                  "black"))))
+ 
     ggplot()+
       geom_line(data = dtaAll[dtaAll$Indicator == input$Indi1,],
                 aes(x = Year, y = value, group = CPP, colour = CPP, linetype = "2"), lwd = 1, show.legend = FALSE)+
       geom_line(data = dtaRaw[dtaRaw$Indicator == input$Indi1,],
                 aes(x = Year, y = value, group = CPP, colour = CPP, linetype = "1"), lwd = 1, show.legend = FALSE)+
       ggtitle(input$Indi1)+
+      annotate("text", x = Inf, y = Inf, label = sprintf('\U25CF'), size = 10, colour = coloursDot, hjust = 1, vjust = 1)+
       theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
             panel.background = element_blank(), axis.line = element_line(colour="black"),
             axis.text.x = element_text(angle = 90, hjust = 1.0, vjust = 0.3))
