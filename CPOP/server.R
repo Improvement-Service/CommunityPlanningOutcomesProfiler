@@ -1,18 +1,108 @@
-library(shiny)
-
-# Define server logic required to draw a histogram
 shinyServer(function(input, output) {
    
-  output$distPlot <- renderPlot({
-    
-    # generate bins based on input$bins from ui.R
-    x    <- faithful[, 2] 
-    bins <- seq(min(x), max(x), length.out = input$bins + 1)
-    
-    # draw the histogram with the specified number of bins
-    hist(x, breaks = bins, col = 'darkgray', border = 'white')
-    
+output$Plot2 <- renderPlot({
+  dat <- filter(CPPdta, Indicator == "Unplanned Hospital Attendances" & Year == "2016/17")
+  dat$slct <- ifelse(dat$CPP == input$LA2, "Sel1", "Other") 
+  cmp <- filter(dat, CPP == input$CompLA2)$value
+ 
+  ggplot(data = dat) +
+    geom_bar(aes(x = reorder(CPP,-value), y = value, fill = slct), stat = "identity", position = "dodge") +
+    scale_fill_manual(values = c("blue","red"), breaks = c("Other", "Sel1")) +
+    guides(fill = FALSE) +
+    geom_hline(aes(yintercept = cmp))
+})
+ 
+for(i in 1:18){
+  local({
+    my.i <- i
+    nms <- gsub(" ", "",unique(CPPdta$Indicator))[[my.i]]
+    plotname <- paste("plot", nms, sep ="_")
+    output[[plotname]] <- renderPlot({
+      indis <- unique(CPPdta$Indicator)
+      slInd <- indis[[my.i]]
+##Need to get this to select most recent year, since indicators have different periods  
+      dat <- filter(CPPdta, Indicator == slInd & Year %in% c("2014/15", "2015", "2014/15 - 2016/17", "2014/15 - 2016/17"))
+      dat$slct <- ifelse(dat$CPP == input$LA3, "Sel1", "Other") 
+      cmp <- filter(dat, CPP == input$CompLA3)$value
+      ggplot(data = dat) +
+        geom_bar(aes(x = reorder(CPP,-value), y = value, fill = slct), stat = "identity", position = "dodge") +
+        scale_fill_manual(values = c("blue","red"), breaks = c("Other", "Sel1")) +
+        guides(fill = FALSE) +
+        ggtitle(slInd)+
+        geom_hline(aes(yintercept = cmp))
+    })
+  })  
+}
+
+##Render a UI with a certain number of rows and columns based on selected graphs
+output$uiPage3 <- renderUI({
+  slctd <- length(input$grphs3)
+#number of columns is 4, unless there are less than 3 graphs
+  cls <- if(slctd>3){4} else{slctd}
+  pctCols <- 100/cls
+  pctCols <- paste0(pctCols, "%")
+#number of rows is the number of graphs divided by 4 and rounded up eg 7 = 2 rows
+  rows <- ceiling(slctd/4)
+##Dynamically create plot height  
+  pltheight <- paste0(800/rows, "px")
+  inptLst <- as.list(gsub(" ", "",input$grphs3))
+##Create however many
+  fluidRow(
+    column(12/cls,map(1, function(nc){
+      plot_output_list1<- map(seq(from = nc,to = slctd,by = cls), function(x){
+        tstNm1 <- inptLst[[x]]
+        plotname <- paste("plot", tstNm1, sep = "_")
+        plotOutput(plotname, height = pltheight)
+             })
+             do.call(tagList, plot_output_list1)         
+    }) ),  
+    column(12/cls,map(2, function(nc){
+      plot_output_list2<- tryCatch(map(seq(from = nc,to = slctd,by = cls), function(x){
+        tstNm2 <- inptLst[[x]]
+        plotname <- paste("plot", tstNm2, sep = "_")
+        plotOutput(plotname, height = pltheight)
+      }), 
+      error=function(cond) {
+        
+        return(list())
+      }
+      )
+      do.call(tagList, plot_output_list2)         
+    })
+    ),
+    column(12/cls,map(3, function(nc){
+      plot_output_list3<- tryCatch(map(seq(from = nc,to = slctd,by = cls), function(x){
+        tstNm3 <- inptLst[[x]]
+        plotname <- paste("plot", tstNm3, sep = "_")
+        plotOutput(plotname, height = pltheight)
+      }), 
+      error=function(cond) {
+        
+        return(list())
+      }
+      )
+      do.call(tagList, plot_output_list3)         
+    })
+    ),
+    column(12/cls,map(4, function(nc){
+      plot_output_list4<- tryCatch(map(seq(from = nc,to = slctd,by = cls), function(x){
+        tstNm4 <- inptLst[[x]]
+        plotname <- paste("plot", tstNm4, sep = "_")
+        plotOutput(plotname, height = pltheight)
+      }), 
+      error=function(cond) {
+        
+        return(list())
+      }
+      )
+      do.call(tagList, plot_output_list4)         
+    })
+    )
+   
+  )  
   })
+
+=======
   
 ##Create Ui ouputs for page 1=============
   
@@ -209,6 +299,7 @@ shinyServer(function(input, output) {
             axis.text.x = element_text(vjust = 0.3))
   })
   
+
 })
 
 

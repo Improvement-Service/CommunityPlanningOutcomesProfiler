@@ -1,8 +1,6 @@
-library(shiny)
-
 shinyUI(navbarPage("CPOP",
  tabPanel("Cover Page/Contents",
-          includeHTML("C:/Users/connachan.cara/Documents/CommunityPlanningOutcomesProfiler/CoverPage.html"),
+          includeHTML("C:/Users/cassidy.nicholas/OneDrive - IS/CommunityPlanningOutcomesProfiler/CoverPage.html"),
           img(src = "http://www.improvementservice.org.uk/benchmarking/images/islogo.png", align = "top")),
  tabPanel("CPP - Page1",
           fluidPage(
@@ -67,37 +65,41 @@ shinyUI(navbarPage("CPOP",
           fluidPage(
             fluidRow(
               column(6,
-                     selectInput("LA2", "Select A Local Authority", c("Aberdeen City", "Some Other Council"))
+                     selectInput("LA2", "Select A Local Authority", unique(filter(CPPdta, CPP != "Scotland")[[1]]), 
+                                 selected = "Aberdeen City")
               ),
               column(6,
-                     selectInput("CompLA2", "Comparator", c("Edinburgh", "Glasgow")
+                     selectInput("CompLA2", "Select Comparator", unique(CPPdta$CPP), selected = "Scotland"
                      )
               )
             ),
             hr(),
             fluidRow(
               mainPanel(
-                
+
+                plotOutput("Plot2")               
               )
             )
           )),
  tabPanel("CPP - Page3",
   fluidPage(
     fluidRow(
-      column(6,
-      selectInput("LA3", "Select A Local Authority", c("Aberdeen City", "Some Other Council"))
+      column(4,
+      selectInput("LA3", "Select A Local Authority", unique(filter(CPPdta, CPP != "Scotland")[[1]]), 
+                  selected = "Aberdeen City")
       ),
-      column(6,
-             selectInput("CompLA3", "Comparator", c("Edinburgh", "Glasgow")
+      column(4,
+             selectInput("CompLA3", "Select Comparator", unique(CPPdta$CPP), selected = "Scotland"
               )
+             ),
+      column(4,
+             div(style = "column-count:2;-webkit-column-count:2; -moz-column-count:2",
+             checkboxGroupInput("grphs3","", unique(CPPdta$Indicator))
              )
+      )
     ),
     hr(),
-    fluidRow(
-    mainPanel(
-       p("PUT PLOT(S) HERE!")
-      )
-    )
+    uiOutput("uiPage3")
   )
  )
 ))
