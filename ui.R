@@ -1,6 +1,6 @@
 shinyUI(navbarPage("CPOP",
  tabPanel("Cover Page/Contents",
-          includeHTML("C:/Users/cassidy.nicholas/OneDrive - IS/CommunityPlanningOutcomesProfiler/CoverPage.html"),
+          includeHTML("CoverPage.html"),
           img(src = "http://www.improvementservice.org.uk/benchmarking/images/islogo.png", align = "top")),
  tabPanel("CPP - Page1",
           fluidPage(

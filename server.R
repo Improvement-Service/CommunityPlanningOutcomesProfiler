@@ -102,7 +102,7 @@ output$uiPage3 <- renderUI({
   )  
   })
 
-=======
+
   
 ##Create Ui ouputs for page 1=============
   
