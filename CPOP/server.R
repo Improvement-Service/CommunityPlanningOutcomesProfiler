@@ -101,4 +101,207 @@ output$uiPage3 <- renderUI({
    
   )  
   })
+
+=======
+  
+##Create Ui ouputs for page 1=============
+  
+#add new column to data so that line type can be specified
+  CPPdtaCurrent <- CPPdta %>% mutate(Grouping=  paste(CPP, Type))  
+  
+#add new column to show rate of improvement 
+  CPPdtaCurrent <- filter(CPPdtaCurrent, Type != "Projected")
+  CPPdtaCurrent <- ddply(CPPdtaCurrent,. (CPP, Indicator), transform, Diff = (last(value) - first(value)))
+  CPPdtaCurrent <- ddply(CPPdtaCurrent,. (CPP, Indicator), transform, Improvement_Rate = ((Diff/first(value))*100))
+  CPPdtaCurrent <- select(CPPdtaCurrent, -Diff)
+  
+#add new column to show whether a high value represents a positive outcome
+  CPPdtaCurrent <- CPPdtaCurrent %>% mutate(`High is Positive?` = "Yes")
+  CPPdtaCurrent$`High is Positive?`[CPPdtaCurrent$Indicator %in% c("Dwelling Fires", "Unplanned Hospital Attendances",
+                                                                   "Fuel Poverty Rate", "Fragility Rate", "CO2 Emissions",
+                                                                   "Child Poverty Rate", "Out Of Work Benefits Rate",
+                                                                   "Total Crime Rate", "Emergency Admissions Rate",
+                                                                   "Mortality", "Depopulation Rate")] <- "No"
+  
+#Create a reactive function to store data for both LA's selected  
+  selectedDta1 <- reactive({
+    dta <- filter(CPPdtaCurrent, CPP %in% c(input$LA1, input$CompLA1))
+  })
+
+#Create a list of all the indicators 
+  Indicators1 <- unique(CPPdtaCurrent$Indicator)
+
+  
+#Create a loop that creates a plot for the indicators selected  
+  for(i in seq_along(Indicators1)){
+    local({
+      my.i <- i
+      plotname <- paste("plot", my.i, sep ="_")
+      output[[plotname]] <- renderPlot({
+        selectedDta1 <- selectedDta1()
+        dtaAll <- selectedDta1
+        
+    #create a subset of the data for the particular indicator in the loop
+        loopdata <- subset(dtaAll, dtaAll$Indicator == Indicators1[my.i])
+    #split this data into the two LAs selected
+        loopdataCPP1 <- filter(loopdata, CPP == input$LA1)
+        loopdataCPP2 <- filter(loopdata, CPP == input$CompLA1)
+        
+    #store unique values of "high is positive?" to use in test later
+        HighValue <- unique(loopdata$`High is Positive?`)
+        
+    #create an if statement to determine the colour of the dot
+    #need to create 2 statement to distinguish between positve high values
+    #compares whether the value of the authority is higher than the comparator and whether the improvement rate is higher
+        coloursDotPos <- if_else(((last(loopdataCPP1$value)) > (last(loopdataCPP2$value)) & 
+                         (last(loopdataCPP1$Improvement_Rate)) > (last(loopdataCPP2$Improvement_Rate))),
+        "green",
+                   if_else(((last(loopdataCPP1$value)) > (last(loopdataCPP2$value)) &
+                         (last(loopdataCPP1$Improvement_Rate)) < (last(loopdataCPP2$Improvement_Rate))),
+        "yellow",
+                   if_else(((last(loopdataCPP1$value)) < (last(loopdataCPP2$value)) &
+                         (last(loopdataCPP1$Improvement_Rate)) > (last(loopdataCPP2$Improvement_Rate))),
+        "yellow",
+                   if_else(((last(loopdataCPP1$value)) < (last(loopdataCPP2$value)) &
+                         (last(loopdataCPP1$Improvement_Rate)) < (last(loopdataCPP2$Improvement_Rate))),
+        "red",
+        "black"))))
+        
+        
+        coloursDotNeg <- if_else(((last(loopdataCPP1$value)) > (last(loopdataCPP2$value)) & 
+                                    (last(loopdataCPP1$Improvement_Rate)) > (last(loopdataCPP2$Improvement_Rate))),
+                                 "red",
+                                 if_else(((last(loopdataCPP1$value)) > (last(loopdataCPP2$value)) &
+                                            (last(loopdataCPP1$Improvement_Rate)) < (last(loopdataCPP2$Improvement_Rate))),
+                                         "yellow",
+                                         if_else(((last(loopdataCPP1$value)) < (last(loopdataCPP2$value)) &
+                                                    (last(loopdataCPP1$Improvement_Rate)) > (last(loopdataCPP2$Improvement_Rate))),
+                                                 "yellow",
+                                                 if_else(((last(loopdataCPP1$value)) < (last(loopdataCPP2$value)) &
+                                                            (last(loopdataCPP1$Improvement_Rate)) < (last(loopdataCPP2$Improvement_Rate))),
+                                                         "green",
+                                                         "black"))))
+        
+        
+    #add new "year2" column to the data to store numeirc values for year
+        loopdata <- arrange(loopdata, CPP)
+        loopdata <- ddply(loopdata,. (CPP), transform, Year2 = (seq(1 : length(Year))))
+        #add new "year3" column to store x axis labels
+        loopdata <- ddply(loopdata,. (CPP), transform, Year3 = Year)
+        loopdata$Year3 <- as.character(loopdata$Year3)
+        
+        Years2 <- unique(loopdata$Year2)
+        #change year3 values so that labels will only show the 1st and last year
+        loopdata$Year3[loopdata$Year2 > 1 & loopdata$Year2 < last(Years2)] <- ""
+        
+        #store unique year2 values and list of year3 values so that data length can be specified using these later
+       
+        Years3 <- filter(loopdata, CPP == input$LA1)
+        Years3 <- Years3$Year3    
+        
+        #store raw data to be used for solid line
+        dtaRaw <- loopdata[loopdata$Type == "Raw data",]        
+               
+        ggplot()+
+          geom_line(data = loopdata,
+                  aes(x = Year2, y = value, group = CPP, colour = CPP, linetype = "2"), lwd = 1, show.legend = FALSE)+
+          geom_line(data = dtaRaw,
+                  aes(x = Year2, y = value, group = CPP, colour = CPP, linetype = "1"), lwd = 1, show.legend = FALSE)+
+          ggtitle(Indicators1[my.i])+
+          annotate("text", x = Inf, y = Inf, label = sprintf('\U25CF'), size = 10, colour = (if_else(HighValue == "Yes", coloursDotPos, coloursDotNeg))
+                     , hjust = 1, vjust = 1) +
+          scale_x_continuous(breaks = c(1: length(Years2)), labels = Years3)+
+          xlab("Year")+
+          theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
+                panel.background = element_blank(), axis.line = element_line(colour="black"),
+                axis.text.x = element_text(vjust = 0.3))
+      })
+   
+    })  
+  }
+  
+#create single plot based on what indicator is selected
+  output$Indi1Plot <- renderPlot({
+    selectedDta1 <- selectedDta1()
+    dtaAll<- selectedDta1
+    
+    
+    dtasubset <- dtaAll[dtaAll$Indicator == input$Indi1,]
+    #split this data into the two LAs selected
+    dtasubsetCPP1 <- filter(dtasubset, CPP == input$LA1)
+    dtasubsetCPP2 <- filter(dtasubset, CPP == input$CompLA1)
+    
+    #store unique values of "high is positive?" to use in test later
+    HighValue <- unique(dtasubset$`High is Positive?`)
+    
+  #create an if statement to determine the colour of the dot
+  #need to create 2 statement to distinguish between positve high values
+  #compares whether the value of the authority is higher than the comparator and whether the improvement rate is higher
+    coloursDotPos <- if_else(((last(dtasubsetCPP1$value)) > (last(dtasubsetCPP2$value)) & 
+                             (last(dtasubsetCPP1$Improvement_Rate)) > (last(dtasubsetCPP2$Improvement_Rate))),
+                          "green",
+                          if_else(((last(dtasubsetCPP1$value)) > (last(dtasubsetCPP2$value)) &
+                                     (last(dtasubsetCPP1$Improvement_Rate)) < (last(dtasubsetCPP2$Improvement_Rate))),
+                                  "yellow",
+                                  if_else(((last(dtasubsetCPP1$value)) < (last(dtasubsetCPP2$value)) &
+                                             (last(dtasubsetCPP1$Improvement_Rate)) > (last(dtasubsetCPP2$Improvement_Rate))),
+                                          "yellow",
+                                          if_else(((last(dtasubsetCPP1$value)) < (last(dtasubsetCPP2$value)) &
+                                                     (last(dtasubsetCPP1$Improvement_Rate)) < (last(dtasubsetCPP2$Improvement_Rate))),
+                                                  "red",
+                                                  "black"))))
+    
+    coloursDotNeg <- if_else(((last(dtasubsetCPP1$value)) > (last(dtasubsetCPP2$value)) & 
+                             (last(dtasubsetCPP1$Improvement_Rate)) > (last(dtasubsetCPP2$Improvement_Rate))),
+                          "red",
+                          if_else(((last(dtasubsetCPP1$value)) > (last(dtasubsetCPP2$value)) &
+                                     (last(dtasubsetCPP1$Improvement_Rate)) < (last(dtasubsetCPP2$Improvement_Rate))),
+                                  "yellow",
+                                  if_else(((last(dtasubsetCPP1$value)) < (last(dtasubsetCPP2$value)) &
+                                             (last(dtasubsetCPP1$Improvement_Rate)) > (last(dtasubsetCPP2$Improvement_Rate))),
+                                          "yellow",
+                                          if_else(((last(dtasubsetCPP1$value)) < (last(dtasubsetCPP2$value)) &
+                                                     (last(dtasubsetCPP1$Improvement_Rate)) < (last(dtasubsetCPP2$Improvement_Rate))),
+                                                  "green",
+                                                  "black"))))
+
+  #add new "year2" column to the data to store numeirc values for year
+    dtasubset <- arrange(dtasubset, CPP)
+    dtasubset <- ddply(dtasubset,. (CPP), transform, Year2 = (seq(1 : length(Year))))
+    #add new "year3" column to store x axis labels
+    dtasubset <- ddply(dtasubset,. (CPP), transform, Year3 = Year)
+    dtasubset$Year3 <- as.character(dtasubset$Year3)
+    
+    Years2 <- unique(dtasubset$Year2)
+    #change year3 values so that labels will only show the 1st and last year
+    dtasubset$Year3[dtasubset$Year2 > 1 & dtasubset$Year2 < last(Years2)] <- ""
+    
+    #store unique year2 values and list of year3 values so that data length can be specified using these later
+    
+    Years3 <- filter(dtasubset, CPP == input$LA1)
+    Years3 <- Years3$Year3    
+   
+    #store raw data to be used for solid line
+    dtaRaw <- dtasubset[dtasubset$Type == "Raw data",]
+ 
+    ggplot()+
+      geom_line(data = dtasubset,
+                aes(x = Year2, y = value, group = CPP, colour = CPP, linetype = "2"), lwd = 1, show.legend = FALSE)+
+      geom_line(data = dtaRaw,
+                aes(x = Year2, y = value, group = CPP, colour = CPP, linetype = "1"), lwd = 1, show.legend = FALSE)+
+      ggtitle(input$Indi1)+
+      annotate("text", x = Inf, y = Inf, label = sprintf('\U25CF'), size = 10, colour = (if_else(HighValue == "Yes", coloursDotPos, coloursDotNeg))
+               , hjust = 1, vjust = 1)+
+      scale_x_continuous(breaks = c(1: length(Years2)), labels = Years3)+
+      xlab("Year")+
+      theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
+            panel.background = element_blank(), axis.line = element_line(colour="black"),
+            axis.text.x = element_text(vjust = 0.3))
+  })
+  
+
 })
+
+
+
+
