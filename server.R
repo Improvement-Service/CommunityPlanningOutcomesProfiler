@@ -20,10 +20,10 @@ shinyServer(function(input, output) {
   #add new column to show whether a high value represents a positive outcome
   CPPdtaCurrent <- CPPdtaCurrent %>% mutate(`High is Positive?` = "Yes")
   CPPdtaCurrent$`High is Positive?`[CPPdtaCurrent$Indicator %in% c("Dwelling Fires", "Unplanned Hospital Attendances",
-                                                                   "Fuel Poverty Rate", "Fragility Rate", "CO2 Emissions",
-                                                                   "Child Poverty Rate", "Out Of Work Benefits Rate",
-                                                                   "Total Crime Rate", "Emergency Admissions Rate",
-                                                                   "Mortality", "Depopulation Rate")] <- "No"
+                                                                   "Fuel Poverty", "Fragility", "Carbon Emissions",
+                                                                   "Child Poverty", "Out Of Work Benefits",
+                                                                   "Crime Rate", "Emergency Admissions",
+                                                                   "Early Mortality")] <- "No"
   
   #Create a reactive function to store data for both LA's selected  
   selectedDta1 <- reactive({
@@ -233,7 +233,7 @@ shinyServer(function(input, output) {
         indis <- unique(CPPdta$Indicator)
         slInd <- indis[[my.i]]
         ##Need to get this to select most recent year, since indicators have different periods  
-        dat <- filter(CPPdta, Indicator == slInd & Year %in% c("2014/15", "2015", "2014/15 - 2016/17", "2014/15 - 2016/17"))
+        dat <- filter(CPPdta, Indicator == slInd & Year %in% c("2016/17", "2014-2016"))
         dat$slct <- ifelse(dat$CPP == input$LA3, "Sel1", "Other") 
         cmp <- filter(dat, CPP == input$CompLA3)$value
         ggplot(data = dat) +
