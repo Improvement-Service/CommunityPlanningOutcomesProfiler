@@ -101,5 +101,22 @@ shinyUI(navbarPage("CPOP",
     hr(),
     uiOutput("uiPage3")
   )
- )
+ ),
+ tabPanel("My Communities Page - Page 4",
+  fluidPage(
+    fluidRow(
+      column(6,
+             selectInput("LA4", "Select a Local Authority", unique(filter(IGZdta, CPP != "Scotland"))[[3]], 
+                         selected = 1, width = "600"),
+             radioButtons("View","Select Display",c("All", "Top/bottom 10", "Top/bottom 5"),inline = TRUE)),
+      column(5,
+             div(style = "column-count:3;-webkit-column-count:3; -moz-column-count:3",
+             checkboxGroupInput("Indi4","Select Indicators", unique(IGZdta$Indicator)))),
+      column(1,
+             actionButton("IndiAll","Select All"),
+             actionButton("IndiClear", "Clear All"))
+    )
+    
+  )        
+          )
 ))
