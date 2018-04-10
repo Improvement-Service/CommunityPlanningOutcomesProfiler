@@ -1,4 +1,4 @@
-shinyServer(function(input, output) {
+shinyServer(function(input, output,session) {
    
 
 
@@ -314,7 +314,28 @@ shinyServer(function(input, output) {
       
     )  
   })
- 
+
+##Create Ui ouputs for page 4 - My communities page=============  
+  
+  
+#create reactive input that updates indicator selection to select all or clear all  
+  observeEvent(eventExpr = input$IndiAll,
+               handlerExpr = {
+                 updateCheckboxGroupInput(session = session,
+                                          inputId = "Indi4",
+                                          selected = unique(IGZdta$Indicator))
+               }
+  )
+  
+  observe({
+    if(input$IndiClear >0){
+      updateCheckboxGroupInput(session = session, 
+                               inputId = "Indi4",
+                               selected = character(0))
+    }
+  })  
+  
+   
 
 })
 
