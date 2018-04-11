@@ -50,9 +50,9 @@ IGZ1617$StandardDeviation <- sqrt(IGZ1617$Variance)
 #Calculate difference divided by standard deviation
 IGZ1617$ZScore <- IGZ1617$Differences/IGZ1617$StandardDeviation
 
-#If high is bad multiply Z score by minus 1 
-IGZ1617 <- filter(IGZ1617, High.is.Positive. == "No") %>%
-            mutate(CPPScore = ZScore * -1)
+#If high is bad multiply Z score by minus 1
+IGZ1617$CPPScore <- IGZ1617$ZScore
+IGZ1617$CPPScore[IGZ1617$High.is.Positive. =="No"] <- (IGZ1617$CPPScore[IGZ1617$High.is.Positive. =="No"])*-1
 IGZ1617 <- select(IGZ1617, c(-CPPMean, -Differences, -SquaredDiff, -SumSquares, -N, -Nminus1,
                              -Variance, -StandardDeviation, -ZScore))
 
@@ -82,8 +82,19 @@ IGZ1617$StandardDeviation <- sqrt(IGZ1617$Variance)
 #Calculate difference divided by standard deviation
 IGZ1617$ZScore <- IGZ1617$Differences/IGZ1617$StandardDeviation
 
-#If high is bad multiply Z score by minus 1 
-IGZ1617 <- filter(IGZ1617, High.is.Positive. == "No") %>%
-  mutate(TypeScore = ZScore * -1)
+#If high is bad multiply Z score by minus 1
+IGZ1617$TypeScore <- IGZ1617$ZScore
+IGZ1617$TypeScore[IGZ1617$High.is.Positive. =="No"] <- (IGZ1617$TypeScore[IGZ1617$High.is.Positive. =="No"])*-1
 IGZ1617 <- select(IGZ1617, c(-TypeMean, -Differences, -SquaredDiff, -SumSquares, -N, -Nminus1,
                              -Variance, -StandardDeviation, -ZScore))
+
+####Create CPP Change Scores and Typology Scores for the change from start to finish year
+
+#filter data to start and finish year
+IGZChange <- filter(IGZdta, Year %in% c("2006/07","2016/17"))
+
+#Group data by IGZ and Indicator and calculate change from start year to finish year
+IGZChange <- ddply(IGZChange,. (InterZone, Indicator), transform, Change = (last(value)/first(value)-1))
+
+
+
