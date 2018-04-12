@@ -31,21 +31,8 @@ IGZ1617 <- ddply(IGZ1617,. (CPP, Indicator), transform, CPPMean = (mean(value)))
 #Calculate score minus group mean
 IGZ1617$Differences <- IGZ1617$value - IGZ1617$CPPMean
 
-#Square this difference
-IGZ1617$SquaredDiff <- IGZ1617$Differences*IGZ1617$Differences
-
-#Group by indicator and CPP and sum these squared differences 
-IGZ1617 <- ddply(IGZ1617,. (CPP, Indicator), transform, SumSquares = (sum(SquaredDiff)))
-
-#Group by CPP and count number of IGZ's within CPP
-IGZ1617 <- ddply(IGZ1617,. (CPP,Indicator), transform, N = (length(InterZone)))
-
-#Calculate sums of squares divided by N -1 
-IGZ1617$Nminus1 <- IGZ1617$N - 1
-IGZ1617$Variance <- IGZ1617$SumSquares/IGZ1617$Nminus1
-
-#Calculate square root of variance
-IGZ1617$StandardDeviation <- sqrt(IGZ1617$Variance)
+#Group by CPP and Indicator and calculate Standard Deviation
+IGZ1617 <- ddply(IGZ1617,. (CPP, Indicator), transform, StandardDeviation = (sd(value)))
 
 #Calculate difference divided by standard deviation
 IGZ1617$ZScore <- IGZ1617$Differences/IGZ1617$StandardDeviation
@@ -53,8 +40,7 @@ IGZ1617$ZScore <- IGZ1617$Differences/IGZ1617$StandardDeviation
 #If high is bad multiply Z score by minus 1
 IGZ1617$CPPScore <- IGZ1617$ZScore
 IGZ1617$CPPScore[IGZ1617$High.is.Positive. =="No"] <- (IGZ1617$CPPScore[IGZ1617$High.is.Positive. =="No"])*-1
-IGZ1617 <- select(IGZ1617, c(-CPPMean, -Differences, -SquaredDiff, -SumSquares, -N, -Nminus1,
-                             -Variance, -StandardDeviation, -ZScore))
+IGZ1617 <- select(IGZ1617, c(-CPPMean, -Differences, -StandardDeviation, -ZScore))
 
 ##Type Score
 #Group by Indicator and Typology Group and calculate Type mean
@@ -63,21 +49,8 @@ IGZ1617 <- ddply(IGZ1617,. (Typology_Group, Indicator), transform, TypeMean = (m
 #Calculate score minus group mean
 IGZ1617$Differences <- IGZ1617$value - IGZ1617$TypeMean
 
-#Square this difference
-IGZ1617$SquaredDiff <- IGZ1617$Differences*IGZ1617$Differences
-
-#Group by indicator and Typology and sum these squared differences 
-IGZ1617 <- ddply(IGZ1617,. (Typology_Group, Indicator), transform, SumSquares = (sum(SquaredDiff)))
-
-#Group by Typology and count number of IGZ's within typology group
-IGZ1617 <- ddply(IGZ1617,. (Typology_Group,Indicator), transform, N = (length(InterZone)))
-
-#Calculate sums of squares divided by N -1 
-IGZ1617$Nminus1 <- IGZ1617$N - 1
-IGZ1617$Variance <- IGZ1617$SumSquares/IGZ1617$Nminus1
-
-#Calculate square root of variance
-IGZ1617$StandardDeviation <- sqrt(IGZ1617$Variance)
+#Group by Typology Group and Indicator and calculate Standard Deviation
+IGZ1617 <- ddply(IGZ1617,. (Typology_Group, Indicator), transform, StandardDeviation = (sd(value)))
 
 #Calculate difference divided by standard deviation
 IGZ1617$ZScore <- IGZ1617$Differences/IGZ1617$StandardDeviation
@@ -85,8 +58,7 @@ IGZ1617$ZScore <- IGZ1617$Differences/IGZ1617$StandardDeviation
 #If high is bad multiply Z score by minus 1
 IGZ1617$TypeScore <- IGZ1617$ZScore
 IGZ1617$TypeScore[IGZ1617$High.is.Positive. =="No"] <- (IGZ1617$TypeScore[IGZ1617$High.is.Positive. =="No"])*-1
-IGZ1617 <- select(IGZ1617, c(-TypeMean, -Differences, -SquaredDiff, -SumSquares, -N, -Nminus1,
-                             -Variance, -StandardDeviation, -ZScore))
+IGZ1617 <- select(IGZ1617, c(-TypeMean, -Differences, -StandardDeviation, -ZScore))
 
 ####Create CPP Change Scores and Typology Scores for the change from start to finish year
 
@@ -96,5 +68,53 @@ IGZChange <- filter(IGZdta, Year %in% c("2006/07","2016/17"))
 #Group data by IGZ and Indicator and calculate change from start year to finish year
 IGZChange <- ddply(IGZChange,. (InterZone, Indicator), transform, Change = (last(value)/first(value)-1))
 
+#If High is bad multiply change value by minus 1
+IGZChange$Change[IGZChange$High.is.Positive. == "No"] <- (IGZChange$Change[IGZChange$High.is.Positive. == "No"])*-1
 
+##Calculate overall Z Score for change value
 
+#Filter data so that change value is only included once per IGZ
+IGZChange <- filter(IGZChange, Year == "2016/17")
+
+#Group by indicator and calculate mean of change value
+IGZChange <- ddply(IGZChange,. (Indicator), transform, OverallMean = (mean(Change)))
+
+#Calculate change score minus overall mean
+IGZChange$Differences <- IGZChange$Change - IGZChange$OverallMean
+
+#Group by indicator and calculate Standard Deviation
+IGZChange <- ddply(IGZChange,. (Indicator), transform, StandardDeviation = (sd(Change)))
+
+#Calculate difference divided by Standard Deviation
+IGZChange$OverallZScore <- IGZChange$Differences/IGZChange$StandardDeviation
+IGZChange <- select(IGZChange, c(-OverallMean, -Differences, -StandardDeviation))
+
+##Calculate CPP Change Score
+
+#Group by Indicator and CPP and calculate mean of overall Z score
+IGZChange <- ddply(IGZChange,. (CPP, Indicator), transform, CPPMean = (mean(OverallZScore)))
+
+#Calculate overallZscore minus CPPmean
+IGZChange$Differences <- IGZChange$OverallZScore - IGZChange$CPPMean
+
+#Group by Indicator and CPP and calculate Standard Deviation
+IGZChange <- ddply(IGZChange,. (CPP, Indicator), transform, StandardDeviation = (sd(OverallZScore)))
+
+#Calculate differences divided by Standard Deviation
+IGZChange$CPPChangeScore <- IGZChange$Differences/IGZChange$StandardDeviation
+IGZChange <- select(IGZChange, c(-CPPMean, -Differences, -StandardDeviation))
+
+##Calculate Typology Change Score
+
+#Group by Indicator and Typology group and calculate mean of overall Z score
+IGZChange <- ddply(IGZChange,. (Typology_Group, Indicator), transform, TypeMean = (mean(OverallZScore)))
+
+#Calculate overallZscore minus Typemean
+IGZChange$Differences <- IGZChange$OverallZScore - IGZChange$TypeMean
+
+#Group by Indicator and Typology Group and calculate Standard Deviation
+IGZChange <- ddply(IGZChange,. (Typology_Group, Indicator), transform, StandardDeviation = (sd(OverallZScore)))
+
+#Calculate differences divided by Standard Deviation
+IGZChange$TypeChangeScore <- IGZChange$Differences/IGZChange$StandardDeviation
+IGZChange <- select(IGZChange, c(-TypeMean, -Differences, -StandardDeviation))
