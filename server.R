@@ -27,11 +27,11 @@ shinyServer(function(input, output, session) {
   
   #Create a reactive function to store data for both LA's selected  
   selectedDta1 <- reactive({
-    dta <<- filter(CPPdtaCurrent, CPP %in% c(input$LA1, input$CompLA1))
+    dta <- filter(CPPdtaCurrent, CPP %in% c(input$LA1, input$CompLA1))
   })
 
   #Create a list of all the indicators 
-  Indicators1 <<- unique(CPPdtaCurrent$Indicator)
+  Indicators1 <- unique(CPPdtaCurrent$Indicator)
 
   
   ##########
@@ -43,8 +43,7 @@ shinyServer(function(input, output, session) {
       plotname <- paste("plot", my.i, sep ="_")
       output[[plotname]] <- renderPlot({
         
-        selectedDta1 <- selectedDta1()
-        dtaAll <- selectedDta1
+        dtaAll <- selectedDta1()
         
     #create a subset of the data for the particular indicator in the loop
     loopdata <- subset(dtaAll, dtaAll$Indicator == Indicators1[my.i])
@@ -252,6 +251,7 @@ shinyServer(function(input, output, session) {
     slctd <- length(input$grphs3)
     #number of columns is 4, unless there are less than 3 graphs
     cls <- if(slctd>3){4} else{slctd}
+    #The percentage fo the space each columns will occupy
     pctCols <- 100/cls
     pctCols <- paste0(pctCols, "%")
     #number of rows is the number of graphs divided by 4 and rounded up eg 7 = 2 rows
@@ -259,9 +259,13 @@ shinyServer(function(input, output, session) {
     ##Dynamically create plot height  
     pltheight <- paste0(800/rows, "px")
     inptLst <- as.list(gsub(" ", "",input$grphs3))
-    ##Create however many
+    ##Create however many columns and then rows as needed
     fluidRow(
+      #split into columns based on no. selected indicators
       column(12/cls,map(1, function(nc){
+      #This part selects graphs created above depending on the 
+      #number of indicators e.g if 12 the map function will pull out
+      #1,5,9 using the seq function
         plot_output_list1<- map(seq(from = nc,to = slctd,by = cls), function(x){
           tstNm1 <- inptLst[[x]]
           plotname <- paste("plot", tstNm1, sep = "_")
@@ -270,6 +274,10 @@ shinyServer(function(input, output, session) {
         do.call(tagList, plot_output_list1)         
       }) ),  
       column(12/cls,map(2, function(nc){
+      #this does the same thing as above, but selectes the next set of indicators
+      #e.g. with 12 it goes 2,6,10
+      #tryCatch is needed because there will be an error if the number of columns
+      #is less than 2 => I need it to return nothing in this case
         plot_output_list2<- tryCatch(map(seq(from = nc,to = slctd,by = cls), function(x){
           tstNm2 <- inptLst[[x]]
           plotname <- paste("plot", tstNm2, sep = "_")
