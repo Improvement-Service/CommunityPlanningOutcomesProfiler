@@ -223,6 +223,8 @@ shinyServer(function(input, output, session) {
       geom_hline(aes(yintercept = cmp))
   })
   
+  ##create all graphs that can be shown in Pages 2 and 3
+  #These are then pulled through in the uiOutputs
   for(i in 1:18){
     local({
       my.i <- i
@@ -241,6 +243,8 @@ shinyServer(function(input, output, session) {
           guides(fill = FALSE) +
           ggtitle(slInd)+
           geom_hline(aes(yintercept = cmp))
+        #get family group of LA
+        FGdta <- filter(dat, FG)
       })
     })  
   }
