@@ -1,4 +1,4 @@
-shinyServer(function(input, output) {
+shinyServer(function(input, output, session) {
    
 
 
@@ -27,11 +27,11 @@ shinyServer(function(input, output) {
   
   #Create a reactive function to store data for both LA's selected  
   selectedDta1 <- reactive({
-    dta <- filter(CPPdtaCurrent, CPP %in% c(input$LA1, input$CompLA1))
+    dta <<- filter(CPPdtaCurrent, CPP %in% c(input$LA1, input$CompLA1))
   })
 
   #Create a list of all the indicators 
-  Indicators1 <- unique(CPPdtaCurrent$Indicator)
+  Indicators1 <<- unique(CPPdtaCurrent$Indicator)
 
   
   ##########
@@ -317,7 +317,3 @@ shinyServer(function(input, output) {
  
 
 })
-
-
-
-
