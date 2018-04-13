@@ -318,7 +318,7 @@ shinyServer(function(input, output,session) {
 ##Create Ui ouputs for page 4 - My communities page=============  
   
   
-#create reactive input that updates indicator selection to select all or clear all  
+  #create reactive input that updates indicator selection to select all or clear all  
   observeEvent(eventExpr = input$IndiAll,
                handlerExpr = {
                  updateCheckboxGroupInput(session = session,
@@ -334,6 +334,9 @@ shinyServer(function(input, output,session) {
                                selected = character(0))
     }
   })  
+  
+  ####Calculate rankings for first two columns
+  #Create a reactive function to filter data based on CPP and indicators selected
   
    
 
