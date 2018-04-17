@@ -316,10 +316,7 @@ shinyServer(function(input, output,session) {
   })
 
 ##Create Ui ouputs for page 4 - My communities page=============  
-  
-  ####Calculate rankings for first two columns
-  
-  
+ 
   #create reactive input that updates indicator selection to select all or clear all  
   observeEvent(eventExpr = input$IndiAll,
                handlerExpr = {
@@ -337,17 +334,25 @@ shinyServer(function(input, output,session) {
     }
   })  
   
-  #Create a reactive function to filter data based on CPP and indicators selected
-  selectedDta4 <- reactive({
-    dta4 <- filter(IGZ1617, CPP %in% input$LA4 & Indicator %in% input$Indi4)
+  #Create a reactive function to filter Best&Worst data based on CPP and indicators selected
+  selectedDta4a <- reactive({
+    dta4a <- filter(IGZ1617, CPP %in% input$LA4 & Indicator %in% input$Indi4)
   })
   
-  #Create table output to check that reactive values are correct 
+  #Create a 2nd reactive function to filter Best&Worst change data based on CPP and indicators selected
+  selectedDta4b <- reactive({
+    dta4b <- filter(IGZChange, CPP %in% input$LA4 & Indicator %in% input$Indi4)
+  })
+  
+  ######Create table output 
   output$view <- renderTable({
-    selectedDta4 <- selectedDta4()
-    IGZBest <- selectedDta4
     
-    #Calculated combined CPP score and combined Type score by grouping by individial IGZ and summing scores
+    
+    ###Create rankings for outcomes
+    selectedDta4a <- selectedDta4a()
+    IGZBest <- selectedDta4a
+    
+    #Calculate combined CPP score and combined Type score by grouping by individial IGZ and summing scores
     IGZBest <- ddply(IGZBest,. (InterZone), transform, CombinedCPPScore = (sum(CPPScore)))
     IGZBest <- ddply(IGZBest,. (InterZone), transform, CombinedTypeScore = (sum(TypeScore)))
     
@@ -358,8 +363,25 @@ shinyServer(function(input, output,session) {
     
     #Create rankings for scores
     IGZBest$CPPScoreRank <- rank(IGZBest$CombinedCPPScore)
-    IGZBest$TypeScoreRank <<- rank(IGZBest$CombinedTypeScore)
+    IGZBest$TypeScoreRank <- rank(IGZBest$CombinedTypeScore)
     
+    
+    ###Create rankingsfor improvement 
+    selectedDta4b <- selectedDta4b()
+    IGZImprovement <- selectedDta4b
+    
+    #Calculate combined CPP score and combined Type score by grouping by individial IGZ and summing scores
+    IGZImprovement <- ddply(IGZImprovement,. (InterZone), transform, CombinedCPPChangeScore = (sum(CPPChangeScore)))
+    IGZImprovement <- ddply(IGZImprovement,. (InterZone), transform, CombinedTypeChangeScore = (sum(TypeChangeScore)))
+    
+    #Filter data so that combined scores are only displayed once for each IGZ
+    #add column which displays the name of the 1st indicator selected, then filter where data equals this
+    IGZImprovement <- ddply(IGZImprovement,. (InterZone), transform, FilterRef = (first(Indicator)))
+    IGZImprovement <-filter(IGZImprovement, Indicator == FilterRef)
+    
+    #Create rankings for scores
+    IGZImprovement$CPPChangeRank <- rank(IGZImprovement$CombinedCPPChangeScore)
+    IGZImprovement$TypeChangeRank <<- rank(IGZImprovement$CombinedTypeChangeScore)
   })
 
 })
