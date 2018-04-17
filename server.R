@@ -339,12 +339,27 @@ shinyServer(function(input, output,session) {
   
   #Create a reactive function to filter data based on CPP and indicators selected
   selectedDta4 <- reactive({
-    dta4 <<- filter(IGZ1617, CPP == input$LA4 & Indicator == input$Indi4)
+    dta4 <- filter(IGZ1617, CPP %in% input$LA4 & Indicator %in% input$Indi4)
   })
   
   #Create table output to check that reactive values are correct 
   output$view <- renderTable({
-    selectedDta4()
+    selectedDta4 <- selectedDta4()
+    IGZBest <- selectedDta4
+    
+    #Calculated combined CPP score and combined Type score by grouping by individial IGZ and summing scores
+    IGZBest <- ddply(IGZBest,. (InterZone), transform, CombinedCPPScore = (sum(CPPScore)))
+    IGZBest <- ddply(IGZBest,. (InterZone), transform, CombinedTypeScore = (sum(TypeScore)))
+    
+    #Filter data so that combined scores are only displayed once for each IGZ
+    #add column which displays the name of the 1st indicator selected, then filter where data equals this
+    IGZBest <- ddply(IGZBest,. (InterZone), transform, FilterRef = (first(Indicator)))
+    IGZBest <- filter(IGZBest, Indicator == FilterRef)
+    
+    #Create rankings for scores
+    IGZBest$CPPScoreRank <- rank(IGZBest$CombinedCPPScore)
+    IGZBest$TypeScoreRank <<- rank(IGZBest$CombinedTypeScore)
+    
   })
 
 })
