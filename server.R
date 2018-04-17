@@ -381,7 +381,22 @@ shinyServer(function(input, output,session) {
     
     #Create rankings for scores
     IGZImprovement$CPPChangeRank <- rank(IGZImprovement$CombinedCPPChangeScore)
-    IGZImprovement$TypeChangeRank <<- rank(IGZImprovement$CombinedTypeChangeScore)
+    IGZImprovement$TypeChangeRank <- rank(IGZImprovement$CombinedTypeChangeScore)
+    
+    
+    ###Split Data into 4 individual DataTables for each ranking, then combine into 1 table
+    
+    Column1 <<- select(IGZBest, c(InterZone_Name, CPPScoreRank)) %>% 
+      arrange(CPPScoreRank) 
+    colnames(Column1)[1] <<- "Test"
+    Column2 <- select(IGZBest, c(InterZone_Name, TypeScoreRank)) %>%
+      arrange(TypeScoreRank)
+    Column3 <- select(IGZImprovement, c(InterZone_Name, CPPChangeRank)) %>%
+      arrange(CPPChangeRank)
+    Column4 <- select(IGZImprovement, c(InterZone_Name, TypeChangeRank)) %>%
+      arrange(TypeChangeRank)
+    
+    
   })
 
 })
