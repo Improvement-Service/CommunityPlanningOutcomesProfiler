@@ -111,10 +111,13 @@ shinyUI(navbarPage("CPOP",
              radioButtons("View","Select Display",c("All", "Top/bottom 10", "Top/bottom 5"),inline = TRUE)),
       column(5,
              div(style = "column-count:3;-webkit-column-count:3; -moz-column-count:3",
-             checkboxGroupInput("Indi4","Select Indicators", unique(IGZdta$Indicator)))),
+             checkboxGroupInput("Indi4","Select Indicators", unique(IGZdta$Indicator),selected = unique(IGZdta$Indicator)))),
       column(1,
              actionButton("IndiAll","Select All"),
              actionButton("IndiClear", "Clear All"))
+    ),
+    mainPanel(
+      tableOutput("view")
     )
     
   )        
