@@ -317,6 +317,8 @@ shinyServer(function(input, output,session) {
 
 ##Create Ui ouputs for page 4 - My communities page=============  
   
+  ####Calculate rankings for first two columns
+  
   
   #create reactive input that updates indicator selection to select all or clear all  
   observeEvent(eventExpr = input$IndiAll,
@@ -335,10 +337,15 @@ shinyServer(function(input, output,session) {
     }
   })  
   
-  ####Calculate rankings for first two columns
   #Create a reactive function to filter data based on CPP and indicators selected
+  selectedDta4 <- reactive({
+    dta4 <<- filter(IGZ1617, CPP == input$LA4 & Indicator == input$Indi4)
+  })
   
-   
+  #Create table output to check that reactive values are correct 
+  output$view <- renderTable({
+    selectedDta4()
+  })
 
 })
 
