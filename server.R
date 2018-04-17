@@ -344,6 +344,11 @@ shinyServer(function(input, output,session) {
     dta4b <- filter(IGZChange, CPP %in% input$LA4 & Indicator %in% input$Indi4)
   })
   
+  #Create a reactive function to store name of council selected, to be used in variable names within the table
+  selectedCPP4 <- reactive({
+    CPP4 <- input$LA4
+  })
+
   ######Create table output 
   output$view <- renderTable({
     
@@ -385,17 +390,30 @@ shinyServer(function(input, output,session) {
     
     
     ###Split Data into 4 individual DataTables for each ranking, then combine into 1 table
+    #Call CPP Name to be used in variable names
+    selectedCPP4 <- selectedCPP4()
+    CPPName <- selectedCPP4
     
-    Column1 <<- select(IGZBest, c(InterZone_Name, CPPScoreRank)) %>% 
+    Column1 <- select(IGZBest, c(InterZone_Name, CPPScoreRank)) %>% 
       arrange(CPPScoreRank) 
-    colnames(Column1)[1] <<- "Test"
+    colnames(Column1)[1] <- paste("Within ", CPPName, " which communities have the poorest outcomes?")
+    
     Column2 <- select(IGZBest, c(InterZone_Name, TypeScoreRank)) %>%
       arrange(TypeScoreRank)
+    colnames(Column2)[1] <- paste("Compared to other, similar communities, how do those in ", 
+                                  CPPName, " fare? (are they better or worse than expected?)")
+    
     Column3 <- select(IGZImprovement, c(InterZone_Name, CPPChangeRank)) %>%
       arrange(CPPChangeRank)
+    colnames(Column3)[1] <- paste("Within ", CPPName, " which communities have improved the least?")
+    
     Column4 <- select(IGZImprovement, c(InterZone_Name, TypeChangeRank)) %>%
       arrange(TypeChangeRank)
+    colnames(Column4)[1] <- paste("Within ", CPPName, "which communities have improved the least relative 
+                                   to other similar communities?")
     
+    MyCommunitiesDta <- cbind(Column1, Column2, Column3, Column4) %>%
+      select(c(-CPPScoreRank, -TypeScoreRank, -CPPChangeRank, -TypeChangeRank))
     
   })
 
