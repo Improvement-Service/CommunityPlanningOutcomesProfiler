@@ -415,33 +415,48 @@ shinyServer(function(input, output,session) {
     MyCommunitiesDta <<- cbind(Column1, Column2, Column3, Column4) %>%
       select(c(-CPPScoreRank, -TypeScoreRank, -CPPChangeRank, -TypeChangeRank))
     
-    #Store cut points for colours by dividing the number of IGZ by the number of colours in the scale
+    ###Calculate References for Colours
+    #Store the number of IGZ
     NoIGZ <- nrow(MyCommunitiesDta)
     NoIGZ <- as.numeric(NoIGZ)
-    Intervals <- (round(NoIGZ/11))+1
-    Limit <- NoIGZ - Intervals
-    Cut <- seq(Intervals, NoIGZ, Intervals)
     
+    #select the number of colours required
+    Clrs <- if_else((NoIGZ < 11),NoIGZ,11)
     
-    #Try referencing particular content of cell using the square bracket filters
-    Prime_factor <- max(primeFactors(NoIGZ))
-    groupings <- NoIGZ/Prime_factor
-    Number_seq <- rep(1:11, each = groupings)
+    #Divide the number of IGZ by the number of colours being used to determine how many times to repeat colour 
+    groupings <- round(NoIGZ/Clrs)
+    #Create a number sequence for the different colours
+    Number_seq <- rep(1:Clrs, each = groupings)
+    #Check the length of this colour sequence to determine whether more needs to be added or some need to be removed
     length_seq <- length(Number_seq)
     Diff_seq <- NoIGZ - length_seq
-    Either_end <- Diff_seq/2
-    start_seq <- rep(1, each = Either_end)
-    End_seq <- rep(11, each = Either_end)
-    Complete_seq <- c(start_seq, Number_seq, End_seq)
+    
+    ##Add in if statement that checks whether Diff_seq is negative 
+    #if difference is negative have a smaller number within each grouping
+    if(Diff_seq < 0) {groupings <- groupings -1}
+    
+    #Create the number sequence again on this bases
+    Number_seq2 <- rep(1:Clrs, each = groupings)
+    length_seq2 <- length(Number_seq2)
+    Diff_seq2 <- NoIGZ - length_seq2
+    
+    #distribute a roughly equal proportion of the colours
+    extra <- seq.int(from = 2, to = Clrs, length.out = Diff_seq2)
+    extra <- round(extra)
+    
+    #add this to the overall sequence, order it and add to the data set
+    Complete_seq <- c(Number_seq2,extra)
+    Complete_seq <- sort(Complete_seq)
     MyCommunitiesDta$Helper <- Complete_seq
-    MyCommunitiesDta$Helper <- as.numeric(MyCommunitiesDta$Helper)
+    
+    #Store unqie colour reference to use as intervals in styling
     Store_unique <- unique(MyCommunitiesDta$Helper)
     
+    #Store colours to be used
+    ColourPal <- brewer.pal(Clrs,"RdYlGn")
     
-   ColourPal <- brewer.pal(11,"RdYlGn")
-    
-    
-   datatable(MyCommunitiesDta, options = list(ColumnDefs =list(list(targets = 5, visible = FALSE)),
+    #Create table
+    datatable(MyCommunitiesDta, options = list(ColumnDefs =list(list(targets = 5, visible = FALSE)),
                                               pageLength = 136, dom = "t", ordering = F), rownames = FALSE)%>%
       formatStyle(columns = 1, valueColumns = 5 ,backgroundColor = styleEqual(Store_unique,ColourPal))
      
