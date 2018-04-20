@@ -350,7 +350,7 @@ shinyServer(function(input, output,session) {
   })
 
   ######Create table output 
-  output$view <- renderTable({
+  output$MyCommunitiesTbl <- DT::renderDataTable({
     
     
     ###Create rankings for outcomes
@@ -412,8 +412,41 @@ shinyServer(function(input, output,session) {
     colnames(Column4)[1] <- paste("Within ", CPPName, "which communities have improved the least relative 
                                    to other similar communities?")
     
-    MyCommunitiesDta <- cbind(Column1, Column2, Column3, Column4) %>%
+    MyCommunitiesDta <<- cbind(Column1, Column2, Column3, Column4) %>%
       select(c(-CPPScoreRank, -TypeScoreRank, -CPPChangeRank, -TypeChangeRank))
+    
+    #Store cut points for colours by dividing the number of IGZ by the number of colours in the scale
+    NoIGZ <- nrow(MyCommunitiesDta)
+    NoIGZ <- as.numeric(NoIGZ)
+    Intervals <- (round(NoIGZ/11))+1
+    Limit <- NoIGZ - Intervals
+    Cut <- seq(Intervals, NoIGZ, Intervals)
+    
+    
+    #Try referencing particular content of cell using the square bracket filters
+    Prime_factor <- max(primeFactors(NoIGZ))
+    groupings <- NoIGZ/Prime_factor
+    Number_seq <- rep(1:11, each = groupings)
+    length_seq <- length(Number_seq)
+    Diff_seq <- NoIGZ - length_seq
+    Either_end <- Diff_seq/2
+    start_seq <- rep(1, each = Either_end)
+    End_seq <- rep(11, each = Either_end)
+    Complete_seq <- c(start_seq, Number_seq, End_seq)
+    MyCommunitiesDta$Helper <- Complete_seq
+    MyCommunitiesDta$Helper <- as.numeric(MyCommunitiesDta$Helper)
+    Store_unique <- unique(MyCommunitiesDta$Helper)
+    
+    
+   ColourPal <- brewer.pal(11,"RdYlGn")
+    
+    
+   datatable(MyCommunitiesDta, options = list(ColumnDefs =list(list(targets = 5, visible = FALSE)),
+                                              pageLength = 136, dom = "t", ordering = F), rownames = FALSE)%>%
+      formatStyle(columns = 1, valueColumns = 5 ,backgroundColor = styleEqual(Store_unique,ColourPal))
+     
+    
+    
     
   })
 
