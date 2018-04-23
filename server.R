@@ -396,21 +396,26 @@ shinyServer(function(input, output,session) {
     
     Column1 <- select(IGZBest, c(InterZone_Name, CPPScoreRank)) %>% 
       arrange(CPPScoreRank) 
-    colnames(Column1)[1] <- paste("Within ", CPPName, " which communities have the poorest outcomes?")
+    #Have placeholder names for now and add proper names later
+    #colnames(Column1)[1] <- paste("Within ", CPPName, " which communities have the poorest outcomes?")
+    colnames(Column1)[1] <- "Variable1"
     
     Column2 <- select(IGZBest, c(InterZone_Name, TypeScoreRank)) %>%
       arrange(TypeScoreRank)
-    colnames(Column2)[1] <- paste("Compared to other, similar communities, how do those in ", 
-                                  CPPName, " fare? (are they better or worse than expected?)")
+    #colnames(Column2)[1] <- paste("Compared to other, similar communities, how do those in ", 
+                                  #CPPName, " fare? (are they better or worse than expected?)")
+    colnames(Column2)[1] <- "Variable2"
     
     Column3 <- select(IGZImprovement, c(InterZone_Name, CPPChangeRank)) %>%
       arrange(CPPChangeRank)
-    colnames(Column3)[1] <- paste("Within ", CPPName, " which communities have improved the least?")
+    #colnames(Column3)[1] <- paste("Within ", CPPName, " which communities have improved the least?")
+    colnames(Column3)[1] <- "Variable3"
     
     Column4 <- select(IGZImprovement, c(InterZone_Name, TypeChangeRank)) %>%
       arrange(TypeChangeRank)
-    colnames(Column4)[1] <- paste("Within ", CPPName, "which communities have improved the least relative 
-                                   to other similar communities?")
+    #colnames(Column4)[1] <- paste("Within ", CPPName, "which communities have improved the least relative 
+                                   #to other similar communities?")
+    colnames(Column4)[1] <- "Variable4"
     
     MyCommunitiesDta <<- cbind(Column1, Column2, Column3, Column4) %>%
       select(c(-CPPScoreRank, -TypeScoreRank, -CPPChangeRank, -TypeChangeRank))
@@ -447,36 +452,45 @@ shinyServer(function(input, output,session) {
     #add this to the overall sequence, order it and add to the data set
     Complete_seq <- c(Number_seq2,extra)
     Complete_seq <- sort(Complete_seq)
-    MyCommunitiesDta$Helper <<- Complete_seq
+    MyCommunitiesDta$Helper1 <- Complete_seq
     
     ####Create colours for the remaining columns
-    filteredDta <- MyCommunitiesDta[,c(1,5)]
-    colnames(filteredDta) <- c("dta", "ref")
-    renamedHelp <- MyCommunitiesDta
-    colnames(renamedHelp)[2] <- "dta"
-    testy <- join(renamedHelp, filteredDta, by = "dta")
+    #Filter the namesin column 1 and the colour references of these
+    #rename the columns and join these back up with the relevant column in the original table
+    #This will keep the order of the original column but match the colour references to the IGZ name
+    colours2 <- MyCommunitiesDta[,c(1,5)]
+    colnames(colours2) <- c("Variable2", "Helper2")
+    MyCommunitiesDta <- join(MyCommunitiesDta, colours2, by = "Variable2")
     
+    colours3 <- MyCommunitiesDta[,c(1,5)]
+    colnames(colours3) <- c("Variable3", "Helper3")
+    MyCommunitiesDta <- join(MyCommunitiesDta, colours3, by = "Variable3")
     
-    
-    
-    #Store unqie colour reference to use as intervals in styling
+    colours4 <- MyCommunitiesDta[,c(1,5)]
+    colnames(colours4) <- c("Variable4", "Helper4")
+    MyCommunitiesDta <- join(MyCommunitiesDta, colours4, by = "Variable4")
+   
+    #Store unique colour reference to use as intervals in styling
     #Store_unique <- unique(MyCommunitiesDta$Helper)
-    Store_unique <- unique(testy$Helper)
-    Store_unique2 <- unique(testy$ref)
-    Store_unique2 <- sort(Store_unique2)
+    Store_unique1 <- unique(MyCommunitiesDta$Helper1)
+    Store_unique2 <- unique(MyCommunitiesDta$Helper2) %>% sort
+    Store_unique3 <- unique(MyCommunitiesDta$Helper3) %>% sort
+    Store_unique4 <- unique(MyCommunitiesDta$Helper4) %>% sort
     
     #Store colours to be used
     ColourPal <- brewer.pal(Clrs,"RdYlGn")
     
     #Create table
-    #datatable(MyCommunitiesDta, options = list(ColumnDefs =list(list(targets = 5, visible = FALSE)),
-                                             # pageLength = 136, dom = "t", ordering = F), rownames = FALSE)%>%
-     # formatStyle(columns = 1, valueColumns = 5 ,backgroundColor = styleEqual(Store_unique,ColourPal))
-     
-    datatable(testy, options = list(ColumnDefs =list(list(targets = 5, visible = FALSE)),
-     pageLength = 136, dom = "t", ordering = F), rownames = FALSE)%>%
-     formatStyle(columns = 1, valueColumns = 5 ,backgroundColor = styleEqual(Store_unique,ColourPal))%>%
-      formatStyle(columns = 2, valueColumns = 6 ,backgroundColor = styleEqual(Store_unique2,ColourPal))
+    datatable(MyCommunitiesDta, rownames = FALSE, options = list(
+    columnDefs =list(list(visible = FALSE, targets = 4)),
+     pageLength = 136, 
+     dom = "t", 
+     ordering = F
+     )%>%
+     formatStyle(columns = 1, valueColumns = 5 ,backgroundColor = styleEqual(Store_unique1,ColourPal))%>%
+      formatStyle(columns = 2, valueColumns = 6 ,backgroundColor = styleEqual(Store_unique2,ColourPal))%>%
+      formatStyle(columns = 3, valueColumns = 7 ,backgroundColor = styleEqual(Store_unique3,ColourPal))%>%
+      formatStyle(columns = 4, valueColumns = 8 ,backgroundColor = styleEqual(Store_unique4,ColourPal)))
     
     
     
