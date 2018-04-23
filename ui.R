@@ -64,22 +64,22 @@ shinyUI(navbarPage("CPOP",
  tabPanel("CPP -Page2",
           fluidPage(
             fluidRow(
-              column(6,
+              column(4,
                      selectInput("LA2", "Select A Local Authority", unique(filter(CPPdta, CPP != "Scotland")[[1]]), 
                                  selected = "Aberdeen City")
               ),
-              column(6,
+              column(4,
                      selectInput("CompLA2", "Select Comparator", unique(CPPdta$CPP), selected = "Scotland"
                      )
-              )
+              ),
+              column(4,
+                     div(style = "column-count:2;-webkit-column-count:2; -moz-column-count:2",
+                         checkboxGroupInput("grphs2","", unique(CPPdta$Indicator))
+                     )
+              ) 
             ),
             hr(),
-            fluidRow(
-              mainPanel(
-
-                plotOutput("Plot2")               
-              )
-            )
+            uiOutput("uiPage2")
           )),
  tabPanel("CPP - Page3",
   fluidPage(
