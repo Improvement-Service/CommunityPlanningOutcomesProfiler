@@ -447,19 +447,36 @@ shinyServer(function(input, output,session) {
     #add this to the overall sequence, order it and add to the data set
     Complete_seq <- c(Number_seq2,extra)
     Complete_seq <- sort(Complete_seq)
-    MyCommunitiesDta$Helper <- Complete_seq
+    MyCommunitiesDta$Helper <<- Complete_seq
+    
+    ####Create colours for the remaining columns
+    filteredDta <- MyCommunitiesDta[,c(1,5)]
+    colnames(filteredDta) <- c("dta", "ref")
+    renamedHelp <- MyCommunitiesDta
+    colnames(renamedHelp)[2] <- "dta"
+    testy <- join(renamedHelp, filteredDta, by = "dta")
+    
+    
+    
     
     #Store unqie colour reference to use as intervals in styling
-    Store_unique <- unique(MyCommunitiesDta$Helper)
+    #Store_unique <- unique(MyCommunitiesDta$Helper)
+    Store_unique <- unique(testy$Helper)
+    Store_unique2 <- unique(testy$ref)
+    Store_unique2 <- sort(Store_unique2)
     
     #Store colours to be used
     ColourPal <- brewer.pal(Clrs,"RdYlGn")
     
     #Create table
-    datatable(MyCommunitiesDta, options = list(ColumnDefs =list(list(targets = 5, visible = FALSE)),
-                                              pageLength = 136, dom = "t", ordering = F), rownames = FALSE)%>%
-      formatStyle(columns = 1, valueColumns = 5 ,backgroundColor = styleEqual(Store_unique,ColourPal))
+    #datatable(MyCommunitiesDta, options = list(ColumnDefs =list(list(targets = 5, visible = FALSE)),
+                                             # pageLength = 136, dom = "t", ordering = F), rownames = FALSE)%>%
+     # formatStyle(columns = 1, valueColumns = 5 ,backgroundColor = styleEqual(Store_unique,ColourPal))
      
+    datatable(testy, options = list(ColumnDefs =list(list(targets = 5, visible = FALSE)),
+     pageLength = 136, dom = "t", ordering = F), rownames = FALSE)%>%
+     formatStyle(columns = 1, valueColumns = 5 ,backgroundColor = styleEqual(Store_unique,ColourPal))%>%
+      formatStyle(columns = 2, valueColumns = 6 ,backgroundColor = styleEqual(Store_unique2,ColourPal))
     
     
     
