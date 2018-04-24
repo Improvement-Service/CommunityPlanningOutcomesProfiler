@@ -481,16 +481,16 @@ shinyServer(function(input, output,session) {
     ColourPal <- brewer.pal(Clrs,"RdYlGn")
     
     #Create table
-    datatable(MyCommunitiesDta, rownames = FALSE, options = list(
-    columnDefs =list(list(visible = FALSE, targets = 4)),
+    datatable(MyCommunitiesDta, options = list(
+    columnDefs =list(list(visible = FALSE, targets = c(4,5,6,7))),
      pageLength = 136, 
      dom = "t", 
      ordering = F
-     )%>%
+     ),rownames = FALSE)%>%
      formatStyle(columns = 1, valueColumns = 5 ,backgroundColor = styleEqual(Store_unique1,ColourPal))%>%
       formatStyle(columns = 2, valueColumns = 6 ,backgroundColor = styleEqual(Store_unique2,ColourPal))%>%
       formatStyle(columns = 3, valueColumns = 7 ,backgroundColor = styleEqual(Store_unique3,ColourPal))%>%
-      formatStyle(columns = 4, valueColumns = 8 ,backgroundColor = styleEqual(Store_unique4,ColourPal)))
+      formatStyle(columns = 4, valueColumns = 8 ,backgroundColor = styleEqual(Store_unique4,ColourPal))
     
     
     
