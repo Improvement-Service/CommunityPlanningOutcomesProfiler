@@ -8,7 +8,8 @@ shinyUI(navbarPage("CPOP",
                    -moz-column-count:6; 
                    column-count:6;
                    text-align:left;
-                   display:block}"))),
+                   display:block}
+                   .col-sm-6{padding-left:0px};"))),
           includeHTML("CoverPage.html"),
           img(src = "http://www.improvementservice.org.uk/benchmarking/images/islogo.png", align = "top")),
  tabPanel("CPP - Page1",

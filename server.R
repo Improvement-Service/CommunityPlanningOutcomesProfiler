@@ -373,7 +373,8 @@ shinyServer(function(input, output, session) {
  #number of rows is the number of graphs divided by 4 and rounded up eg 7 = 2 rows
     rows <- ceiling(slctd/4)
  ##Dynamically create plot height  
-    pltheight <- ifelse(rows <2, "600px",ifelse(rows>4,"275px",paste0(1100/rows, "px")))    inptLst <- as.list(gsub(" ", "",input$grphs2))
+    pltheight <- ifelse(rows <2, "600px",ifelse(rows>4,"275px",paste0(1100/rows, "px")))
+    inptLst <- as.list(gsub(" ", "",input$grphs2))
 ##Create however many columns and then rows as needed
     fluidRow(
  #split into columns based on no. selected indicators
