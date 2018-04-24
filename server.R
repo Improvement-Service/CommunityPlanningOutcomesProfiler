@@ -499,6 +499,12 @@ shinyServer(function(input, output,session) {
     MyCommunitiesDta <- MyCommunitiesDta[,c(1,2,3,4,5,11,6,7,8,9,10)]
     colnames(MyCommunitiesDta)[c(2,4,6)] <- ""
     
+    
+    #Store values of the colours which need to have white text
+    WhiteTxt <- c(head(Store_unique1,2),tail(Store_unique1,2))
+    TxtValue <- Store_unique1
+    TxtValue <- if_else(TxtValue %in% WhiteTxt, "White", "Black")
+    
     #####Allow table to be split into top/bottom 10 and top/bottom 5
     
     #Create an if statement to determine how many rows to split by if CPP has small no. of IGZ
@@ -551,7 +557,11 @@ shinyServer(function(input, output,session) {
      formatStyle(columns = 1, valueColumns = 8 ,backgroundColor = styleEqual(Store_unique1,ColourPal))%>%
       formatStyle(columns = 3, valueColumns = 9 ,backgroundColor = styleEqual(Store_unique2,ColourPal))%>%
       formatStyle(columns = 5, valueColumns = 10,backgroundColor = styleEqual(Store_unique3,ColourPal))%>%
-      formatStyle(columns = 7, valueColumns = 11,backgroundColor = styleEqual(Store_unique4,ColourPal))
+      formatStyle(columns = 7, valueColumns = 11,backgroundColor = styleEqual(Store_unique4,ColourPal))%>%
+      formatStyle(columns = 1, valueColumns = 8, color = styleEqual(Store_unique1,TxtValue))%>%
+      formatStyle(columns = 3, valueColumns = 9, color = styleEqual(Store_unique1,TxtValue))%>%
+      formatStyle(columns = 5, valueColumns = 10, color = styleEqual(Store_unique1,TxtValue))%>%
+      formatStyle(columns = 7, valueColumns = 11, color = styleEqual(Store_unique1,TxtValue))
     
     
     
