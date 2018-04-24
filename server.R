@@ -482,6 +482,14 @@ shinyServer(function(input, output,session) {
     colnames(MyCommunitiesDta)[4] <- paste("Within ", CPPName, "which communities have improved the least relative 
     to other similar communities?")
     
+    #####Try to split the data table into top 10 and bottom 10 (will then work out the reactivity)
+    #also need to work out how to adjust for smaller CPPs
+    #Create seperate table of top 10, add an empty row, then add to seperate table of bottom 10
+    Top10 <- head(MyCommunitiesDta,10)
+    Top10[nrow(Top10)+1,] <- NA
+    Bottom10 <- tail(MyCommunitiesDta, 10)
+    MyCommunitiesDta <- rbind(Top10, Bottom10)
+    
     #Create table
     datatable(MyCommunitiesDta, options = list(
     columnDefs =list(list(visible = FALSE, targets = c(4,5,6,7))),
