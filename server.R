@@ -497,9 +497,7 @@ shinyServer(function(input, output,session) {
     MyCommunitiesDta <- MyCommunitiesDta[,c(1,2,3,10,4,5,6,7,8,9)]
     MyCommunitiesDta[,ncol(MyCommunitiesDta)+1] <- NA
     MyCommunitiesDta <- MyCommunitiesDta[,c(1,2,3,4,5,11,6,7,8,9,10)]
-    MyCommunitiesDta[,ncol(MyCommunitiesDta)+1] <- NA
-    MyCommunitiesDta <- MyCommunitiesDta[,c(1,2,3,4,5,6,7,12,8,9,10,11)]
-    colnames(MyCommunitiesDta)[c(2,4,6,8)] <- ""
+    colnames(MyCommunitiesDta)[c(2,4,6)] <- ""
     
     #####Allow table to be split into top/bottom 10 and top/bottom 5
     
@@ -542,7 +540,7 @@ shinyServer(function(input, output,session) {
     
     #Create table
     datatable(MyCommunitiesDta, options = list(
-    columnDefs =list(list(visible = FALSE, targets = c(8,9,10,11)),
+    columnDefs =list(list(visible = FALSE, targets = c(7,8,9,10)),
                      list(width = '400px', targets = c(0,2,4,6))),
      pageLength = 136, 
      dom = "t", 
@@ -550,10 +548,10 @@ shinyServer(function(input, output,session) {
      ),
     class = 'compact',
     rownames = FALSE)%>%
-     formatStyle(columns = 1, valueColumns = 9 ,backgroundColor = styleEqual(Store_unique1,ColourPal))%>%
-      formatStyle(columns = 3, valueColumns = 10 ,backgroundColor = styleEqual(Store_unique2,ColourPal))%>%
-      formatStyle(columns = 5, valueColumns = 11,backgroundColor = styleEqual(Store_unique3,ColourPal))%>%
-      formatStyle(columns = 7, valueColumns = 12,backgroundColor = styleEqual(Store_unique4,ColourPal))
+     formatStyle(columns = 1, valueColumns = 8 ,backgroundColor = styleEqual(Store_unique1,ColourPal))%>%
+      formatStyle(columns = 3, valueColumns = 9 ,backgroundColor = styleEqual(Store_unique2,ColourPal))%>%
+      formatStyle(columns = 5, valueColumns = 10,backgroundColor = styleEqual(Store_unique3,ColourPal))%>%
+      formatStyle(columns = 7, valueColumns = 11,backgroundColor = styleEqual(Store_unique4,ColourPal))
     
     
     
