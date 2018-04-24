@@ -238,11 +238,16 @@ shinyServer(function(input, output, session) {
         dat$slct <- ifelse(dat$CPP == input$LA3, "Sel1", "Other") 
         cmp <- filter(dat, CPP == input$CompLA3)$value
         ggplot(data = dat) +
-          geom_bar(aes(x = reorder(CPP,-value), y = value, fill = slct), stat = "identity", position = "dodge") +
+          geom_bar(aes(x = reorder(CPP,-value), y = value, fill = slct), 
+                   stat = "identity", position = "dodge", width = 0.5) +
           scale_fill_manual(values = c("blue","red"), breaks = c("Other", "Sel1")) +
           guides(fill = FALSE) +
           ggtitle(slInd)+
-          geom_hline(aes(yintercept = cmp))
+          xlab("")+
+          ylab("")+
+          geom_hline(aes(yintercept = cmp)) +
+          theme_bw()+
+          theme(axis.text.x = element_text(angle =90, hjust =1, vjust = 0))
       })
     })  
   }
@@ -264,11 +269,16 @@ shinyServer(function(input, output, session) {
         cmp <- filter(dat, CPP == input$CompLA2)$value
         dat <- filter(dat, FG == FGNo)
         ggplot(data = dat) +
-          geom_bar(aes(x = reorder(CPP,-value), y = value, fill = slct), stat = "identity", position = "dodge") +
+          geom_bar(aes(x = reorder(CPP,-value), y = value, fill = slct), 
+                   stat = "identity", position = "dodge", width = 0.5) +
           scale_fill_manual(values = c("blue","red"), breaks = c("Other", "Sel1")) +
           guides(fill = FALSE) +
           ggtitle(slInd)+
-          geom_hline(aes(yintercept = cmp))
+          geom_hline(aes(yintercept = cmp))+
+          xlab("")+
+          ylab("")+
+          theme_bw()+
+          theme(axis.text.x = element_text(angle =90, hjust = 1, vjust = 0))
       })
     })  
   }
@@ -285,7 +295,7 @@ shinyServer(function(input, output, session) {
     #number of rows is the number of graphs divided by 4 and rounded up eg 7 = 2 rows
     rows <- ceiling(slctd/4)
     ##Dynamically create plot height  
-    pltheight <- paste0(800/rows, "px")
+    pltheight <- ifelse(rows <2, "600px",ifelse(rows>4,"275px",paste0(1100/rows, "px")))
     inptLst <- as.list(gsub(" ", "",input$grphs3))
     ##Create however many columns and then rows as needed
     fluidRow(
@@ -363,8 +373,7 @@ shinyServer(function(input, output, session) {
  #number of rows is the number of graphs divided by 4 and rounded up eg 7 = 2 rows
     rows <- ceiling(slctd/4)
  ##Dynamically create plot height  
-    pltheight <- paste0(800/rows, "px")
-    inptLst <- as.list(gsub(" ", "",input$grphs2))
+    pltheight <- ifelse(rows <2, "600px",ifelse(rows>4,"275px",paste0(1100/rows, "px")))    inptLst <- as.list(gsub(" ", "",input$grphs2))
 ##Create however many columns and then rows as needed
     fluidRow(
  #split into columns based on no. selected indicators
