@@ -542,7 +542,8 @@ shinyServer(function(input, output,session) {
     
     #Create table
     datatable(MyCommunitiesDta, options = list(
-    columnDefs =list(list(visible = FALSE, targets = c(8,9,10,11))),
+    columnDefs =list(list(visible = FALSE, targets = c(8,9,10,11)),
+                     list(width = '400px', targets = c(0,2,4,6))),
      pageLength = 136, 
      dom = "t", 
      ordering = F
