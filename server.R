@@ -487,6 +487,20 @@ shinyServer(function(input, output,session) {
     colnames(MyCommunitiesDta)[4] <- paste("Within ", CPPName, "which communities have improved the least relative 
     to other similar communities?")
     
+    
+    
+    #####add 4 empty columns so that there is space in between each column in the table
+    #order these bewteen each of the columns and ensure column name is blank
+    MyCommunitiesDta[,ncol(MyCommunitiesDta)+1] <- NA
+    MyCommunitiesDta <- MyCommunitiesDta[,c(1,9,2,3,4,5,6,7,8)]
+    MyCommunitiesDta[,ncol(MyCommunitiesDta)+1] <- NA
+    MyCommunitiesDta <- MyCommunitiesDta[,c(1,2,3,10,4,5,6,7,8,9)]
+    MyCommunitiesDta[,ncol(MyCommunitiesDta)+1] <- NA
+    MyCommunitiesDta <- MyCommunitiesDta[,c(1,2,3,4,5,11,6,7,8,9,10)]
+    MyCommunitiesDta[,ncol(MyCommunitiesDta)+1] <- NA
+    MyCommunitiesDta <- MyCommunitiesDta[,c(1,2,3,4,5,6,7,12,8,9,10,11)]
+    colnames(MyCommunitiesDta)[c(2,4,6,8)] <- ""
+    
     #####Allow table to be split into top/bottom 10 and top/bottom 5
     
     #Create an if statement to determine how many rows to split by if CPP has small no. of IGZ
@@ -500,7 +514,7 @@ shinyServer(function(input, output,session) {
     
     #Create seperate table of top 10, add an empty row, then add to seperate table of bottom 10
     Top10 <- head(MyCommunitiesDta,Top10Rows)
-    Top10[nrow(Top10)+1,] <- NA
+    Top10[nrow(Top10)+2,] <- NA
     Bottom10 <- tail(MyCommunitiesDta, Bottom10Rows)
     TopBottom10 <- rbind(Top10, Bottom10)
     
@@ -514,7 +528,7 @@ shinyServer(function(input, output,session) {
                             5)
     
     Top5 <- head(MyCommunitiesDta,Top5Rows)
-    Top5[nrow(Top5)+1,] <- NA
+    Top5[nrow(Top5)+2,] <- NA
     Bottom5 <- tail(MyCommunitiesDta, Bottom5Rows)
     TopBottom5 <- rbind(Top5, Bottom5)
     
@@ -528,15 +542,17 @@ shinyServer(function(input, output,session) {
     
     #Create table
     datatable(MyCommunitiesDta, options = list(
-    columnDefs =list(list(visible = FALSE, targets = c(4,5,6,7))),
+    columnDefs =list(list(visible = FALSE, targets = c(8,9,10,11))),
      pageLength = 136, 
      dom = "t", 
      ordering = F
-     ),rownames = FALSE)%>%
-     formatStyle(columns = 1, valueColumns = 5 ,backgroundColor = styleEqual(Store_unique1,ColourPal))%>%
-      formatStyle(columns = 2, valueColumns = 6 ,backgroundColor = styleEqual(Store_unique2,ColourPal))%>%
-      formatStyle(columns = 3, valueColumns = 7 ,backgroundColor = styleEqual(Store_unique3,ColourPal))%>%
-      formatStyle(columns = 4, valueColumns = 8 ,backgroundColor = styleEqual(Store_unique4,ColourPal))
+     ),
+    class = 'compact',
+    rownames = FALSE)%>%
+     formatStyle(columns = 1, valueColumns = 9 ,backgroundColor = styleEqual(Store_unique1,ColourPal))%>%
+      formatStyle(columns = 3, valueColumns = 10 ,backgroundColor = styleEqual(Store_unique2,ColourPal))%>%
+      formatStyle(columns = 5, valueColumns = 11,backgroundColor = styleEqual(Store_unique3,ColourPal))%>%
+      formatStyle(columns = 7, valueColumns = 12,backgroundColor = styleEqual(Store_unique4,ColourPal))
     
     
     
