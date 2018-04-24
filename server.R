@@ -348,6 +348,11 @@ shinyServer(function(input, output,session) {
   selectedCPP4 <- reactive({
     CPP4 <- input$LA4
   })
+  
+  #Create a reactive function to store display selection
+  selectedDisplay4 <- reactive({
+    Display4 <- input$View
+  })
 
   ######Create table output 
   output$MyCommunitiesTbl <- DT::renderDataTable({
@@ -482,13 +487,44 @@ shinyServer(function(input, output,session) {
     colnames(MyCommunitiesDta)[4] <- paste("Within ", CPPName, "which communities have improved the least relative 
     to other similar communities?")
     
-    #####Try to split the data table into top 10 and bottom 10 (will then work out the reactivity)
-    #also need to work out how to adjust for smaller CPPs
+    #####Allow table to be split into top/bottom 10 and top/bottom 5
+    
+    #Create an if statement to determine how many rows to split by if CPP has small no. of IGZ
+    Top10Rows <- if_else(NoIGZ<20,
+                        if_else((NoIGZ%%2)==0, NoIGZ/2, (NoIGZ/2)+0.5 ),
+                        10)
+    
+    Bottom10Rows <- if_else(NoIGZ<20,
+                        if_else((NoIGZ%%2)==0, NoIGZ/2, (NoIGZ/2)-0.5 ),
+                        10)
+    
     #Create seperate table of top 10, add an empty row, then add to seperate table of bottom 10
-    Top10 <- head(MyCommunitiesDta,10)
+    Top10 <- head(MyCommunitiesDta,Top10Rows)
     Top10[nrow(Top10)+1,] <- NA
-    Bottom10 <- tail(MyCommunitiesDta, 10)
-    MyCommunitiesDta <- rbind(Top10, Bottom10)
+    Bottom10 <- tail(MyCommunitiesDta, Bottom10Rows)
+    TopBottom10 <- rbind(Top10, Bottom10)
+    
+    #Same for top and bottom 5
+    Top5Rows <- if_else(NoIGZ<10,
+                         if_else((NoIGZ%%2)==0, NoIGZ/2, (NoIGZ/2)+0.5 ),
+                         5)
+    
+    Bottom5Rows <- if_else(NoIGZ<10,
+                            if_else((NoIGZ%%2)==0, NoIGZ/2, (NoIGZ/2)-0.5 ),
+                            5)
+    
+    Top5 <- head(MyCommunitiesDta,Top5Rows)
+    Top5[nrow(Top5)+1,] <- NA
+    Bottom5 <- tail(MyCommunitiesDta, Bottom5Rows)
+    TopBottom5 <- rbind(Top5, Bottom5)
+    
+    #Call display input
+    selectedDisplay4 <- selectedDisplay4()
+    Display <- selectedDisplay4
+    
+    #Create if statements to select data based on display input
+    if(Display == "Top/bottom 10") { MyCommunitiesDta <- TopBottom10}
+    if(Display == "Top/bottom 5") {MyCommunitiesDta <- TopBottom5}
     
     #Create table
     datatable(MyCommunitiesDta, options = list(
