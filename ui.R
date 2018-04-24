@@ -1,5 +1,14 @@
 shinyUI(navbarPage("CPOP",
+                   
  tabPanel("Cover Page/Contents",
+          #css for checkbox
+              tags$head(tags$style(
+              HTML(".checkbox-inline {margin-left:0px !important; margin-right:10px}
+                   .chckBx{-webkit-column-count:6;
+                   -moz-column-count:6; 
+                   column-count:6;
+                   text-align:left;
+                   display:block}"))),
           includeHTML("CoverPage.html"),
           img(src = "http://www.improvementservice.org.uk/benchmarking/images/islogo.png", align = "top")),
  tabPanel("CPP - Page1",
@@ -64,19 +73,18 @@ shinyUI(navbarPage("CPOP",
  tabPanel("CPP -Page2",
           fluidPage(
             fluidRow(
-              column(4,
+              column(6,
                      selectInput("LA2", "Select A Local Authority", unique(filter(CPPdta, CPP != "Scotland")[[1]]), 
                                  selected = "Aberdeen City")
               ),
-              column(4,
+              column(6,
                      selectInput("CompLA2", "Select Comparator", unique(CPPdta$CPP), selected = "Scotland"
                      )
               ),
-              column(4,
-                     div(style = "column-count:2;-webkit-column-count:2; -moz-column-count:2",
-                         checkboxGroupInput("grphs2","", unique(CPPdta$Indicator))
-                     )
-              ) 
+              column(12,div(class = "chckBx",
+                     checkboxGroupInput("grphs2", unique(CPPdta$Indicator), inline = TRUE, label = NULL)
+                      )
+                     ) 
             ),
             hr(),
             uiOutput("uiPage2")
@@ -93,8 +101,10 @@ shinyUI(navbarPage("CPOP",
               )
              ),
       column(12,
-             checkboxGroupInput("grphs3","", unique(CPPdta$Indicator), inline = TRUE)
+             div(class = "chckBx",
+             checkboxGroupInput("grphs3",label = NULL, unique(CPPdta$Indicator), inline = TRUE)
              )
+      )
     ),
     hr(),
     uiOutput("uiPage3")
