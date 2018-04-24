@@ -390,31 +390,21 @@ shinyServer(function(input, output,session) {
     
     
     ###Split Data into 4 individual DataTables for each ranking, then combine into 1 table
-    #Call CPP Name to be used in variable names
-    selectedCPP4 <- selectedCPP4()
-    CPPName <- selectedCPP4
     
     Column1 <- select(IGZBest, c(InterZone_Name, CPPScoreRank)) %>% 
       arrange(CPPScoreRank) 
-    #Have placeholder names for now and add proper names later
-    #colnames(Column1)[1] <- paste("Within ", CPPName, " which communities have the poorest outcomes?")
     colnames(Column1)[1] <- "Variable1"
     
     Column2 <- select(IGZBest, c(InterZone_Name, TypeScoreRank)) %>%
       arrange(TypeScoreRank)
-    #colnames(Column2)[1] <- paste("Compared to other, similar communities, how do those in ", 
-                                  #CPPName, " fare? (are they better or worse than expected?)")
     colnames(Column2)[1] <- "Variable2"
     
     Column3 <- select(IGZImprovement, c(InterZone_Name, CPPChangeRank)) %>%
       arrange(CPPChangeRank)
-    #colnames(Column3)[1] <- paste("Within ", CPPName, " which communities have improved the least?")
     colnames(Column3)[1] <- "Variable3"
     
     Column4 <- select(IGZImprovement, c(InterZone_Name, TypeChangeRank)) %>%
       arrange(TypeChangeRank)
-    #colnames(Column4)[1] <- paste("Within ", CPPName, "which communities have improved the least relative 
-                                   #to other similar communities?")
     colnames(Column4)[1] <- "Variable4"
     
     MyCommunitiesDta <<- cbind(Column1, Column2, Column3, Column4) %>%
@@ -479,6 +469,18 @@ shinyServer(function(input, output,session) {
     
     #Store colours to be used
     ColourPal <- brewer.pal(Clrs,"RdYlGn")
+    
+    #Call CPP Name to be used in variable names
+    selectedCPP4 <- selectedCPP4()
+    CPPName <- selectedCPP4
+    
+    #Rename variables
+    colnames(MyCommunitiesDta)[1] <- paste("Within ", CPPName, " which communities have the poorest outcomes?")
+    colnames(MyCommunitiesDta)[2] <- paste("Compared to other, similar communities, how do those in ", 
+                                           CPPName, " fare? (are they better or worse than expected?)")
+    colnames(MyCommunitiesDta)[3] <- paste("Within ", CPPName, " which communities have improved the least?")
+    colnames(MyCommunitiesDta)[4] <- paste("Within ", CPPName, "which communities have improved the least relative 
+    to other similar communities?")
     
     #Create table
     datatable(MyCommunitiesDta, options = list(
