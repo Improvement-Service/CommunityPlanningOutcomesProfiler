@@ -1,7 +1,5 @@
 shinyServer(function(input, output,session) {
    
-
-
   
 ##Create Ui ouputs for page 1=============
   
@@ -486,8 +484,14 @@ shinyServer(function(input, output,session) {
     colnames(MyCommunitiesDta)[3] <- paste("Within ", CPPName, " which communities have improved the least?")
     colnames(MyCommunitiesDta)[4] <- paste("Within ", CPPName, "which communities have improved the least relative 
     to other similar communities?")
-    
-    
+   
+    ##Store Column Names
+    Container1 <- paste("Within ", CPPName, " which communities have the poorest outcomes?")
+    Container2 <- paste("Compared to other, similar communities, how do those in ", 
+                        CPPName, " fare? (are they better or worse than expected?)")
+    Container3 <- paste("Within ", CPPName, " which communities have improved the least?")
+    Container4 <- paste("Within ", CPPName, "which communities have improved the least relative 
+    to other similar communities?")
     
     #####add 4 empty columns so that there is space in between each column in the table
     #order these bewteen each of the columns and ensure column name is blank
@@ -544,6 +548,19 @@ shinyServer(function(input, output,session) {
     if(Display == "Top/bottom 10") { MyCommunitiesDta <- TopBottom10}
     if(Display == "Top/bottom 5") {MyCommunitiesDta <- TopBottom5}
     
+   #Create custom HTML to allow column headers to span multiple columns
+    sketch = htmltools::withTags(table(
+      thead(
+        tr(
+          th(class = 'dt-center', colspan = 4, 'Outcomes'),
+          th(class = 'dt-center', colspan = 3, 'Improvement')
+        ),
+        tr(
+          lapply(c(Container1, "", Container2, "", Container3, "", Container4),th)
+        )
+      )
+    ))
+   
     #Create table
     datatable(MyCommunitiesDta, options = list(
     columnDefs =list(list(visible = FALSE, targets = c(7,8,9,10)),
@@ -552,8 +569,10 @@ shinyServer(function(input, output,session) {
      dom = "t", 
      ordering = F
      ),
+    container = sketch,
     class = 'compact',
-    rownames = FALSE)%>%
+    rownames = FALSE,
+    selection = 'none')%>%
      formatStyle(columns = 1, valueColumns = 8 ,backgroundColor = styleEqual(Store_unique1,ColourPal))%>%
       formatStyle(columns = 3, valueColumns = 9 ,backgroundColor = styleEqual(Store_unique2,ColourPal))%>%
       formatStyle(columns = 5, valueColumns = 10,backgroundColor = styleEqual(Store_unique3,ColourPal))%>%
@@ -562,7 +581,6 @@ shinyServer(function(input, output,session) {
       formatStyle(columns = 3, valueColumns = 9, color = styleEqual(Store_unique1,TxtValue))%>%
       formatStyle(columns = 5, valueColumns = 10, color = styleEqual(Store_unique1,TxtValue))%>%
       formatStyle(columns = 7, valueColumns = 11, color = styleEqual(Store_unique1,TxtValue))
-    
     
     
   })

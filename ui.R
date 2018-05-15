@@ -133,13 +133,21 @@ shinyUI(navbarPage("CPOP",
     ),
     fluidPage(
       fluidRow(
-        column(12,
+        column(1,
+               tags$img(src = "Arrow1.png")),
+        column(10,
                DT::dataTableOutput("MyCommunitiesTbl")
-               )
+               ),
+        column(1,
+               tags$img(src = "Arrow2.png"))
       )
       
     )
     
   )        
-          )
+          
+
+
+   
+ )
 ))
