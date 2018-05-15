@@ -127,8 +127,38 @@ shinyServer(function(input, output, session) {
   }
   
   ##########
-  #create single plot based on what indicator is selected
+
+##Events for Button inputs page 2 and 3======================  
+  observeEvent(input$selAll2,
+    handlerExpr = {
+      updateCheckboxGroupInput(session = session,
+                               inputId = "grphs2",
+                               selected = unique(CPPdta$Indicator))
+    } 
+               )
+  observeEvent(input$selNone2,
+      handlerExpr = {
+       updateCheckboxGroupInput(session = session,
+                                 inputId = "grphs2",
+              selected = NA)
+               }     
+               )
+  observeEvent(input$selAll3,
+               handlerExpr = {
+                 updateCheckboxGroupInput(session = session,
+                                          inputId = "grphs3",
+                                          selected = unique(CPPdta$Indicator))
+               } 
+  )
+  observeEvent(input$selNone3,
+               handlerExpr = {
+                 updateCheckboxGroupInput(session = session,
+                                          inputId = "grphs3",
+                                          selected = NA)
+               }     
+  )
   
+  #create single plot based on what indicator is selected===  
   output$Indi1Plot <- renderPlot({
     
     selectedDta1 <- selectedDta1()

@@ -74,14 +74,17 @@ shinyUI(navbarPage("CPOP",
  tabPanel("CPP -Page2",
           fluidPage(
             fluidRow(
-              column(6,
+              column(4,
                      selectInput("LA2", "Select A Local Authority", unique(filter(CPPdta, CPP != "Scotland")[[1]]), 
                                  selected = "Aberdeen City")
               ),
-              column(6,
+              column(4,
                      selectInput("CompLA2", "Select Comparator", unique(CPPdta$CPP), selected = "Scotland"
                      )
               ),
+              column(4,
+                     actionButton("selAll2", "All"),
+                     actionButton("selNone2", "None")),
               column(12,div(class = "chckBx",
                      checkboxGroupInput("grphs2", unique(CPPdta$Indicator), inline = TRUE, label = NULL)
                       )
@@ -93,14 +96,17 @@ shinyUI(navbarPage("CPOP",
  tabPanel("CPP - Page3",
   fluidPage(
     fluidRow(
-      column(6,
+      column(4,
       selectInput("LA3", "Select A Local Authority", unique(filter(CPPdta, CPP != "Scotland")[[1]]), 
                   selected = "Aberdeen City")
       ),
-      column(6,
+      column(4,
              selectInput("CompLA3", "Select Comparator", unique(CPPdta$CPP), selected = "Scotland"
               )
              ),
+      column(4,
+             actionButton("selAll3", "All"),
+             actionButton("selNone3", "None")),
       column(12,
              div(class = "chckBx",
              checkboxGroupInput("grphs3",label = NULL, unique(CPPdta$Indicator), inline = TRUE)
