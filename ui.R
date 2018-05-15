@@ -92,9 +92,9 @@ shinyUI(navbarPage("CPOP",
              selectInput("CompLA3", "Select Comparator", unique(CPPdta$CPP), selected = "Scotland"
               )
              ),
-      column(4
+      column(4,
              #div(style = "column-count:2;-webkit-column-count:2; -moz-column-count:2",
-             #checkboxGroupInput("grphs3","", unique(CPPdta$Indicator))
+             checkboxGroupInput("grphs3","", unique(CPPdta$Indicator))
              #)
       )
     ),
@@ -104,14 +104,29 @@ shinyUI(navbarPage("CPOP",
  ),
  tabPanel("My Communities Page - Page 4",
   fluidPage(
+    tags$head(
+      tags$style(HTML("
+                      
+                      .multicol {
+                      
+                      -webkit-column-count: 3; /* Chrome, Safari, Opera */
+                      
+                      -moz-column-count: 3; /* Firefox */
+                      
+                      column-count: 3;
+                      
+                      }
+                      
+                      "))
+      
+      ),
     fluidRow(
       column(6,
              selectInput("LA4", "Select a Local Authority", unique(filter(IGZdta, CPP != "Scotland"))[[3]], 
                          selected = 1, width = "600"),
              radioButtons("View","Select Display",c("All", "Top/bottom 10", "Top/bottom 5"),inline = TRUE)),
       column(5,
-             #div(style = "column-count:3;-webkit-column-count:3; -moz-column-count:3",
-             checkboxGroupInput("Indi4","Select Indicators", unique(IGZdta$Indicator),selected = unique(IGZdta$Indicator))),
+             tags$div(class = "multicol",checkboxGroupInput("Indi4","Select Indicators", unique(IGZdta$Indicator),selected = unique(IGZdta$Indicator)))),
       column(1,
              actionButton("IndiAll","Select All"),
              actionButton("IndiClear", "Clear All"))
