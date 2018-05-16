@@ -471,7 +471,9 @@ shinyServer(function(input, output, session) {
 
   ##Create Leaflet Maps=============================
   output$IZUI <- renderUI({
-    selectInput("IZ", h5("Select a Community"), sort(unique(CPPMapDta[CPPMapDta$council == input$CPP, 11])))
+    selectizeInput("IZ", "", choices = sort(unique(CPPMapDta[CPPMapDta$council == input$CPP, 11])),
+                options = list(placeholder = "Select a Community",
+                               onInitialize = I('function() { this.setValue(""); }')))
   })
   
   clrs<-brewer.pal(7, "RdYlGn")

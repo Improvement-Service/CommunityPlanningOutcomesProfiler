@@ -141,7 +141,10 @@ shinyUI(navbarPage("CPOP",
   absolutePanel(fixed = FALSE, draggable = FALSE, top = "28px", left = 0, right = 0,
                                      bottom = 0, width = "100%", height = "0px", 
                                      wellPanel(div(class = "span4",style = "padding-left:6vh", 
-                                        selectInput("CPPIZ", h5("Select a CPP"), unique(CPPMapDta$council), width = "350px")))),
+                         selectizeInput("CPPIZ", "", unique(CPPMapDta$council),
+                                        options = list(placeholder = "Select a CPP",
+                                        onInitialize = I('function() { this.setValue(""); }')), 
+                                        width = "350px")))),
     fluidRow(div(class = "row-fluid", leafletOutput("communityMap")))
                      )
             ),
@@ -153,7 +156,7 @@ shinyUI(navbarPage("CPOP",
                             wellPanel(
                               div(class = "row",
                              div(class = "span4",style = "padding-right:6vh; padding-left:6vh", 
-                         selectizeInput("CPP", h5("Select a CPP"), 
+                         selectizeInput("CPP", "",
                                 choices = unique(CPPMapDta$council), options = list(placeholder = "Select a CPP",
                                onInitialize = I('function() { this.setValue(""); }')))
                              ),
