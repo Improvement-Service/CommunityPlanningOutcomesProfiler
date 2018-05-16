@@ -3,13 +3,31 @@ shinyUI(navbarPage("CPOP",
  tabPanel("Cover Page/Contents",
           #css for checkbox
               tags$head(tags$style(
+                ".leaflet{height:38vh !important; border-style:solid; border-width:1px; margin-top:1px}",
+                ".well {background-color:white; padding-bottom:0px; height:0vh;}",
+                ".row-fluid {padding-top:7vh;}",
+                ".span4 {display: inline-block; vertical-align: text-top; width: 35vw;}",
+                "#communityMap{height:85vh !important;border-style:solid;border-width:1px; padding-top:8px}",
               HTML(".checkbox-inline {margin-left:0px !important; margin-right:10px}
                    .chckBx{-webkit-column-count:6;
                    -moz-column-count:6; 
                    column-count:6;
                    text-align:left;
                    display:block}
-                   .col-sm-6{padding-left:0px};"))),
+                   .col-sm-6{padding-left:0px};
+                   h5{height: 18px;
+                       margin-top:2px;
+                       margin-bottom:0px;
+                       text-align:center;
+                       font-weight: bold;}
+                   h4 {
+                      font-size:12px;
+                      height: 18px;
+                      margin-top:2px;
+                      margin-bottom:0px;
+                      text-align:center;
+                      font-weight: bold
+                      }"))),
           includeHTML("CoverPage.html"),
           img(src = "http://www.improvementservice.org.uk/benchmarking/images/islogo.png", align = "top")),
  tabPanel("CPP - Page1",
