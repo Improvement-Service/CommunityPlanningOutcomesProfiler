@@ -232,9 +232,16 @@ shinyUI(navbarPage("CPOP",
     )
     
   )        
-          
-
-
-   
+ ),
+ tabPanel("Community Profile - Page5",
+  fluidPage(
+    fluidRow(
+      column(3,
+             selectInput("LA5","Select a Local Authority", unique(filter(IGZdta, CPP != "Scotland"))[[3]],
+                         selected = 1)),
+      column(3,
+             checkboxGroupInput("Indi5", "Select Indicators",unique(IGZdta$Indicator),selected = unique(IGZdta$Indicator)))
+  )
+          )
  )
 ))
