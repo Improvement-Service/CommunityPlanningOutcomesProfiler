@@ -238,9 +238,13 @@ shinyUI(navbarPage("CPOP",
     fluidRow(
       column(3,
              selectInput("LA5","Select a Local Authority", unique(filter(IGZdta, CPP != "Scotland"))[[3]],
-                         selected = 1)),
+                         selected = 1),
+             uiOutput("Comm5")
+              ),
       column(3,
              checkboxGroupInput("Indi5", "Select Indicators",unique(IGZdta$Indicator),selected = unique(IGZdta$Indicator)))
+  
+  
   )
           )
  )

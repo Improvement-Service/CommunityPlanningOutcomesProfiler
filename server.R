@@ -971,4 +971,11 @@ shinyServer(function(input, output,session) {
     })
     
   })
+  
+##Create Ui ouputs for page 5 - Community Profile=============    
+  output$Comm5 <- renderUI({
+    IGZsubset <- filter(IGZdta, CPP == input$LA5)
+    selectInput("Community5", "Select a Community", sort(unique(IGZsubset$InterZone_Name)))
+  })
+  
 })
