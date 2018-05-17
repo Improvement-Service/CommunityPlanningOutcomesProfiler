@@ -187,5 +187,54 @@ shinyUI(navbarPage("CPOP",
       )
                                       
          )
-            ))
+            )),
+
+ tabPanel("My Communities Page - Page 4",
+  fluidPage(
+    tags$head(
+      tags$style(HTML("
+                      
+                      .multicol {
+                      
+                      -webkit-column-count: 3; /* Chrome, Safari, Opera */
+                      
+                      -moz-column-count: 3; /* Firefox */
+                      
+                      column-count: 3;
+                      
+                      }
+                      
+                      "))
+      
+      ),
+    fluidRow(
+      column(6,
+             selectInput("LA4", "Select a Local Authority", unique(filter(IGZdta, CPP != "Scotland"))[[3]], 
+                         selected = 1, width = "600"),
+             radioButtons("View","Select Display",c("All", "Top/bottom 10", "Top/bottom 5"),inline = TRUE)),
+      column(5,
+             tags$div(class = "multicol",checkboxGroupInput("Indi4","Select Indicators", unique(IGZdta$Indicator),selected = unique(IGZdta$Indicator)))),
+      column(1,
+             actionButton("IndiAll","Select All"),
+             actionButton("IndiClear", "Clear All"))
+    ),
+    fluidPage(
+      fluidRow(
+        column(1,
+               tags$img(src = "Arrow1.png")),
+        column(10,
+               DT::dataTableOutput("MyCommunitiesTbl")
+               ),
+        column(1,
+               tags$img(src = "Arrow2.png"))
+      )
+      
+    )
+    
+  )        
+          
+
+
+   
+ )
 ))
