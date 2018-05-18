@@ -1023,6 +1023,11 @@ shinyServer(function(input, output,session) {
     CPP5 <- input$LA5
   })
   
+  #Create a reactive function to store name of community selected
+  selectedComm <- reactive({
+    Community <- input$Community5
+  })
+  
   #Create a reactive function to store display selection
   selectedDisplay5 <- reactive({
     Display5 <- input$View5
@@ -1133,18 +1138,41 @@ shinyServer(function(input, output,session) {
     #Call CPP Name to be used in variable names
     selectedCPP5 <- selectedCPP5()
     CPPName <- selectedCPP5
+      
+    ###Create helper column to determine which IGZ should be bold
+    #call Community name
+    selectedComm <- selectedComm()
+    Community <- selectedComm
     
+    #concatenate community name with CPP name so that comparison can be made
+    Community <- paste(CPPName, "-", Community)
+    
+    #Add new community name as a column of data
+    CommunityProfileDta$Community <- Community
+    
+    #If IGZ name matches the community selected set as yes, otherwise no
+    CommunityProfileDta$Community1 <- if_else(CommunityProfileDta$Variable1 == CommunityProfileDta$Community,
+                                        "Yes","No")
+    CommunityProfileDta$Community2 <- if_else(CommunityProfileDta$Variable2 == CommunityProfileDta$Community,
+                                              "Yes","No")
+    CommunityProfileDta <- select(CommunityProfileDta, -Community)
+    
+    #Store unique Yes No values for levels in style Equal
+    fontlevels <- c("No", "Yes")
+
+    #Store values of font wanted
+    fontvalues <- c('normal', 'bold')
+     
     #Rename variables
     colnames(CommunityProfileDta)[1] <- paste("How does the selected community in  ", CPPName, 
-                                              " compare to similar communities in Scotland?")
+                                                " compare to similar communities in Scotland?")
     colnames(CommunityProfileDta)[2] <- paste("How does the improvement rate of the selected community in ", 
-                                           CPPName, " compare to similar communities in Scotland?")
-    
+                                              CPPName, " compare to similar communities in Scotland?")
     
     #####add empty column so that there is space between the columns in the table
     #order these bewteen the columns and ensure column name is blank
     CommunityProfileDta[,ncol(CommunityProfileDta)+1] <- NA
-    CommunityProfileDta <- CommunityProfileDta[,c(1,5,2,3,4)]
+    CommunityProfileDta <- CommunityProfileDta[,c(1,7,2,3,4,5,6)]
     colnames(CommunityProfileDta)[2] <- ""
     
     #Store values of the colours which need to have white text
@@ -1193,7 +1221,7 @@ shinyServer(function(input, output,session) {
     
     #Create table
     datatable(CommunityProfileDta, options = list(
-      columnDefs =list(list(visible = FALSE, targets = c(3,4)),
+      columnDefs =list(list(visible = FALSE, targets = c(3,4,5,6)),
                        list(width = '400px', targets = c(0,2))),
       pageLength = 136, 
       dom = "t", 
@@ -1205,7 +1233,9 @@ shinyServer(function(input, output,session) {
       formatStyle(columns = 1, valueColumns = 4 ,backgroundColor = styleEqual(Store_unique1,ColourPal))%>%
       formatStyle(columns = 3, valueColumns = 5 ,backgroundColor = styleEqual(Store_unique2,ColourPal))%>%
       formatStyle(columns = 1, valueColumns = 4, color = styleEqual(Store_unique1,TxtValue))%>%
-      formatStyle(columns = 3, valueColumns = 5, color = styleEqual(Store_unique1,TxtValue))
+      formatStyle(columns = 3, valueColumns = 5, color = styleEqual(Store_unique1,TxtValue))%>%
+      formatStyle(columns = 1, valueColumns = 6, fontWeight = styleEqual(fontlevels,fontvalues))%>%
+      formatStyle(columns = 3, valueColumns = 7, fontWeight = styleEqual(fontlevels,fontvalues))
     
   })
   
