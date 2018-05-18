@@ -973,9 +973,28 @@ shinyServer(function(input, output,session) {
   })
   
 ##Create Ui ouputs for page 5 - Community Profile=============    
+  #Create reactive selection for community, filter to only show communities within the CPP
   output$Comm5 <- renderUI({
     IGZsubset <- filter(IGZdta, CPP == input$LA5)
     selectInput("Community5", "Select a Community", sort(unique(IGZsubset$InterZone_Name)))
   })
   
+  #Create text showing group description of community selected
+  output$Descrip <- renderText({
+    IGZsubset <- filter(IGZdta, InterZone_Name == input$Community5)
+    txt <- first(IGZsubset$Typology_Name)
+    txt <- paste("Group Description: ", txt)
+  })
+  
+  #Create text showing the number of other communities in the selected group
+  output$GrpSize <- renderText({
+    IGZsubset <- filter(IGZdta, InterZone_Name == input$Community5)
+    Typology <- first(IGZsubset$Typology_Group)
+    Indi <- first(IGZsubset$Indicator)
+    Yr <- first(IGZsubset$Year)
+    TypeSubset <- filter(IGZdta, Typology_Group == Typology & Indicator == Indi & Year == Yr)
+    Size <- nrow(TypeSubset)
+    Size <- Size - 1
+    txt <- paste(Size, " other, similar communities in this group")
+  })
 })
