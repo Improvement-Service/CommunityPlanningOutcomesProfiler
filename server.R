@@ -26,6 +26,7 @@ shinyServer(function(input, output,session) {
   
   #Create a reactive function to store data for both LA's selected  
   selectedDta1 <- reactive({
+    CPPdtaCurrent$colourscheme <- ifelse(CPPdtaCurrent$CPP == input$LA1,"A","B")
     dta <- filter(CPPdtaCurrent, CPP %in% c(input$LA1, input$CompLA1))
   })
 
@@ -108,10 +109,11 @@ shinyServer(function(input, output,session) {
                
             ggplot()+
             geom_line(data = loopdata,
-                    aes(x = Year2, y = value, group = CPP, colour = CPP, linetype = "2"), lwd = 1, show.legend = FALSE)+
+                    aes(x = Year2, y = value, group = colourscheme, colour = colourscheme, linetype = "2"), lwd = 1, show.legend = FALSE)+
             geom_line(data = dtaRaw,
-                    aes(x = Year2, y = value, group = CPP, colour = CPP, linetype = "1"), lwd = 1, show.legend = FALSE)+
-            ggtitle(Indicators1[my.i])+
+                    aes(x = Year2, y = value, group = colourscheme, colour = colourscheme, linetype = "1"), lwd = 1, show.legend = FALSE)+
+            scale_color_manual(values = c("red", "blue"))+
+              ggtitle(Indicators1[my.i])+
             annotate("text", x = Inf, y = Inf, label = sprintf('\U25CF'), size = 10, 
                     colour = (if_else(HighValue == "Yes", coloursDotPos, coloursDotNeg))
                     , hjust = 1, vjust = 1) +
@@ -238,20 +240,7 @@ shinyServer(function(input, output,session) {
   })
 
   
-  ##Create Ui Outputs for page 2 & 3 =================    
-  
-  output$Plot2 <- renderPlot({
-    dat <- filter(CPPdta, Indicator == "Unplanned Hospital Attendances" & Year == "2016/17")
-    dat$slct <- ifelse(dat$CPP == input$LA2, "Sel1", "Other") 
-    cmp <- filter(dat, CPP == input$CompLA2)$value
-    
-    ggplot(data = dat) +
-      geom_bar(aes(x = reorder(CPP,-value), y = value, fill = slct), stat = "identity", position = "dodge") +
-      scale_fill_manual(values = c("blue","red"), breaks = c("Other", "Sel1")) +
-      guides(fill = FALSE) +
-      geom_hline(aes(yintercept = cmp))
-  })
-  
+##Create Ui Outputs for page 2 & 3 =================    
   ##create all graphs that can be shown in Pages 3
   #These are then pulled through in the uiOutputs
   for(i in 1:18){
@@ -971,4 +960,36 @@ shinyServer(function(input, output,session) {
     })
     
   })
+  
+##All communities per indicator==================================
+##Firstly render all of the plots for filling in the UI rendered below 
+  myheight <- function(){
+    nrow(unique(IGZdta[IGZdta$CPP== input$`CPP-AllC`,"InterZone_Name"]))*60
+  }
+  output$AllCPlots <- renderPlot({
+    dta <- IGZdta[IGZdta$CPP== input$`CPP-AllC` & IGZdta$Indicator==input$`Indi-AllC`&IGZdta$Type != "Projected",c(2,8,9)]
+    nComs <- length(unique(dta$InterZone_Name))
+    comList <- unique(dta$InterZone_Name)
+    dta2 <- CPPdta[CPPdta$CPP %in% input$`CPP-AllC`& CPPdta$Indicator==input$`Indi-AllC`&CPPdta$Type != "Projected",c(1,4,5)]
+    dta3 <- CPPdta[CPPdta$CPP %in% "Scotland"& CPPdta$Indicator==input$`Indi-AllC`&CPPdta$Type != "Projected",c(1,4,5)]
+    colnames(dta2) <- colnames(dta)
+    colnames(dta3) <- colnames(dta)
+    dta <- rbind(dta, dta2, dta3)
+    dta$colourscheme <-ifelse(dta$InterZone_Name == "Scotland","Scot",ifelse(dta$InterZone_Name == input$`CPP-AllC`,"CPP","Com"))
+    yrs <- c(dta$Year[[1]], dta$Year[[length(dta$Year)]])
+    ##lapply to generate plots
+    plts <- list()
+    plts <-lapply(1:nComs, FUN = function(.x){
+      ggplot(data = dta[dta$InterZone_Name %in% c(comList[.x], input$`CPP-AllC`, "Scotland"),])+
+        geom_line(aes(x = Year, y = value, group = colourscheme, colour = colourscheme), size = 1.5)+
+        theme_bw()+
+        ggtitle(comList[.x])+
+        theme(axis.text.x =  element_text(angle = 90, vjust = 0, hjust = 1))+
+        ylab("")+xlab("")+
+        scale_x_discrete(breaks = yrs, expand = c(0.01,0.01))+
+      scale_color_manual(breaks = c("Com", "CPP", "Scot") ,values = c("red", "green","blue"))+
+      guides(colour = FALSE)
+    })
+    do.call("plot_grid", c(plts, ncol = 4))
+  }, height = myheight)
 })
