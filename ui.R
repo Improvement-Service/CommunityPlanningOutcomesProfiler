@@ -244,10 +244,18 @@ shinyUI(navbarPage("CPOP",
              h3(textOutput("GrpSize"))
               ),
       column(3,
-             checkboxGroupInput("Indi5", "Select Indicators",unique(IGZdta$Indicator),selected = unique(IGZdta$Indicator)))
+             checkboxGroupInput("Indi5", "Select Indicators",unique(IGZdta$Indicator),selected = unique(IGZdta$Indicator)),
+             radioButtons("View5", "Select Display", c("All", "Top/bottom 10", "Top/bottom 5"),inline = TRUE)
+             )
+      ),
+      fluidRow(
+        column(6,
+               DT::dataTableOutput("CommunityProfileTbl"))
+      )
+     
+      
+     
   
-  
-  )
           )
  )
 ))
