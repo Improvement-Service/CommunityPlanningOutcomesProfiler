@@ -249,8 +249,12 @@ shinyUI(navbarPage("CPOP",
              )
       ),
       fluidRow(
-        column(6,
-               DT::dataTableOutput("CommunityProfileTbl"))
+        column(1,
+               tags$img(src="Arrow3.png")),
+        column(5,
+               DT::dataTableOutput("CommunityProfileTbl")),
+        column(1,
+               tags$img(src="Arrow4.png"))
       )
      
       
