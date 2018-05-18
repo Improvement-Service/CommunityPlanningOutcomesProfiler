@@ -690,7 +690,10 @@ shinyServer(function(input, output, session) {
   })
   
 ##All communities per indicator==================================
-##Firstly render all of the plots for filling in the UI rendered below  
+##Firstly render all of the plots for filling in the UI rendered below 
+  myheight <- function(){
+    nrow(unique(IGZdta[IGZdta$CPP== input$`CPP-AllC`,"InterZone_Name"]))*60
+  }
   output$AllCPlots <- renderPlot({
     dta <- IGZdta[IGZdta$CPP== input$`CPP-AllC` & IGZdta$Indicator==input$`Indi-AllC`&IGZdta$Type != "Projected",c(2,8,9)]
     nComs <- length(unique(dta$InterZone_Name))
@@ -716,6 +719,5 @@ shinyServer(function(input, output, session) {
       guides(colour = FALSE)
     })
     do.call("plot_grid", c(plts, ncol = 4))
-  })
-
+  }, height = myheight)
 })

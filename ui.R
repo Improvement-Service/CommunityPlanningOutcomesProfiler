@@ -193,6 +193,6 @@ shinyUI(navbarPage("CPOP",
             fluidRow(column(6, selectInput("CPP-AllC","Select CPP", unique(IGZdta$CPP))),
                      column(6,selectInput("Indi-AllC", "Select Indicator", unique(IGZdta$Indicator)))),
             hr(),
-            plotOutput("AllCPlots", heigh = "2000px")
+            plotOutput("AllCPlots")
           ))
 ))
