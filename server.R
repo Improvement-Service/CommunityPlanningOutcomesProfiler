@@ -1048,6 +1048,9 @@ shinyServer(function(input, output,session) {
     #Create rankings for scores
     IGZBest$TypeScoreRank <- rank(IGZBest$CombinedTypeScore)
     
+    #Concatenate CPP Names with Community Names
+    IGZBest <- ddply(IGZBest,. (InterZone), transform, InterZone_Name = paste(CPP, "-",InterZone_Name))
+    
     ##Create Rankings for Improvement
     selectedDta5b <- selectedDta5b()
     IGZImprovement <- selectedDta5b
@@ -1062,6 +1065,9 @@ shinyServer(function(input, output,session) {
     
     #Create rankings for scores
     IGZImprovement$TypeChangeRank <- rank(IGZImprovement$CombinedTypeChangeScore)
+    
+    #Concatenate CPP Names with Community Names
+    IGZImprovement <- ddply(IGZImprovement,. (InterZone), transform, InterZone_Name = paste(CPP, "-",InterZone_Name))
     
     ###Split Data into 2 individual DataTables for each ranking, then combine into 1 table
     Column1 <- select(IGZBest, c(InterZone_Name, TypeScoreRank)) %>%
