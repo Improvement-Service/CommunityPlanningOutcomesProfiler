@@ -8,6 +8,7 @@ library(DT)
 library(data.table)
 library(Unicode)
 library(leaflet)
+library(cowplot)
 
 
 SpPolysDF<-read_rds("Files for Maps/Shapes.rds")
