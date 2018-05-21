@@ -565,7 +565,7 @@ shinyServer(function(input, output,session) {
       arrange(TypeChangeRank)
     colnames(Column4)[1] <- "Variable4"
     
-    MyCommunitiesDta <<- cbind(Column1, Column2, Column3, Column4) %>%
+    MyCommunitiesDta <- cbind(Column1, Column2, Column3, Column4) %>%
       select(c(-CPPScoreRank, -TypeScoreRank, -CPPChangeRank, -TypeChangeRank))
     
     ###Calculate References for Colours
@@ -1083,7 +1083,7 @@ shinyServer(function(input, output,session) {
       arrange(TypeChangeRank)
     colnames(Column2)[1] <- "Variable2"
     
-    CommunityProfileDta <<- cbind(Column1, Column2) %>%
+    CommunityProfileDta <- cbind(Column1, Column2) %>%
       select(c(-TypeScoreRank, -TypeChangeRank))
     
     ###Calculate References for Colours
@@ -1254,6 +1254,99 @@ shinyServer(function(input, output,session) {
     Choices <- LineChoices
     checkboxGroupInput("Choices5", "Select lines to plot", Choices, selected = Choices, inline = TRUE)
   })
+  
+  #Store indicators to be plotted
+  Indicators5 <- unique(IGZdta$Indicator)
+  
+  ##use reactive functions to store possible data selections
+  CommunityChoice <- reactive({
+    Community <- filter(IGZdta, InterZone_Name == input$Community5)
+    Community$Identifier <- input$Community5
+    Community$Colours <- "red"
+    Community <- select(Community, c(-InterZone, -InterZone_Name, -CPP, -Typology_Group, -Typology_Name,
+                                     -`High is Positive?`) )
+  })
+  
+  LAChoice <- reactive({
+    Indicators <- unique(IGZdta$Indicator)
+    LA <- filter(CPPdta, CPP == input$LA5 & Indicator %in% Indicators)
+    LA$Identifier <- input$LA5
+    LA$Colours <- "green"
+    LA <- select(LA, c(-CPP, -FG))
+  })
+  
+  ScotlandChoice <- reactive({
+    Indicators <- unique(IGZdta$Indicator)
+    Scotland <- filter(CPPdta, CPP == "Scotland" & Indicator %in% Indicators)
+    Scotland$Identifier <- "Scotland"
+    Scotland$Colours <- "blue"
+    Scotland <- select(Scotland, c(-CPP, -FG))
+  })
+  
+  GrpAvChoice <- reactive({
+    IGZsubset <- filter(IGZdta, InterZone_Name == input$Community5)
+    Typology <- first(IGZsubset$Typology_Group)
+    GrpAv <- filter(IGZdta, Typology_Group == Typology)
+    GrpAv <- select(GrpAv, -`High is Positive?`)
+    GrpAv <- ddply(GrpAv,. (Indicator, Year), transform, GrpAver = mean(value))
+    GrpAv <- filter(GrpAv, InterZone_Name == input$Community5)
+    GrpAv <- select(GrpAv, -value)
+    colnames(GrpAv)[9] <- "value"
+    GrpAv$Identifier <- "Group Average"
+    GrpAv$Colours <- "orange"
+    GrpAv <- select(GrpAv, c(-InterZone, -InterZone_Name, -CPP, -Typology_Group, -Typology_Name))
+  })
+  
+  ###Create plot outputs
+  for(i in seq_along(Indicators5)){
+    local({
+      my.i <- i
+      plotname <- paste("5plot", my.i, sep ="_")
+      output[[plotname]]<- renderPlot({
+    
+    #Call reactive data
+    CommunityChoice <- CommunityChoice()
+    Community <- CommunityChoice
+    
+    LAChoice <- LAChoice()
+    LA <- LAChoice
+    
+    ScotlandChoice <- ScotlandChoice()
+    Scotland <- ScotlandChoice
+    
+    GrpAvChoice <- GrpAvChoice()
+    GrpAv <- GrpAvChoice
+    
+    #Combine reactive data into one data set
+    LineChoiceDta <- rbind(Community, LA, Scotland, GrpAv)
+    #filter this data to match choices selected
+    LineChoiceDta <<- filter(LineChoiceDta, Identifier %in% input$Choices5)
+    #Store unique choices and unique colour values
+    LineChoices <- unique(LineChoiceDta$Identifier)
+    LineColours <- unique(LineChoiceDta$colours)
+    
+    #Create if statement that filters data based on projection selection and plots based on this
+    if(input$Projections5 == "No") {LineChoiceDta <- filter(LineChoiceDta, Type != "Projected")} 
+
+    #LineChoiceDta1 <- filter(LineChoiceDta, Indicator == "Child Poverty")
+    
+    #ggplot(data = LineChoiceDta1)+
+    #geom_line(aes(x = Year, y = value, group = Identifier, colour = Identifier))
+      
+    ggplot()+
+      geom_line(data = LineChoiceDta,
+                aes(x = Year, y = value, group = Identifier, colour = Identifier, linetype = "2"), lwd = 1, show.legend = FALSE)+
+      ggtitle(Indicators5[my.i])+
+      theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
+            panel.background = element_blank(), axis.line = element_line(colour="black"),
+            axis.text.x = element_text(vjust = 0.3))  
+  
+    
+  })
+    })
+  }
+    
+  
   
   
 })

@@ -247,11 +247,18 @@ shinyUI(navbarPage("CPOP",
              checkboxGroupInput("Indi5", "Select Indicators",unique(IGZdta$Indicator),selected = unique(IGZdta$Indicator)),
              radioButtons("View5", "Select Display", c("All", "Top/bottom 10", "Top/bottom 5"),inline = TRUE)
              ),
-      column(4,
-             uiOutput("LineChoices5")
+      column(3,
+             uiOutput("LineChoices5"),
+             plotOutput("5plot_1"),
+             plotOutput("5plot_3"),
+             plotOutput("5plot_5"),
+             plotOutput("5plot_7")
              ),
-      column(2,
-             radioButtons("Projections5", "Show projections?", c("Yes","No"), selected = "Yes", inline = TRUE) 
+      column(3,
+             radioButtons("Projections5", "Show projections?", c("Yes","No"), selected = "Yes", inline = TRUE),
+             plotOutput("5plot_2"),
+             plotOutput("5plot_4"),
+             plotOutput("5plot_6")
              )
       ),
       fluidRow(
@@ -260,7 +267,9 @@ shinyUI(navbarPage("CPOP",
         column(5,
                DT::dataTableOutput("CommunityProfileTbl")),
         column(1,
-               tags$img(src="Arrow4.png"))
+               tags$img(src="Arrow4.png")),
+        column(6, 
+               plotOutput("CommunityProfilePlots"))
       )
      
       
