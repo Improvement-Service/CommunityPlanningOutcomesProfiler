@@ -1239,4 +1239,21 @@ shinyServer(function(input, output,session) {
     
   })
   
+  ####Create Graphs for Community Profile Page
+  
+  ##First create checkbox selections within a reactive function
+  LineChoices <- reactive({
+    LA <- input$LA5
+    Community <- input$Community5
+    Choices <- c(Community, LA, "Scotland", "Group Average")
+  })
+  
+  #Create ui output for checkbox selection
+  output$LineChoices5 <- renderUI({
+    LineChoices <- LineChoices()
+    Choices <- LineChoices
+    checkboxGroupInput("Choices5", "Select lines to plot", Choices, selected = Choices, inline = TRUE)
+  })
+  
+  
 })

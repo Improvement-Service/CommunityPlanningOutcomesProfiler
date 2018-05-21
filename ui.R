@@ -246,6 +246,12 @@ shinyUI(navbarPage("CPOP",
       column(3,
              checkboxGroupInput("Indi5", "Select Indicators",unique(IGZdta$Indicator),selected = unique(IGZdta$Indicator)),
              radioButtons("View5", "Select Display", c("All", "Top/bottom 10", "Top/bottom 5"),inline = TRUE)
+             ),
+      column(4,
+             uiOutput("LineChoices5")
+             ),
+      column(2,
+             radioButtons("Projections5", "Show projections?", c("Yes","No"), selected = "Yes", inline = TRUE) 
              )
       ),
       fluidRow(
