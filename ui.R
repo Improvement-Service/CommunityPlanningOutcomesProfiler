@@ -249,27 +249,27 @@ shinyUI(navbarPage("CPOP",
              ),
       column(3,
              uiOutput("LineChoices5"),
-             plotOutput("5plot_1"),
-             plotOutput("5plot_3"),
-             plotOutput("5plot_5"),
-             plotOutput("5plot_7")
+             radioButtons("Projections5", "Show projections?", c("Yes","No"), selected = "Yes", inline = TRUE)
              ),
       column(3,
-             radioButtons("Projections5", "Show projections?", c("Yes","No"), selected = "Yes", inline = TRUE),
-             plotOutput("5plot_2"),
-             plotOutput("5plot_4"),
-             plotOutput("5plot_6")
+             plotOutput("5plot_1")
              )
       ),
       fluidRow(
         column(1,
                tags$img(src="Arrow3.png")),
-        column(5,
+        column(4,
                DT::dataTableOutput("CommunityProfileTbl")),
         column(1,
                tags$img(src="Arrow4.png")),
-        column(6, 
-               plotOutput("CommunityProfilePlots"))
+        column(3, 
+               plotOutput("5plot_2"),
+               plotOutput("5plot_4"),
+               plotOutput("5plot_6")),
+        column(3,
+               plotOutput("5plot_3"),
+               plotOutput("5plot_5"),
+               plotOutput("5plot_7"))
       )
      
       
