@@ -379,11 +379,8 @@ shinyServer(function(input, output,session) {
     )  
   })
 
-##Create Ui ouputs for page 4 - My communities page=============  
- 
-
 ##Render a UI with a certain number of rows and columns based on selected graphs
-##Excpet this one is for page 2!  
+##Except this one is for page 2!  
   output$uiPage2 <- renderUI({
     slctd <- length(input$grphs2)
 #number of columns is 4, unless there are less than 3 graphs
@@ -459,6 +456,9 @@ shinyServer(function(input, output,session) {
       
     )  
 })
+  
+#Create Ui ouputs for page 4 - My communities page=============  
+
   #create reactive input that updates indicator selection to select all or clear all  
   observeEvent(eventExpr = input$IndiAll,
                handlerExpr = {
@@ -944,7 +944,7 @@ shinyServer(function(input, output,session) {
     selectedIZ <- SpPolysIZ@data[SpPolysIZ@data$InterZone == group,]
     content <- as.character(tagList(
       tags$h4(as.character(unique(selectedIZ$`IGZ name`))),
-      paste("Intermediate Geography Ranking:", as.character(unique(selectedIZ[12]))),
+      paste("Intermediate Geography Ranking:", as.character(unique(selectedIZ[14]))),
       tags$br()
     ))
     leafletProxy("communityMap") %>% addPopups(lng, lat, content, layerId = group)

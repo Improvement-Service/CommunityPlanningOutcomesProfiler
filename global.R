@@ -170,3 +170,10 @@ IGZChange <- ddply(IGZChange,. (Typology_Group, Indicator), transform, StandardD
 IGZChange$TypeChangeScore <- IGZChange$Differences/IGZChange$StandardDeviation
 IGZChange <- select(IGZChange, c(-TypeMean, -Differences, -StandardDeviation))
 
+##For IGZs add Z score column to SpDF
+decs <- c()
+decs <- ddply(IGZ1617, .(InterZone, CPP), summarise, combCPP = sum(CPPScore)) %>%
+  ddply(., .(CPP), mutate, CPPDec = ntile(combCPP, n = 7)) %>% 
+  ddply(.,.(CPP), mutate, CPPRank = frank(combCPP)) %>% select(InterZone, CPPDec,CPPRank)
+SpPolysIZ@data <- left_join(SpPolysIZ@data, decs, by = "InterZone") %>% select(-rank_decs, -`rank-min`)
+names(SpPolysIZ@data)[c(13,14)] <- c("rank_decs", "rank-min")
