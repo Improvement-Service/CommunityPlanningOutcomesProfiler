@@ -1321,27 +1321,25 @@ shinyServer(function(input, output,session) {
     LineChoiceDta <- rbind(Community, LA, Scotland, GrpAv)
     #filter this data to match choices selected
     LineChoiceDta <<- filter(LineChoiceDta, Identifier %in% input$Choices5)
-    #Store unique choices and unique colour values
-    LineChoices <- unique(LineChoiceDta$Identifier)
-    LineColours <- unique(LineChoiceDta$colours)
+    #Store unique unique colour values
+    LineColours <- unique(LineChoiceDta$Colours)
     
     #Create if statement that filters data based on projection selection and plots based on this
     if(input$Projections5 == "No") {LineChoiceDta <- filter(LineChoiceDta, Type != "Projected")} 
 
-    #LineChoiceDta1 <- filter(LineChoiceDta, Indicator == "Child Poverty")
+    #Subset data to plot the selected indicator within the loop
+    loopdata <- subset(LineChoiceDta, LineChoiceDta$Indicator == Indicators5[my.i])
     
-    #ggplot(data = LineChoiceDta1)+
-    #geom_line(aes(x = Year, y = value, group = Identifier, colour = Identifier))
       
-    ggplot()+
-      geom_line(data = LineChoiceDta,
-                aes(x = Year, y = value, group = Identifier, colour = Identifier, linetype = "2"), lwd = 1, show.legend = FALSE)+
+    ggplot(data = loopdata, aes(x = Year, y = value, group = Identifier, colour = Identifier))+
+      geom_line(lwd = 1, show.legend = TRUE)+
       ggtitle(Indicators5[my.i])+
+      scale_colour_manual(breaks = LineColours, values = LineColours)+
       theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
             panel.background = element_blank(), axis.line = element_line(colour="black"),
             axis.text.x = element_text(vjust = 0.3))  
   
-    
+   
   })
     })
   }
