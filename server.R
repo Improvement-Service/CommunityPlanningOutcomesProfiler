@@ -1252,7 +1252,7 @@ shinyServer(function(input, output,session) {
   output$LineChoices5 <- renderUI({
     LineChoices <- LineChoices()
     Choices <- LineChoices
-    checkboxGroupInput("Choices5", "Select lines to plot", Choices, selected = Choices, inline = TRUE)
+    checkboxGroupInput("Choices5", "Select lines to plot", Choices, selected = Choices)
   })
   
   #Store indicators to be plotted
@@ -1319,6 +1319,12 @@ shinyServer(function(input, output,session) {
     
     #Combine reactive data into one data set
     LineChoiceDta <- rbind(Community, LA, Scotland, GrpAv)
+    #Add column to data to fix y axis labels
+    LineChoiceDta$YearLabels <- LineChoiceDta$Year
+    LineChoiceDta$YearLabels <- if_else(LineChoiceDta$Year == "2006/07","2006/07",
+                                        if_else(LineChoiceDta$Year == "2016/17", "2016/17",
+                                                if_else(LineChoiceDta$Year == "2020/21","2020/21","")))
+    LineChoiceDta <- ddply(LineChoiceDta,. (Indicator, Identifier), transform, YearPoints = (seq(1 : length(Year))))
     #filter this data to match choices selected
     LineChoiceDta <- filter(LineChoiceDta, Identifier %in% input$Choices5)
     
@@ -1329,10 +1335,17 @@ shinyServer(function(input, output,session) {
     loopdata <- filter(LineChoiceDta, Indicator == Indicators5[my.i])
     #Store unique colour values
     LineColours <- unique(loopdata$Colours)
+    #Store unique year values
+    YPoints <- unique(loopdata$YearPoints)
+    YPoints <- as.numeric(YPoints)
+    FilterRef <- first(loopdata$Identifier)
+    YLabels <- filter(loopdata, Identifier == FilterRef)
+    YLabels <- YLabels$YearLabels
       
     #Seperarate projected data so this can be plotted seperately
     DashedLine <- loopdata
     SolidLine <- filter(loopdata, Type != "Projected")
+  
     
     #Create Plot
     ggplot()+
@@ -1342,6 +1355,7 @@ shinyServer(function(input, output,session) {
                 aes(x = Year, y = value, group = Identifier, colour = Identifier, linetype = "1"),lwd = 1, show.legend = FALSE)+
       ggtitle(Indicators5[my.i])+
       scale_colour_manual(breaks = LineColours, values = LineColours)+
+      #scale_x_continuous(breaks = c(1: length(YPoints)), labels = YLabels)+
       theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
             panel.background = element_blank(), axis.line = element_line(colour="black"),
             axis.text.x = element_text(vjust = 0.3))
