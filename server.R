@@ -1326,19 +1326,26 @@ shinyServer(function(input, output,session) {
     if(input$Projections5 == "No") {LineChoiceDta <- filter(LineChoiceDta, Type != "Projected")} 
 
     #Subset data to plot the selected indicator within the loop
-    loopdata <<- filter(LineChoiceDta, Indicator == Indicators5[my.i])
-    #Store unique unique colour values
+    loopdata <- filter(LineChoiceDta, Indicator == Indicators5[my.i])
+    #Store unique colour values
     LineColours <- unique(loopdata$Colours)
       
-    ggplot(data = loopdata, aes(x = Year, y = value, group = Identifier, colour = Identifier))+
-      geom_line(lwd = 1)+
+    #Seperarate projected data so this can be plotted seperately
+    DashedLine <- loopdata
+    SolidLine <- filter(loopdata, Type != "Projected")
+    
+    #Create Plot
+    ggplot()+
+      geom_line(data = DashedLine, 
+                aes(x = Year, y = value, group = Identifier, colour = Identifier, linetype = "2"),lwd = 1, show.legend = FALSE)+
+      geom_line(data = SolidLine, 
+                aes(x = Year, y = value, group = Identifier, colour = Identifier, linetype = "1"),lwd = 1, show.legend = FALSE)+
       ggtitle(Indicators5[my.i])+
       scale_colour_manual(breaks = LineColours, values = LineColours)+
       theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
             panel.background = element_blank(), axis.line = element_line(colour="black"),
-            axis.text.x = element_text(vjust = 0.3))  
-  
-   
+            axis.text.x = element_text(vjust = 0.3))
+    
   })
     })
   }
