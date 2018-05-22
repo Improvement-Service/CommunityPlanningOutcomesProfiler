@@ -1320,19 +1320,18 @@ shinyServer(function(input, output,session) {
     #Combine reactive data into one data set
     LineChoiceDta <- rbind(Community, LA, Scotland, GrpAv)
     #filter this data to match choices selected
-    LineChoiceDta <<- filter(LineChoiceDta, Identifier %in% input$Choices5)
-    #Store unique unique colour values
-    LineColours <- unique(LineChoiceDta$Colours)
+    LineChoiceDta <- filter(LineChoiceDta, Identifier %in% input$Choices5)
     
     #Create if statement that filters data based on projection selection and plots based on this
     if(input$Projections5 == "No") {LineChoiceDta <- filter(LineChoiceDta, Type != "Projected")} 
 
     #Subset data to plot the selected indicator within the loop
-    loopdata <- subset(LineChoiceDta, LineChoiceDta$Indicator == Indicators5[my.i])
-    
+    loopdata <<- filter(LineChoiceDta, Indicator == Indicators5[my.i])
+    #Store unique unique colour values
+    LineColours <- unique(loopdata$Colours)
       
     ggplot(data = loopdata, aes(x = Year, y = value, group = Identifier, colour = Identifier))+
-      geom_line(lwd = 1, show.legend = TRUE)+
+      geom_line(lwd = 1)+
       ggtitle(Indicators5[my.i])+
       scale_colour_manual(breaks = LineColours, values = LineColours)+
       theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
