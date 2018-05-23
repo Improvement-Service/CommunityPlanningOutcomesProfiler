@@ -1350,12 +1350,12 @@ shinyServer(function(input, output,session) {
     #Create Plot
     ggplot()+
       geom_line(data = DashedLine, 
-                aes(x = Year, y = value, group = Identifier, colour = Identifier, linetype = "2"),lwd = 1, show.legend = FALSE)+
+                aes(x = YearPoints, y = value, group = Identifier, colour = Identifier, linetype = "2"),lwd = 1, show.legend = FALSE)+
       geom_line(data = SolidLine, 
-                aes(x = Year, y = value, group = Identifier, colour = Identifier, linetype = "1"),lwd = 1, show.legend = FALSE)+
+                aes(x = YearPoints, y = value, group = Identifier, colour = Identifier, linetype = "1"),lwd = 1, show.legend = FALSE)+
       ggtitle(Indicators5[my.i])+
       scale_colour_manual(breaks = LineColours, values = LineColours)+
-      #scale_x_continuous(breaks = c(1: length(YPoints)), labels = YLabels)+
+      scale_x_continuous(breaks = c(1: length(YPoints)), labels = YLabels)+
       theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
             panel.background = element_blank(), axis.line = element_line(colour="black"),
             axis.text.x = element_text(vjust = 0.3))
