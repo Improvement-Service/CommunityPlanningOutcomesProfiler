@@ -238,14 +238,7 @@ shinyUI(navbarPage("CPOP",
 
    
  ),
- tabPanel("All Communities by Outcome",icon = icon("bath"),
-          fluidPage(
-            fluidRow(column(6, selectInput("CPP-AllC","Select CPP", unique(IGZdta$CPP))),
-                     column(6,selectInput("Indi-AllC", "Select Indicator", unique(IGZdta$Indicator)))),
-            hr(),
-            plotOutput("AllCPlots")
-          )
- ),
+ 
  tabPanel("Community Profile - Page5",
   fluidPage(
     fluidRow(
@@ -285,6 +278,16 @@ shinyUI(navbarPage("CPOP",
                plotOutput("5plot_7"))
       )
 
+          )
+ ),
+ 
+ 
+ tabPanel("All Communities by Outcome",icon = icon("bath"),
+          fluidPage(
+            fluidRow(column(6, selectInput("CPP-AllC","Select CPP", unique(IGZdta$CPP))),
+                     column(6,selectInput("Indi-AllC", "Select Indicator", unique(IGZdta$Indicator)))),
+            hr(),
+            plotOutput("AllCPlots")
           )
  )
 ))
