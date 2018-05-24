@@ -554,7 +554,7 @@ shinyServer(function(input, output,session) {
       arrange(TypeChangeRank)
     colnames(Column4)[1] <- "Variable4"
     
-    MyCommunitiesDta <<- cbind(Column1, Column2, Column3, Column4) %>%
+    MyCommunitiesDta <- cbind(Column1, Column2, Column3, Column4) %>%
       select(c(-CPPScoreRank, -TypeScoreRank, -CPPChangeRank, -TypeChangeRank))
     
     ###Calculate References for Colours
@@ -608,7 +608,6 @@ shinyServer(function(input, output,session) {
     MyCommunitiesDta <- join(MyCommunitiesDta, colours4, by = "Variable4")
    
     #Store unique colour reference to use as intervals in styling
-    #Store_unique <- unique(MyCommunitiesDta$Helper)
     Store_unique1 <- unique(MyCommunitiesDta$Helper1)
     Store_unique2 <- unique(MyCommunitiesDta$Helper2) %>% sort
     Store_unique3 <- unique(MyCommunitiesDta$Helper3) %>% sort
@@ -961,8 +960,403 @@ shinyServer(function(input, output,session) {
     
   })
   
-##All communities per indicator==================================
-##Firstly render all of the plots for filling in the UI rendered below 
+  
+##Create Ui ouputs for page 5 - Community Profile=============    
+  #Create reactive selection for community, filter to only show communities within the CPP
+  output$Comm5 <- renderUI({
+    IGZsubset <- filter(IGZdta, CPP == input$LA5)
+    selectInput("Community5", "Select a Community", sort(unique(IGZsubset$InterZone_Name)))
+  })
+  
+  #Create text showing group description of community selected
+  output$Descrip <- renderText({
+    IGZsubset <- filter(IGZdta, InterZone_Name == input$Community5)
+    txt <- first(IGZsubset$Typology_Name)
+    txt <- paste("Group Description: ", txt)
+  })
+  
+  #Create text showing the number of other communities in the selected group
+  output$GrpSize <- renderText({
+    IGZsubset <- filter(IGZdta, InterZone_Name == input$Community5)
+    Typology <- first(IGZsubset$Typology_Group)
+    Indi <- first(IGZsubset$Indicator)
+    Yr <- first(IGZsubset$Year)
+    TypeSubset <- filter(IGZdta, Typology_Group == Typology & Indicator == Indi & Year == Yr)
+    Size <- nrow(TypeSubset)
+    Size <- Size - 1
+    txt <- paste(Size, " other, similar communities in this group")
+  })
+  
+  ###create reactive data selections to be used in table
+  #Create a reactive function to store vaue of typology group selected
+  selectedType <- reactive({
+    IGZsubset <- filter(IGZdta, InterZone_Name == input$Community5)
+    Typology <- first(IGZsubset$Typology_Group)
+  })
+  
+  #Create a reactive function to filter Best&Worst data based on Typology and indicators selected
+  selectedDta5a <- reactive({
+    selectedType <- selectedType()
+    Typology <- selectedType
+    dta5a <- filter(IGZ1617, Typology_Group == Typology & Indicator %in% input$Indi5)
+  })
+  
+  #Create a 2nd reactive function to filter Best&Worst change data based on Typology and indicators selected
+  selectedDta5b <- reactive({
+    selectedType <- selectedType()
+    Typology <- selectedType
+    dta5b <- filter(IGZChange, Typology_Group == Typology & Indicator %in% input$Indi5)
+  })
+  
+  #Create a reactive function to store name of council selected, to be used in variable names within the table
+  selectedCPP5 <- reactive({
+    CPP5 <- input$LA5
+  })
+  
+  #Create a reactive function to store name of community selected
+  selectedComm <- reactive({
+    Community <- input$Community5
+  })
+  
+  #Create a reactive function to store display selection
+  selectedDisplay5 <- reactive({
+    Display5 <- input$View5
+  })
+  
+  ###create table output
+  output$CommunityProfileTbl <- DT::renderDataTable({
+    
+    ###Create rankings for table
+    
+    ##Create Rankings for Outcomes
+    selectedDta5a <- selectedDta5a()
+    IGZBest <- selectedDta5a
+    
+    #Calculate combined Type score by grouping by individial IGZ and summing scores
+    IGZBest <- ddply(IGZBest,. (InterZone), transform, CombinedTypeScore = (sum(TypeScore)))
+    
+    #Filter data so that combined scores are only displayed once for each IGZ
+    #add column which displays the name of the 1st indicator selected, then filter where data equals this
+    IGZBest <- ddply(IGZBest,. (InterZone), transform, FilterRef = (first(Indicator)))
+    IGZBest <- filter(IGZBest, Indicator == FilterRef)
+  
+    #Create rankings for scores
+    IGZBest$TypeScoreRank <- rank(IGZBest$CombinedTypeScore)
+    
+    #Concatenate CPP Names with Community Names
+    IGZBest <- ddply(IGZBest,. (InterZone), transform, InterZone_Name = paste(CPP, "-",InterZone_Name))
+    
+    ##Create Rankings for Improvement
+    selectedDta5b <- selectedDta5b()
+    IGZImprovement <- selectedDta5b
+    
+    #Calculate combined Type score by grouping by individial IGZ and summing scores
+    IGZImprovement <- ddply(IGZImprovement,. (InterZone), transform, CombinedTypeChangeScore = (sum(TypeChangeScore)))
+    
+    #Filter data so that combined scores are only displayed once for each IGZ
+    #add column which displays the name of the 1st indicator selected, then filter where data equals this
+    IGZImprovement <- ddply(IGZImprovement,. (InterZone), transform, FilterRef = (first(Indicator)))
+    IGZImprovement <-filter(IGZImprovement, Indicator == FilterRef)
+    
+    #Create rankings for scores
+    IGZImprovement$TypeChangeRank <- rank(IGZImprovement$CombinedTypeChangeScore)
+    
+    #Concatenate CPP Names with Community Names
+    IGZImprovement <- ddply(IGZImprovement,. (InterZone), transform, InterZone_Name = paste(CPP, "-",InterZone_Name))
+    
+    ###Split Data into 2 individual DataTables for each ranking, then combine into 1 table
+    Column1 <- select(IGZBest, c(InterZone_Name, TypeScoreRank)) %>%
+      arrange(TypeScoreRank)
+    colnames(Column1)[1] <- "Variable1"
+
+    Column2 <- select(IGZImprovement, c(InterZone_Name, TypeChangeRank)) %>%
+      arrange(TypeChangeRank)
+    colnames(Column2)[1] <- "Variable2"
+    
+    CommunityProfileDta <- cbind(Column1, Column2) %>%
+      select(c(-TypeScoreRank, -TypeChangeRank))
+    
+    ###Calculate References for Colours
+    #Store the number of IGZ
+    NoIGZ <- nrow(CommunityProfileDta)
+    NoIGZ <- as.numeric(NoIGZ)
+    
+    #select the number of colours required
+    Clrs <- if_else((NoIGZ < 11),NoIGZ,11)
+    
+    #Divide the number of IGZ by the number of colours being used to determine how many times to repeat colour 
+    groupings <- round(NoIGZ/Clrs)
+    #Create a number sequence for the different colours
+    Number_seq <- rep(1:Clrs, each = groupings)
+    #Check the length of this colour sequence to determine whether more needs to be added or some need to be removed
+    length_seq <- length(Number_seq)
+    Diff_seq <- NoIGZ - length_seq
+    
+    ##Add in if statement that checks whether Diff_seq is negative 
+    #if difference is negative have a smaller number within each grouping
+    if(Diff_seq < 0) {groupings <- groupings -1}
+    
+    #Create the number sequence again on this bases
+    Number_seq2 <- rep(1:Clrs, each = groupings)
+    length_seq2 <- length(Number_seq2)
+    Diff_seq2 <- NoIGZ - length_seq2
+    
+    #distribute a roughly equal proportion of the colours
+    extra <- seq.int(from = 2, to = Clrs, length.out = Diff_seq2)
+    extra <- round(extra)
+    
+    #add this to the overall sequence, order it and add to the data set
+    Complete_seq <- c(Number_seq2,extra)
+    Complete_seq <- sort(Complete_seq)
+    CommunityProfileDta$Helper1 <- Complete_seq
+    
+    ####Create colours for the remaining column
+    #Filter the names in column 1 and the colour references of these
+    #rename the columns and join these back up with the relevant column in the original table
+    #This will keep the order of the original column but match the colour references to the IGZ name
+    colours2 <- CommunityProfileDta[,c(1,3)]
+    colnames(colours2) <- c("Variable2", "Helper2")
+    CommunityProfileDta <- join(CommunityProfileDta, colours2, by = "Variable2")
+    
+    #Store unique colour reference to use as intervals in styling
+    Store_unique1 <- unique(CommunityProfileDta$Helper1)
+    Store_unique2 <- unique(CommunityProfileDta$Helper2) %>% sort
+    
+    #Store colours to be used
+    ColourPal <- brewer.pal(Clrs,"RdYlGn")
+    
+    #Call CPP Name to be used in variable names
+    selectedCPP5 <- selectedCPP5()
+    CPPName <- selectedCPP5
+      
+    ###Create helper column to determine which IGZ should be bold
+    #call Community name
+    selectedComm <- selectedComm()
+    Community <- selectedComm
+    
+    #concatenate community name with CPP name so that comparison can be made
+    Community <- paste(CPPName, "-", Community)
+    
+    #Add new community name as a column of data
+    CommunityProfileDta$Community <- Community
+    
+    #If IGZ name matches the community selected set as yes, otherwise no
+    CommunityProfileDta$Community1 <- if_else(CommunityProfileDta$Variable1 == CommunityProfileDta$Community,
+                                        "Yes","No")
+    CommunityProfileDta$Community2 <- if_else(CommunityProfileDta$Variable2 == CommunityProfileDta$Community,
+                                              "Yes","No")
+    CommunityProfileDta <- select(CommunityProfileDta, -Community)
+    
+    #Store unique Yes No values for levels in style Equal
+    fontlevels <- c("No", "Yes")
+
+    #Store values of font wanted
+    fontvalues <- c('normal', 'bold')
+     
+    #Rename variables
+    colnames(CommunityProfileDta)[1] <- paste("How does the selected community in  ", CPPName, 
+                                                " compare to similar communities in Scotland?")
+    colnames(CommunityProfileDta)[2] <- paste("How does the improvement rate of the selected community in ", 
+                                              CPPName, " compare to similar communities in Scotland?")
+    
+    #####add empty column so that there is space between the columns in the table
+    #order these bewteen the columns and ensure column name is blank
+    CommunityProfileDta[,ncol(CommunityProfileDta)+1] <- NA
+    CommunityProfileDta <- CommunityProfileDta[,c(1,7,2,3,4,5,6)]
+    colnames(CommunityProfileDta)[2] <- ""
+    
+    #Store values of the colours which need to have white text
+    WhiteTxt <- c(head(Store_unique1,2),tail(Store_unique1,2))
+    TxtValue <- Store_unique1
+    TxtValue <- if_else(TxtValue %in% WhiteTxt, "White", "Black")
+    
+    #####Allow table to be split into top/bottom 10 and top/bottom 5
+    
+    #Create an if statement to determine how many rows to split by if CPP has small no. of IGZ
+    Top10Rows <- if_else(NoIGZ<20,
+                         if_else((NoIGZ%%2)==0, NoIGZ/2, (NoIGZ/2)+0.5 ),
+                         10)
+    
+    Bottom10Rows <- if_else(NoIGZ<20,
+                            if_else((NoIGZ%%2)==0, NoIGZ/2, (NoIGZ/2)-0.5 ),
+                            10)
+    
+    #Create seperate table of top 10, add an empty row, then add to seperate table of bottom 10
+    Top10 <- head(CommunityProfileDta,Top10Rows)
+    Top10[nrow(Top10)+2,] <- NA
+    Bottom10 <- tail(CommunityProfileDta, Bottom10Rows)
+    TopBottom10 <- rbind(Top10, Bottom10)
+    
+    #Same for top and bottom 5
+    Top5Rows <- if_else(NoIGZ<10,
+                        if_else((NoIGZ%%2)==0, NoIGZ/2, (NoIGZ/2)+0.5 ),
+                        5)
+    
+    Bottom5Rows <- if_else(NoIGZ<10,
+                           if_else((NoIGZ%%2)==0, NoIGZ/2, (NoIGZ/2)-0.5 ),
+                           5)
+    
+    Top5 <- head(CommunityProfileDta,Top5Rows)
+    Top5[nrow(Top5)+2,] <- NA
+    Bottom5 <- tail(CommunityProfileDta, Bottom5Rows)
+    TopBottom5 <- rbind(Top5, Bottom5)
+    
+    #Call display input
+    selectedDisplay5 <- selectedDisplay5()
+    Display <- selectedDisplay5
+    
+    #Create if statements to select data based on display input
+    if(Display == "Top/bottom 10") { CommunityProfileDta <- TopBottom10}
+    if(Display == "Top/bottom 5") {CommunityProfileDta <- TopBottom5}
+    
+    #Create table
+    datatable(CommunityProfileDta, options = list(
+      columnDefs =list(list(visible = FALSE, targets = c(3,4,5,6)),
+                       list(width = '400px', targets = c(0,2))),
+      pageLength = 136, 
+      dom = "t", 
+      ordering = F
+    ),
+    class = 'compact',
+    rownames = FALSE,
+    selection = 'none')%>%
+      formatStyle(columns = 1, valueColumns = 4 ,backgroundColor = styleEqual(Store_unique1,ColourPal))%>%
+      formatStyle(columns = 3, valueColumns = 5 ,backgroundColor = styleEqual(Store_unique2,ColourPal))%>%
+      formatStyle(columns = 1, valueColumns = 4, color = styleEqual(Store_unique1,TxtValue))%>%
+      formatStyle(columns = 3, valueColumns = 5, color = styleEqual(Store_unique1,TxtValue))%>%
+      formatStyle(columns = 1, valueColumns = 6, fontWeight = styleEqual(fontlevels,fontvalues))%>%
+      formatStyle(columns = 3, valueColumns = 7, fontWeight = styleEqual(fontlevels,fontvalues))
+    
+  })
+  
+  ####Create Graphs for Community Profile Page
+  
+  ##First create checkbox selections within a reactive function
+  LineChoices <- reactive({
+    LA <- input$LA5
+    Community <- input$Community5
+    Choices <- c(Community, LA, "Scotland", "Group Average")
+  })
+  
+  #Create ui output for checkbox selection
+  output$LineChoices5 <- renderUI({
+    LineChoices <- LineChoices()
+    Choices <- LineChoices
+    checkboxGroupInput("Choices5", "Select lines to plot", Choices, selected = Choices)
+  })
+  
+  #Store indicators to be plotted
+  Indicators5 <- unique(IGZdta$Indicator)
+  
+  ##use reactive functions to store possible data selections
+  CommunityChoice <- reactive({
+    Community <- filter(IGZdta, InterZone_Name == input$Community5)
+    Community$Identifier <- input$Community5
+    Community$Colours <- "red"
+    Community <- select(Community, c(-InterZone, -InterZone_Name, -CPP, -Typology_Group, -Typology_Name,
+                                     -`High is Positive?`) )
+  })
+  
+  LAChoice <- reactive({
+    Indicators <- unique(IGZdta$Indicator)
+    LA <- filter(CPPdta, CPP == input$LA5 & Indicator %in% Indicators)
+    LA$Identifier <- input$LA5
+    LA$Colours <- "green"
+    LA <- select(LA, c(-CPP, -FG))
+  })
+  
+  ScotlandChoice <- reactive({
+    Indicators <- unique(IGZdta$Indicator)
+    Scotland <- filter(CPPdta, CPP == "Scotland" & Indicator %in% Indicators)
+    Scotland$Identifier <- "Scotland"
+    Scotland$Colours <- "blue"
+    Scotland <- select(Scotland, c(-CPP, -FG))
+  })
+  
+  GrpAvChoice <- reactive({
+    IGZsubset <- filter(IGZdta, InterZone_Name == input$Community5)
+    Typology <- first(IGZsubset$Typology_Group)
+    GrpAv <- filter(IGZdta, Typology_Group == Typology)
+    GrpAv <- select(GrpAv, -`High is Positive?`)
+    GrpAv <- ddply(GrpAv,. (Indicator, Year), transform, GrpAver = mean(value))
+    GrpAv <- filter(GrpAv, InterZone_Name == input$Community5)
+    GrpAv <- select(GrpAv, -value)
+    colnames(GrpAv)[9] <- "value"
+    GrpAv$Identifier <- "Group Average"
+    GrpAv$Colours <- "orange"
+    GrpAv <- select(GrpAv, c(-InterZone, -InterZone_Name, -CPP, -Typology_Group, -Typology_Name))
+  })
+  
+  ###Create plot outputs
+  for(i in seq_along(Indicators5)){
+    local({
+      my.i <- i
+      plotname <- paste("5plot", my.i, sep ="_")
+      output[[plotname]]<- renderPlot({
+    
+    #Call reactive data
+    CommunityChoice <- CommunityChoice()
+    Community <- CommunityChoice
+    
+    LAChoice <- LAChoice()
+    LA <- LAChoice
+    
+    ScotlandChoice <- ScotlandChoice()
+    Scotland <- ScotlandChoice
+    
+    GrpAvChoice <- GrpAvChoice()
+    GrpAv <- GrpAvChoice
+    
+    #Combine reactive data into one data set
+    LineChoiceDta <- rbind(Community, LA, Scotland, GrpAv)
+    #Add column to data to fix y axis labels
+    LineChoiceDta$YearLabels <- LineChoiceDta$Year
+    LineChoiceDta$YearLabels <- if_else(LineChoiceDta$Year == "2006/07","2006/07",
+                                        if_else(LineChoiceDta$Year == "2016/17", "2016/17",
+                                                if_else(LineChoiceDta$Year == "2020/21","2020/21","")))
+    LineChoiceDta <- ddply(LineChoiceDta,. (Indicator, Identifier), transform, YearPoints = (seq(1 : length(Year))))
+    #filter this data to match choices selected
+    LineChoiceDta <- filter(LineChoiceDta, Identifier %in% input$Choices5)
+    
+    #Create if statement that filters data based on projection selection and plots based on this
+    if(input$Projections5 == "No") {LineChoiceDta <- filter(LineChoiceDta, Type != "Projected")} 
+
+    #Subset data to plot the selected indicator within the loop
+    loopdata <- filter(LineChoiceDta, Indicator == Indicators5[my.i])
+    #Store unique colour values
+    LineColours <- unique(loopdata$Colours)
+    #Store unique year values
+    YPoints <- unique(loopdata$YearPoints)
+    YPoints <- as.numeric(YPoints)
+    FilterRef <- first(loopdata$Identifier)
+    YLabels <- filter(loopdata, Identifier == FilterRef)
+    YLabels <- YLabels$YearLabels
+      
+    #Seperarate projected data so this can be plotted seperately
+    DashedLine <- loopdata
+    SolidLine <- filter(loopdata, Type != "Projected")
+  
+    
+    #Create Plot
+    ggplot()+
+      geom_line(data = DashedLine, 
+                aes(x = YearPoints, y = value, group = Identifier, colour = Identifier, linetype = "2"),lwd = 1, show.legend = FALSE)+
+      geom_line(data = SolidLine, 
+                aes(x = YearPoints, y = value, group = Identifier, colour = Identifier, linetype = "1"),lwd = 1, show.legend = FALSE)+
+      ggtitle(Indicators5[my.i])+
+      scale_colour_manual(breaks = LineColours, values = LineColours)+
+      scale_x_continuous(breaks = c(1: length(YPoints)), labels = YLabels)+
+      theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
+            panel.background = element_blank(), axis.line = element_line(colour="black"),
+            axis.text.x = element_text(vjust = 0.3))
+    
+  })
+    })
+  }
+
+      
+  ##All communities per indicator==================================
+  ##Firstly render all of the plots for filling in the UI rendered below 
   myheight <- function(){
     nrow(unique(IGZdta[IGZdta$CPP== input$`CPP-AllC`,"InterZone_Name"]))*60
   }
@@ -987,9 +1381,12 @@ shinyServer(function(input, output,session) {
         theme(axis.text.x =  element_text(angle = 90, vjust = 0, hjust = 1))+
         ylab("")+xlab("")+
         scale_x_discrete(breaks = yrs, expand = c(0.01,0.01))+
-      scale_color_manual(breaks = c("Com", "CPP", "Scot") ,values = c("red", "green","blue"))+
-      guides(colour = FALSE)
+        scale_color_manual(breaks = c("Com", "CPP", "Scot") ,values = c("red", "green","blue"))+
+        guides(colour = FALSE)
     })
     do.call("plot_grid", c(plts, ncol = 4))
   }, height = myheight)
+  
+  
+
 })
