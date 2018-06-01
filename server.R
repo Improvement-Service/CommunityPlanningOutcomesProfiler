@@ -12,10 +12,8 @@ shinyServer(function(input, output,session) {
   
   #add new column to show rate of improvement 
   CPPdtaCurrent <- filter(CPPdtaCurrent, Type != "Projected")
-  CPPdtaCurrent <- ddply(CPPdtaCurrent,. (CPP, Indicator), transform, Diff = (last(value) - first(value)))
-  CPPdtaCurrent <- ddply(CPPdtaCurrent,. (CPP, Indicator), transform, Improvement_Rate = ((Diff/first(value))*100))
-  CPPdtaCurrent <- select(CPPdtaCurrent, -Diff)
-  
+  #CPPdtaCurrent <- ddply(CPPdtaCurrent, .(CPP, Indicator), transform, Improvement_Rate = ((last(value)/first(value)-1)*100))
+  CPPdtaCurrent <- setDT(CPPdtaCurrent)[, Improvement_Rate :=(last(value)/first(value)-1)*100,by = list(CPP, Indicator)]
   #add new column to show whether a high value represents a positive outcome
   CPPdtaCurrent <- CPPdtaCurrent %>% mutate(`High is Positive?` = "Yes")
   CPPdtaCurrent$`High is Positive?`[CPPdtaCurrent$Indicator %in% c("Dwelling Fires", "Unplanned Hospital Attendances",
