@@ -232,16 +232,62 @@ shinyUI(navbarPage("CPOP",
     )
     
   )        
+
           
 
 
    
  ),
+ 
+ tabPanel("Community Profile - Page5",
+  fluidPage(
+    fluidRow(
+      column(3,
+             selectInput("LA5","Select a Local Authority", unique(filter(IGZdta, CPP != "Scotland"))[[3]],
+                         selected = 1),
+             uiOutput("Comm5"),
+             h3(textOutput("Descrip")),
+             h3(textOutput("GrpSize"))
+              ),
+      column(3,
+             checkboxGroupInput("Indi5", "Select Indicators",unique(IGZdta$Indicator),selected = unique(IGZdta$Indicator)),
+             radioButtons("View5", "Select Display", c("All", "Top/bottom 10", "Top/bottom 5"),inline = TRUE)
+             ),
+      column(3,
+             uiOutput("LineChoices5"),
+             radioButtons("Projections5", "Show projections?", c("Yes","No"), selected = "Yes", inline = TRUE)
+             ),
+      column(3,
+             plotOutput("5plot_1")
+             )
+      ),
+      fluidRow(
+        column(1,
+               tags$img(src="Arrow3.png")),
+        column(4,
+               DT::dataTableOutput("CommunityProfileTbl")),
+        column(1,
+               tags$img(src="Arrow4.png")),
+        column(3, 
+               plotOutput("5plot_2"),
+               plotOutput("5plot_4"),
+               plotOutput("5plot_6")),
+        column(3,
+               plotOutput("5plot_3"),
+               plotOutput("5plot_5"),
+               plotOutput("5plot_7"))
+      )
+
+          )
+ ),
+ 
+ 
  tabPanel("All Communities by Outcome",icon = icon("bath"),
           fluidPage(
             fluidRow(column(6, selectInput("CPP-AllC","Select CPP", unique(IGZdta$CPP))),
                      column(6,selectInput("Indi-AllC", "Select Indicator", unique(IGZdta$Indicator)))),
             hr(),
             plotOutput("AllCPlots")
-          ))
+          )
+ )
 ))
