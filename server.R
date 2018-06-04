@@ -88,10 +88,11 @@ shinyServer(function(input, output,session) {
         
     #add new "year2" column to the data to store numeirc values for year
     loopdata <- arrange(loopdata, CPP)
-    loopdata <- ddply(loopdata,. (CPP), transform, Year2 = (seq(1 : length(Year))))
-
+    ##loopdata <- ddply(loopdata,. (CPP), transform, Year2 = (seq(1 : length(Year))))
+    loopdata <- setDT(loopdata)[, Year2 :=(seq(1 : length(Year))), by = CPP]
     #add new "year3" column to store x axis labels
-    loopdata <- ddply(loopdata,. (CPP), transform, Year3 = Year)
+    ##loopdata <- ddply(loopdata,. (CPP), transform, Year3 = Year)
+    loopdata <- setDT(loopdata)[, Year3 :=Year, by = CPP]
     loopdata$Year3 <- as.character(loopdata$Year3)
     Years2 <- unique(loopdata$Year2)
         
@@ -125,7 +126,6 @@ shinyServer(function(input, output,session) {
             })  
   }
   
-  ##########
 
 ##Events for Button inputs page 2 and 3======================  
   observeEvent(input$selAll2,
