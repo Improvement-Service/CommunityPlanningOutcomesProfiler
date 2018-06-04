@@ -189,7 +189,7 @@ shinyUI(navbarPage("CPOP",
          )
             )),
 
- tabPanel("My Communities Page - Page 4",
+ tabPanel("My Communities",
   fluidPage(
     tags$head(
       tags$style(HTML("
@@ -239,7 +239,7 @@ shinyUI(navbarPage("CPOP",
    
  ),
  
- tabPanel("Community Profile - Page5",
+ tabPanel("Community Profile",
   fluidPage(
     fluidRow(
       column(3,
@@ -282,7 +282,7 @@ shinyUI(navbarPage("CPOP",
  ),
  
  
- tabPanel("All Communities by Outcome",icon = icon("bath"),
+ tabPanel("All Communities",icon = icon("bath"),
           fluidPage(
             fluidRow(column(6, selectInput("CPP-AllC","Select CPP", unique(IGZdta$CPP))),
                      column(6,selectInput("Indi-AllC", "Select Indicator", unique(IGZdta$Indicator)))),

@@ -15,7 +15,6 @@ SpPolysDF<-read_rds("Files for Maps/Shapes_decs.rds")
 SpPolysIZ <- read_rds("Files for Maps/IZshapes_decs.rds")
 CPPdta <- read_csv("CPPcleandata.csv")
 IGZdta <- read_csv("IGZcleandata.csv")
-DZdta <- read_csv("DZcleandata.csv")
 IGZ1617 <- read_csv("IGZ1617Typology.csv")
 IGZChange <- read_csv("IGZChangeTypology.csv")
 
