@@ -983,8 +983,7 @@ shinyServer(function(input, output,session) {
     Indi <- first(IGZsubset$Indicator)
     Yr <- first(IGZsubset$Year)
     TypeSubset <- filter(IGZdta, Typology_Group == Typology & Indicator == Indi & Year == Yr)
-    Size <- nrow(TypeSubset)
-    Size <- Size - 1
+    Size <- nrow(TypeSubset)-1
     txt <- paste(Size, " other, similar communities in this group")
   })
   
@@ -1018,11 +1017,11 @@ shinyServer(function(input, output,session) {
     
     #Calculate combined Type score by grouping by individial IGZ and summing scores
     #IGZBest <- ddply(IGZBest,. (InterZone), transform, CombinedTypeScore = (sum(TypeScore)))
-    IGZBest <- setDT(IGZBest)[,CombinedTypeScore := sum(TypeScore), by = InterZone]
+    IGZBest <- setDT(IGZBest)[,CombinedTypeScore := (sum(TypeScore)), by = InterZone]
     #Filter data so that combined scores are only displayed once for each IGZ
     #add column which displays the name of the 1st indicator selected, then filter where data equals this
     #IGZBest <- ddply(IGZBest,. (InterZone), transform, FilterRef = (first(Indicator)))
-    IGZBest <- setDT(IGZBest)[,FilterRef := first(Indicator), by = InterZone]
+    IGZBest <- setDT(IGZBest)[,FilterRef := (first(Indicator)), by = InterZone]
     IGZBest <- filter(IGZBest, Indicator == FilterRef)
   
     #Create rankings for scores
@@ -1030,7 +1029,7 @@ shinyServer(function(input, output,session) {
     
     #Concatenate CPP Names with Community Names
     #IGZBest <- ddply(IGZBest,. (InterZone), transform, InterZone_Name = paste(CPP, "-",InterZone_Name))
-    IGZBest <- setDT(IGZBest)[, InterZone_Name := paste(CPP, "-",InterZone_Name), by = InterZone]
+    IGZBest$InterZone_Name <-  paste(IGZBest$CPP, "-",IGZBest$InterZone_Name)
     ##Create Rankings for Improvement
     IGZImprovement <- selectedDta5b()
     
@@ -1257,16 +1256,15 @@ shinyServer(function(input, output,session) {
     IGZsubset <- filter(IGZdta, InterZone_Name == input$Community5)
     Typology <- first(IGZsubset$Typology_Group)
     GrpAv <- filter(IGZdta, Typology_Group == Typology)
-    GrpAv <- select(GrpAv, -`High is Positive?`)
-    GrpAv <- ddply(GrpAv,. (Indicator, Year), transform, GrpAver = mean(value))
-    #GrpAv <- setDT(GrpAv)[,GrpAver := mean(value), by = list(Indicator, Year)]
+    #GrpAv <- select(GrpAv, -`High is Positive?`)
+    #GrpAv <- ddply(GrpAv,. (Indicator, Year), transform, GrpAver = mean(value))
+    GrpAv <- setDT(GrpAv)[,GrpAver := mean(value), by = list(Indicator, Year)]
     GrpAv <- filter(GrpAv, InterZone_Name == input$Community5)
     GrpAv <- select(GrpAv, -value)
     colnames(GrpAv)[9] <- "value"
     GrpAv$Identifier <- "Group Average"
     GrpAv$Colours <- "orange"
-    GrpAv <- select(GrpAv, c(-InterZone, -InterZone_Name, -CPP, -Typology_Group, -Typology_Name,
-                             -`High is Positive?`))
+    GrpAv <- select(GrpAv, c(-InterZone, -InterZone_Name, -CPP, -Typology_Group, -Typology_Name))
   })
   
   ###Create plot outputs
@@ -1293,7 +1291,7 @@ shinyServer(function(input, output,session) {
                                         if_else(LineChoiceDta$Year == "2016/17", "2016/17",
                                                 if_else(LineChoiceDta$Year == "2020/21","2020/21","")))
     #LineChoiceDta <- ddply(LineChoiceDta,. (Indicator, Identifier), transform, YearPoints = (seq(1 : length(Year))))
-    LineChoiceDta <- setDT(LineChoiceDta)[.,YearPoints := seq(1 : length(Year)), by = list(Indicator, Identifier) ]
+    LineChoiceDta <- setDT(LineChoiceDta)[,YearPoints := seq(1 : length(Year)), by = list(Indicator, Identifier) ]
     #filter this data to match choices selected
     LineChoiceDta <- filter(LineChoiceDta, Identifier %in% input$Choices5)
     
