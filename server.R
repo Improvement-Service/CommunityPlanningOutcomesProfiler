@@ -204,10 +204,11 @@ shinyServer(function(input, output,session) {
 
     #add new "year2" column to the data to store numeirc values for year
     dtasubset <- arrange(dtasubset, CPP)
-    dtasubset <- ddply(dtasubset,. (CPP), transform, Year2 = (seq(1 : length(Year))))
-    
+    #dtasubset <- ddply(dtasubset,. (CPP), transform, Year2 = (seq(1 : length(Year))))
+    dtasubset <- setDT(dtasubset)[, Year2:=seq(1:length(Year)), by = CPP]
     #add new "year3" column to store x axis labels
-    dtasubset <- ddply(dtasubset,. (CPP), transform, Year3 = Year)
+    #dtasubset <- ddply(dtasubset,. (CPP), transform, Year3 = Year)
+    dtasubset <- setDT(dtasubset)[, Year3 :=Year, by = CPP]
     dtasubset$Year3 <- as.character(dtasubset$Year3)
     Years2 <- unique(dtasubset$Year2)
     
@@ -499,16 +500,18 @@ shinyServer(function(input, output,session) {
     
     
     ###Create rankings for outcomes
-    selectedDta4a <- selectedDta4a()
-    IGZBest <- selectedDta4a
+    IGZBest <- selectedDta4a()
     
     #Calculate combined CPP score and combined Type score by grouping by individial IGZ and summing scores
-    IGZBest <- ddply(IGZBest,. (InterZone), transform, CombinedCPPScore = (sum(CPPScore)))
-    IGZBest <- ddply(IGZBest,. (InterZone), transform, CombinedTypeScore = (sum(TypeScore)))
+    #IGZBest <- ddply(IGZBest,. (InterZone), transform, CombinedCPPScore = (sum(CPPScore)))
+    IGZBest <-setDT(IGZBest)[, CombinedCPPScore := sum(CPPScore), by = InterZone]
+    #IGZBest <- ddply(IGZBest,. (InterZone), transform, CombinedTypeScore = (sum(TypeScore)))
+    IGZBest <-setDT(IGZBest)[, CombinedTypeScore := sum(TypeScore), by = InterZone]
     
     #Filter data so that combined scores are only displayed once for each IGZ
     #add column which displays the name of the 1st indicator selected, then filter where data equals this
-    IGZBest <- ddply(IGZBest,. (InterZone), transform, FilterRef = (first(Indicator)))
+    #IGZBest <- ddply(IGZBest,. (InterZone), transform, FilterRef = (first(Indicator)))
+    IGZBest <- setDT(IGZBest)[, FilterRef:= first(Indicator), by = InterZone]
     IGZBest <- filter(IGZBest, Indicator == FilterRef)
     
     #Create rankings for scores
@@ -517,16 +520,18 @@ shinyServer(function(input, output,session) {
     
     
     ###Create rankingsfor improvement 
-    selectedDta4b <- selectedDta4b()
-    IGZImprovement <- selectedDta4b
+    IGZImprovement <- selectedDta4b()
     
     #Calculate combined CPP score and combined Type score by grouping by individial IGZ and summing scores
-    IGZImprovement <- ddply(IGZImprovement,. (InterZone), transform, CombinedCPPChangeScore = (sum(CPPChangeScore)))
-    IGZImprovement <- ddply(IGZImprovement,. (InterZone), transform, CombinedTypeChangeScore = (sum(TypeChangeScore)))
+    #IGZImprovement <- ddply(IGZImprovement,. (InterZone), transform, CombinedCPPChangeScore = (sum(CPPChangeScore)))
+    IGZImprovement <- setDT(IGZImprovement)[,CombinedCPPChangeScore := sum(CPPChangeScore), by = InterZone]
+    #IGZImprovement <- ddply(IGZImprovement,. (InterZone), transform, CombinedTypeChangeScore = (sum(TypeChangeScore)))
+    IGZImprovement <- setDT(IGZImprovement)[,CombinedTypeChangeScore := sum(TypeChangeScore), by = InterZone]
     
     #Filter data so that combined scores are only displayed once for each IGZ
     #add column which displays the name of the 1st indicator selected, then filter where data equals this
-    IGZImprovement <- ddply(IGZImprovement,. (InterZone), transform, FilterRef = (first(Indicator)))
+    #IGZImprovement <- ddply(IGZImprovement,. (InterZone), transform, FilterRef = (first(Indicator)))
+    IGZImprovement <- setDT(IGZImprovement)[, FilterRef := first(Indicator), by = InterZone]
     IGZImprovement <-filter(IGZImprovement, Indicator == FilterRef)
     
     #Create rankings for scores
@@ -615,8 +620,7 @@ shinyServer(function(input, output,session) {
     ColourPal <- brewer.pal(Clrs,"RdYlGn")
     
     #Call CPP Name to be used in variable names
-    selectedCPP4 <- selectedCPP4()
-    CPPName <- selectedCPP4
+    CPPName <- selectedCPP4()
     
     #Rename variables
     colnames(MyCommunitiesDta)[1] <- paste("Within ", CPPName, " which communities have the poorest outcomes?")
@@ -682,8 +686,7 @@ shinyServer(function(input, output,session) {
     TopBottom5 <- rbind(Top5, Bottom5)
     
     #Call display input
-    selectedDisplay4 <- selectedDisplay4()
-    Display <- selectedDisplay4
+    Display <- selectedDisplay4()
     
     #Create if statements to select data based on display input
     if(Display == "Top/bottom 10") { MyCommunitiesDta <- TopBottom10}
@@ -994,74 +997,58 @@ shinyServer(function(input, output,session) {
   
   #Create a reactive function to filter Best&Worst data based on Typology and indicators selected
   selectedDta5a <- reactive({
-    selectedType <- selectedType()
-    Typology <- selectedType
+    Typology <- selectedType()
     dta5a <- filter(IGZ1617, Typology_Group == Typology & Indicator %in% input$Indi5)
   })
   
   #Create a 2nd reactive function to filter Best&Worst change data based on Typology and indicators selected
   selectedDta5b <- reactive({
-    selectedType <- selectedType()
-    Typology <- selectedType
+    Typology <- selectedType()
     dta5b <- filter(IGZChange, Typology_Group == Typology & Indicator %in% input$Indi5)
   })
   
-  #Create a reactive function to store name of council selected, to be used in variable names within the table
-  selectedCPP5 <- reactive({
-    CPP5 <- input$LA5
-  })
-  
-  #Create a reactive function to store name of community selected
-  selectedComm <- reactive({
-    Community <- input$Community5
-  })
-  
-  #Create a reactive function to store display selection
-  selectedDisplay5 <- reactive({
-    Display5 <- input$View5
-  })
-  
+
   ###create table output
   output$CommunityProfileTbl <- DT::renderDataTable({
     
     ###Create rankings for table
     
     ##Create Rankings for Outcomes
-    selectedDta5a <- selectedDta5a()
-    IGZBest <- selectedDta5a
+    IGZBest <- selectedDta5a()
     
     #Calculate combined Type score by grouping by individial IGZ and summing scores
-    IGZBest <- ddply(IGZBest,. (InterZone), transform, CombinedTypeScore = (sum(TypeScore)))
-    
+    #IGZBest <- ddply(IGZBest,. (InterZone), transform, CombinedTypeScore = (sum(TypeScore)))
+    IGZBest <- setDT(IGZBest)[,CombinedTypeScore := sum(TypeScore), by = InterZone]
     #Filter data so that combined scores are only displayed once for each IGZ
     #add column which displays the name of the 1st indicator selected, then filter where data equals this
-    IGZBest <- ddply(IGZBest,. (InterZone), transform, FilterRef = (first(Indicator)))
+    #IGZBest <- ddply(IGZBest,. (InterZone), transform, FilterRef = (first(Indicator)))
+    IGZBest <- setDT(IGZBest)[,FilterRef := first(Indicator), by = InterZone]
     IGZBest <- filter(IGZBest, Indicator == FilterRef)
   
     #Create rankings for scores
     IGZBest$TypeScoreRank <- rank(IGZBest$CombinedTypeScore)
     
     #Concatenate CPP Names with Community Names
-    IGZBest <- ddply(IGZBest,. (InterZone), transform, InterZone_Name = paste(CPP, "-",InterZone_Name))
-    
+    #IGZBest <- ddply(IGZBest,. (InterZone), transform, InterZone_Name = paste(CPP, "-",InterZone_Name))
+    IGZBest <- setDT(IGZBest)[, InterZone_Name := paste(CPP, "-",InterZone_Name), by = InterZone]
     ##Create Rankings for Improvement
-    selectedDta5b <- selectedDta5b()
-    IGZImprovement <- selectedDta5b
+    IGZImprovement <- selectedDta5b()
     
     #Calculate combined Type score by grouping by individial IGZ and summing scores
-    IGZImprovement <- ddply(IGZImprovement,. (InterZone), transform, CombinedTypeChangeScore = (sum(TypeChangeScore)))
-    
+    #IGZImprovement <- ddply(IGZImprovement,. (InterZone), transform, CombinedTypeChangeScore = (sum(TypeChangeScore)))
+    IGZImprovement <- setDT(IGZImprovement)[, CombinedTypeChangeScore := sum(TypeChangeScore), by = InterZone]
     #Filter data so that combined scores are only displayed once for each IGZ
     #add column which displays the name of the 1st indicator selected, then filter where data equals this
-    IGZImprovement <- ddply(IGZImprovement,. (InterZone), transform, FilterRef = (first(Indicator)))
+    #IGZImprovement <- ddply(IGZImprovement,. (InterZone), transform, FilterRef = (first(Indicator)))
+    IGZImprovement <- setDT(IGZImprovement)[,FilterRef := first(Indicator), by = InterZone]
     IGZImprovement <-filter(IGZImprovement, Indicator == FilterRef)
     
     #Create rankings for scores
     IGZImprovement$TypeChangeRank <- rank(IGZImprovement$CombinedTypeChangeScore)
     
     #Concatenate CPP Names with Community Names
-    IGZImprovement <- ddply(IGZImprovement,. (InterZone), transform, InterZone_Name = paste(CPP, "-",InterZone_Name))
-    
+    #IGZImprovement <- ddply(IGZImprovement,. (InterZone), transform, InterZone_Name = paste(CPP, "-",InterZone_Name))
+    IGZImprovement <-setDT(IGZImprovement)[, InterZone_Name := paste(CPP, "-",InterZone_Name), by = InterZone]
     ###Split Data into 2 individual DataTables for each ranking, then combine into 1 table
     Column1 <- select(IGZBest, c(InterZone_Name, TypeScoreRank)) %>%
       arrange(TypeScoreRank)
@@ -1124,13 +1111,11 @@ shinyServer(function(input, output,session) {
     ColourPal <- brewer.pal(Clrs,"RdYlGn")
     
     #Call CPP Name to be used in variable names
-    selectedCPP5 <- selectedCPP5()
-    CPPName <- selectedCPP5
+    CPPName <-  input$LA5
       
     ###Create helper column to determine which IGZ should be bold
     #call Community name
-    selectedComm <- selectedComm()
-    Community <- selectedComm
+    Community <- input$Community5
     
     #concatenate community name with CPP name so that comparison can be made
     Community <- paste(CPPName, "-", Community)
@@ -1200,8 +1185,7 @@ shinyServer(function(input, output,session) {
     TopBottom5 <- rbind(Top5, Bottom5)
     
     #Call display input
-    selectedDisplay5 <- selectedDisplay5()
-    Display <- selectedDisplay5
+    Display <- input$View5
     
     #Create if statements to select data based on display input
     if(Display == "Top/bottom 10") { CommunityProfileDta <- TopBottom10}
@@ -1238,8 +1222,7 @@ shinyServer(function(input, output,session) {
   
   #Create ui output for checkbox selection
   output$LineChoices5 <- renderUI({
-    LineChoices <- LineChoices()
-    Choices <- LineChoices
+    Choices <- LineChoices()
     checkboxGroupInput("Choices5", "Select lines to plot", Choices, selected = Choices)
   })
   
@@ -1251,8 +1234,7 @@ shinyServer(function(input, output,session) {
     Community <- filter(IGZdta, InterZone_Name == input$Community5)
     Community$Identifier <- input$Community5
     Community$Colours <- "red"
-    Community <- select(Community, c(-InterZone, -InterZone_Name, -CPP, -Typology_Group, -Typology_Name,
-                                     -`High is Positive?`) )
+    Community <- select(Community, c(-InterZone, -InterZone_Name, -CPP, -Typology_Group, -Typology_Name) )
   })
   
   LAChoice <- reactive({
@@ -1277,12 +1259,14 @@ shinyServer(function(input, output,session) {
     GrpAv <- filter(IGZdta, Typology_Group == Typology)
     GrpAv <- select(GrpAv, -`High is Positive?`)
     GrpAv <- ddply(GrpAv,. (Indicator, Year), transform, GrpAver = mean(value))
+    #GrpAv <- setDT(GrpAv)[,GrpAver := mean(value), by = list(Indicator, Year)]
     GrpAv <- filter(GrpAv, InterZone_Name == input$Community5)
     GrpAv <- select(GrpAv, -value)
     colnames(GrpAv)[9] <- "value"
     GrpAv$Identifier <- "Group Average"
     GrpAv$Colours <- "orange"
-    GrpAv <- select(GrpAv, c(-InterZone, -InterZone_Name, -CPP, -Typology_Group, -Typology_Name))
+    GrpAv <- select(GrpAv, c(-InterZone, -InterZone_Name, -CPP, -Typology_Group, -Typology_Name,
+                             -`High is Positive?`))
   })
   
   ###Create plot outputs
@@ -1293,17 +1277,13 @@ shinyServer(function(input, output,session) {
       output[[plotname]]<- renderPlot({
     
     #Call reactive data
-    CommunityChoice <- CommunityChoice()
-    Community <- CommunityChoice
+    Community <- CommunityChoice()
     
-    LAChoice <- LAChoice()
-    LA <- LAChoice
+    LA <- LAChoice()
     
-    ScotlandChoice <- ScotlandChoice()
-    Scotland <- ScotlandChoice
+    Scotland <- ScotlandChoice()
     
-    GrpAvChoice <- GrpAvChoice()
-    GrpAv <- GrpAvChoice
+    GrpAv <- GrpAvChoice()
     
     #Combine reactive data into one data set
     LineChoiceDta <- rbind(Community, LA, Scotland, GrpAv)
@@ -1312,7 +1292,8 @@ shinyServer(function(input, output,session) {
     LineChoiceDta$YearLabels <- if_else(LineChoiceDta$Year == "2006/07","2006/07",
                                         if_else(LineChoiceDta$Year == "2016/17", "2016/17",
                                                 if_else(LineChoiceDta$Year == "2020/21","2020/21","")))
-    LineChoiceDta <- ddply(LineChoiceDta,. (Indicator, Identifier), transform, YearPoints = (seq(1 : length(Year))))
+    #LineChoiceDta <- ddply(LineChoiceDta,. (Indicator, Identifier), transform, YearPoints = (seq(1 : length(Year))))
+    LineChoiceDta <- setDT(LineChoiceDta)[.,YearPoints := seq(1 : length(Year)), by = list(Indicator, Identifier) ]
     #filter this data to match choices selected
     LineChoiceDta <- filter(LineChoiceDta, Identifier %in% input$Choices5)
     
