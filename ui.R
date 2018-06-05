@@ -1,6 +1,6 @@
 shinyUI(navbarPage("CPOP",
                    
- tabPanel("Cover Page/Contents",
+ tabPanel("Home",
           #css for checkbox
               tags$head(tags$style(
                 ".leaflet{height:38vh !important; border-style:solid; border-width:1px; margin-top:1px}",
@@ -28,8 +28,8 @@ shinyUI(navbarPage("CPOP",
                       text-align:center;
                       font-weight: bold
                       }"))),
-          includeHTML("CoverPage.html"),
-          img(src = "http://www.improvementservice.org.uk/benchmarking/images/islogo.png", align = "top")),
+                  includeHTML("CoverPage.html") 
+                   ),
  tabPanel("CPP - Page1",
           fluidPage(
             fluidRow(
@@ -103,6 +103,7 @@ shinyUI(navbarPage("CPOP",
               column(4,
                      actionButton("selAll2", "All"),
                      actionButton("selNone2", "None")),
+                    checkboxInput("Similar", "Similar Councils"),
               column(12,div(class = "chckBx",
                      checkboxGroupInput("grphs2", unique(CPPdta$Indicator), inline = TRUE, label = NULL)
                       )
@@ -111,44 +112,20 @@ shinyUI(navbarPage("CPOP",
             hr(),
             uiOutput("uiPage2")
           )),
- tabPanel("CPP - Page3",
-  fluidPage(
-    fluidRow(
-      column(4,
-      selectInput("LA3", "Select A Local Authority", unique(filter(CPPdta, CPP != "Scotland")[[1]]), 
-                  selected = "Aberdeen City")
-      ),
-      column(4,
-             selectInput("CompLA3", "Select Comparator", unique(CPPdta$CPP), selected = "Scotland"
-              )
-             ),
-      column(4,
-             actionButton("selAll3", "All"),
-             actionButton("selNone3", "None")),
-      column(12,
-             div(class = "chckBx",
-             checkboxGroupInput("grphs3",label = NULL, unique(CPPdta$Indicator), inline = TRUE)
-             )
-      )
-    ),
-    hr(),
-    uiOutput("uiPage3")
-  )
- ),
- navbarMenu("Maps", icon = icon("globe"),
-            tabPanel("CPP Communities",
-                     fluidPage(
-  absolutePanel(fixed = FALSE, draggable = FALSE, top = "28px", left = 0, right = 0,
-                                     bottom = 0, width = "100%", height = "0px", 
-                                     wellPanel(div(class = "span4",style = "padding-left:6vh", 
-                         selectizeInput("CPPIZ", "", unique(CPPMapDta$council),
-                                        options = list(placeholder = "Select a CPP",
-                                        onInitialize = I('function() { this.setValue(""); }')), 
-                                        width = "350px")))),
-    fluidRow(div(class = "row-fluid", leafletOutput("communityMap")))
-                     )
-            ),
-            tabPanel("Data Zones",
+navbarMenu("Maps",
+           tabPanel("Community Map",
+           fluidPage(
+             absolutePanel(fixed = FALSE, draggable = FALSE, top = "28px", left = 0, right = 0,
+                           bottom = 0, width = "100%", height = "0px", 
+                           wellPanel(div(class = "span4",style = "padding-left:6vh", 
+                                         selectizeInput("CPPIZ", "", unique(CPPMapDta$council),
+                                                        options = list(placeholder = "Select a CPP",
+                                                                       onInitialize = I('function() { this.setValue(""); }')), 
+                                                        width = "350px")))),
+             fluidRow(div(class = "row-fluid", leafletOutput("communityMap")))
+             )), 
+
+             tabPanel("Data Zone Map",
         fluidPage(
                        absolutePanel(fixed = FALSE,
                             draggable = FALSE, top = "28px", left = 0, right = 0, bottom = 0,
@@ -185,9 +162,9 @@ shinyUI(navbarPage("CPOP",
                       leafletOutput("newplot5"), 
                       leafletOutput("newplot6")))
       )
-                                      
+        )                         
          )
-            )),
+            ),
 
  tabPanel("My Communities",
   fluidPage(
@@ -243,8 +220,9 @@ shinyUI(navbarPage("CPOP",
   fluidPage(
     fluidRow(
       column(3,
-             selectInput("LA5","Select a Local Authority", unique(filter(IGZdta, CPP != "Scotland"))[[3]],
-                         selected = 1),
+             selectizeInput("LA5","Select a Local Authority", unique(filter(IGZdta, CPP != "Scotland"))[[3]],
+                            options = list(placeholder = "Select a CPP",
+                                           onInitialize = I('function() { this.setValue(""); }'))),
              uiOutput("Comm5"),
              h3(textOutput("Descrip")),
              h3(textOutput("GrpSize"))
@@ -282,9 +260,11 @@ shinyUI(navbarPage("CPOP",
  ),
  
  
- tabPanel("All Communities",icon = icon("bath"),
+ tabPanel("All Communities",
           fluidPage(
-            fluidRow(column(6, selectInput("CPP-AllC","Select CPP", unique(IGZdta$CPP))),
+            fluidRow(column(6, selectizeInput("CPP-AllC","Select CPP", unique(IGZdta$CPP),
+                            options = list(placeholder = "Select a CPP",
+                                           onInitialize = I('function() { this.setValue(""); }')))),
                      column(6,selectInput("Indi-AllC", "Select Indicator", unique(IGZdta$Indicator)))),
             hr(),
             plotOutput("AllCPlots")
