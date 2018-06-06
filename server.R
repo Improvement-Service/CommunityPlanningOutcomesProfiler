@@ -372,7 +372,7 @@ shinyServer(function(input, output,session) {
       updateCheckboxGroupInput(session = session, 
                                inputId = "Indi4",
                                selected = character(0))
-    }, ignoreInit = TRUE 
+    }
   })  
   
   #Create a reactive function to filter Best&Worst data based on CPP and indicators selected
