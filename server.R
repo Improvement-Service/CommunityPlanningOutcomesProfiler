@@ -1,37 +1,20 @@
 shinyServer(function(input, output,session) {
-
-   
   
-##Create Ui ouputs for page 1=============
   
-  ##########
-  #Compute improvement rates and store data for plots on page 1
   
-  #add new column to data so that line type can be specified
-  CPPdtaCurrent <- CPPdta %>% mutate(Grouping=  paste(CPP, Type))  
-  
-  #add new column to show rate of improvement 
-  CPPdtaCurrent <- filter(CPPdtaCurrent, Type != "Projected")
-  #CPPdtaCurrent <- ddply(CPPdtaCurrent, .(CPP, Indicator), transform, Improvement_Rate = ((last(value)/first(value)-1)*100))
-  CPPdtaCurrent <- setDT(CPPdtaCurrent)[, Improvement_Rate :=(last(value)/first(value)-1)*100,by = list(CPP, Indicator)]
-  #add new column to show whether a high value represents a positive outcome
-  CPPdtaCurrent <- CPPdtaCurrent %>% mutate(`High is Positive?` = "Yes")
-  CPPdtaCurrent$`High is Positive?`[CPPdtaCurrent$Indicator %in% c("Dwelling Fires", "Unplanned Hospital Attendances",
-                                                                   "Fuel Poverty", "Fragility", "Carbon Emissions",
-                                                                   "Child Poverty", "Out Of Work Benefits",
-                                                                   "Crime Rate", "Emergency Admissions",
-                                                                   "Early Mortality")] <- "No"
+  ##Create Ui ouputs for page 1=============
   
   #Create a reactive function to store data for both LA's selected  
   selectedDta1 <- reactive({
     CPPdtaCurrent$colourscheme <- ifelse(CPPdtaCurrent$CPP == input$LA1,"A","B")
     dta <- filter(CPPdtaCurrent, CPP %in% c(input$LA1, input$CompLA1))
   })
-
+  
   #Create a list of all the indicators 
   Indicators1 <- unique(CPPdtaCurrent$Indicator)
-
   
+  
+  ##########
   #Create a loop that creates a plot for the indicators selected 
   
   for(i in seq_along(Indicators1)){
@@ -42,105 +25,105 @@ shinyServer(function(input, output,session) {
         
         dtaAll <- selectedDta1()
         
-    #create a subset of the data for the particular indicator in the loop
-    loopdata <- subset(dtaAll, dtaAll$Indicator == Indicators1[my.i])
-  
-    #split this data into the two LAs selected
-    loopdataCPP1 <- filter(loopdata, CPP == input$LA1)
-    loopdataCPP2 <- filter(loopdata, CPP == input$CompLA1)
+        #create a subset of the data for the particular indicator in the loop
+        loopdata <- subset(dtaAll, dtaAll$Indicator == Indicators1[my.i])
         
-    #store unique values of "high is positive?" to use in test later
-    HighValue <- unique(loopdata$`High is Positive?`)
+        #split this data into the two LAs selected
+        loopdataCPP1 <- filter(loopdata, CPP == input$LA1)
+        loopdataCPP2 <- filter(loopdata, CPP == input$CompLA1)
         
-    #create an if statement to determine the colour of the dot
-    #need to create 2 statements to distinguish "high is positive"
-    #compares whether the value of the authority is higher than the comparator and whether the improvement rate is higher
-    coloursDotPos <- if_else(((last(loopdataCPP1$value)) > (last(loopdataCPP2$value)) & 
-                            (last(loopdataCPP1$Improvement_Rate)) > (last(loopdataCPP2$Improvement_Rate))),
-                            "green",
-                     if_else(((last(loopdataCPP1$value)) > (last(loopdataCPP2$value)) &
-                            (last(loopdataCPP1$Improvement_Rate)) < (last(loopdataCPP2$Improvement_Rate))),
-                            "yellow",
-                     if_else(((last(loopdataCPP1$value)) < (last(loopdataCPP2$value)) &
-                           (last(loopdataCPP1$Improvement_Rate)) > (last(loopdataCPP2$Improvement_Rate))),
-                            "yellow",
-                     if_else(((last(loopdataCPP1$value)) < (last(loopdataCPP2$value)) &
-                           (last(loopdataCPP1$Improvement_Rate)) < (last(loopdataCPP2$Improvement_Rate))),
-                           "red",
-                           "black"))))
+        #store unique values of "high is positive?" to use in test later
+        HighValue <- unique(loopdata$`High is Positive?`)
         
-        
-    coloursDotNeg <- if_else(((last(loopdataCPP1$value)) > (last(loopdataCPP2$value)) & 
-                            (last(loopdataCPP1$Improvement_Rate)) > (last(loopdataCPP2$Improvement_Rate))),
-                            "red",
-                     if_else(((last(loopdataCPP1$value)) > (last(loopdataCPP2$value)) &
-                            (last(loopdataCPP1$Improvement_Rate)) < (last(loopdataCPP2$Improvement_Rate))),
-                            "yellow",
-                     if_else(((last(loopdataCPP1$value)) < (last(loopdataCPP2$value)) &
-                            (last(loopdataCPP1$Improvement_Rate)) > (last(loopdataCPP2$Improvement_Rate))),
-                            "yellow",
-                    if_else(((last(loopdataCPP1$value)) < (last(loopdataCPP2$value)) &
-                            (last(loopdataCPP1$Improvement_Rate)) < (last(loopdataCPP2$Improvement_Rate))),
-                            "green",
-                            "black"))))
+        #create an if statement to determine the colour of the dot
+        #need to create 2 statements to distinguish "high is positive"
+        #compares whether the value of the authority is higher than the comparator and whether the improvement rate is higher
+        coloursDotPos <- if_else(((last(loopdataCPP1$value)) > (last(loopdataCPP2$value)) & 
+                                    (last(loopdataCPP1$Improvement_Rate)) > (last(loopdataCPP2$Improvement_Rate))),
+                                 "green",
+                                 if_else(((last(loopdataCPP1$value)) > (last(loopdataCPP2$value)) &
+                                            (last(loopdataCPP1$Improvement_Rate)) < (last(loopdataCPP2$Improvement_Rate))),
+                                         "yellow",
+                                         if_else(((last(loopdataCPP1$value)) < (last(loopdataCPP2$value)) &
+                                                    (last(loopdataCPP1$Improvement_Rate)) > (last(loopdataCPP2$Improvement_Rate))),
+                                                 "yellow",
+                                                 if_else(((last(loopdataCPP1$value)) < (last(loopdataCPP2$value)) &
+                                                            (last(loopdataCPP1$Improvement_Rate)) < (last(loopdataCPP2$Improvement_Rate))),
+                                                         "red",
+                                                         "black"))))
         
         
-    #add new "year2" column to the data to store numeirc values for year
-    loopdata <- arrange(loopdata, CPP)
-    ##loopdata <- ddply(loopdata,. (CPP), transform, Year2 = (seq(1 : length(Year))))
-    loopdata <- setDT(loopdata)[, Year2 :=(seq(1 : length(Year))), by = CPP]
-    #add new "year3" column to store x axis labels
-    ##loopdata <- ddply(loopdata,. (CPP), transform, Year3 = Year)
-    loopdata <- setDT(loopdata)[, Year3 :=Year, by = CPP]
-    loopdata$Year3 <- as.character(loopdata$Year3)
-    Years2 <- unique(loopdata$Year2)
+        coloursDotNeg <- if_else(((last(loopdataCPP1$value)) > (last(loopdataCPP2$value)) & 
+                                    (last(loopdataCPP1$Improvement_Rate)) > (last(loopdataCPP2$Improvement_Rate))),
+                                 "red",
+                                 if_else(((last(loopdataCPP1$value)) > (last(loopdataCPP2$value)) &
+                                            (last(loopdataCPP1$Improvement_Rate)) < (last(loopdataCPP2$Improvement_Rate))),
+                                         "yellow",
+                                         if_else(((last(loopdataCPP1$value)) < (last(loopdataCPP2$value)) &
+                                                    (last(loopdataCPP1$Improvement_Rate)) > (last(loopdataCPP2$Improvement_Rate))),
+                                                 "yellow",
+                                                 if_else(((last(loopdataCPP1$value)) < (last(loopdataCPP2$value)) &
+                                                            (last(loopdataCPP1$Improvement_Rate)) < (last(loopdataCPP2$Improvement_Rate))),
+                                                         "green",
+                                                         "black"))))
         
-    #change year3 values so that labels will only show the 1st and last year
-    loopdata$Year3[loopdata$Year2 > 1 & loopdata$Year2 < last(Years2)] <- ""
         
-    #store unique year2 values and list of year3 values so that data length can be specified using these later
-    Years3 <- filter(loopdata, CPP == input$LA1)
-    Years3 <- Years3$Year3    
+        #add new "year2" column to the data to store numeirc values for year
+        loopdata <- arrange(loopdata, CPP)
+        ##loopdata <- ddply(loopdata,. (CPP), transform, Year2 = (seq(1 : length(Year))))
+        loopdata <- setDT(loopdata)[, Year2 :=(seq(1 : length(Year))), by = CPP]
+        #add new "year3" column to store x axis labels
+        ##loopdata <- ddply(loopdata,. (CPP), transform, Year3 = Year)
+        loopdata <- setDT(loopdata)[, Year3 :=Year, by = CPP]
+        loopdata$Year3 <- as.character(loopdata$Year3)
+        Years2 <- unique(loopdata$Year2)
         
-    #store raw data to be used for solid line
-    dtaRaw <- loopdata[loopdata$Type == "Raw data",]        
-               
-            ggplot()+
-            geom_line(data = loopdata,
+        #change year3 values so that labels will only show the 1st and last year
+        loopdata$Year3[loopdata$Year2 > 1 & loopdata$Year2 < last(Years2)] <- ""
+        
+        #store unique year2 values and list of year3 values so that data length can be specified using these later
+        Years3 <- filter(loopdata, CPP == input$LA1)
+        Years3 <- Years3$Year3    
+        
+        #store raw data to be used for solid line
+        dtaRaw <- loopdata[loopdata$Type == "Raw data",]        
+        
+        ggplot()+
+          geom_line(data = loopdata,
                     aes(x = Year2, y = value, group = colourscheme, colour = colourscheme, linetype = "2"), lwd = 1, show.legend = FALSE)+
-            geom_line(data = dtaRaw,
+          geom_line(data = dtaRaw,
                     aes(x = Year2, y = value, group = colourscheme, colour = colourscheme, linetype = "1"), lwd = 1, show.legend = FALSE)+
-            scale_color_manual(values = c("red", "blue"))+
-              ggtitle(Indicators1[my.i])+
-            annotate("text", x = Inf, y = Inf, label = sprintf('\U25CF'), size = 10, 
-                    colour = (if_else(HighValue == "Yes", coloursDotPos, coloursDotNeg))
-                    , hjust = 1, vjust = 1) +
-            scale_x_continuous(breaks = c(1: length(Years2)), labels = Years3)+
-            xlab("Year")+
-            theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
-                  panel.background = element_blank(), axis.line = element_line(colour="black"),
-                  axis.text.x = element_text(vjust = 0.3))
-      
-                                       })
-            })  
+          scale_color_manual(values = c("red", "blue"))+
+          ggtitle(Indicators1[my.i])+
+          annotate("text", x = Inf, y = Inf, label = sprintf('\U25CF'), size = 10, 
+                   colour = (if_else(HighValue == "Yes", coloursDotPos, coloursDotNeg))
+                   , hjust = 1, vjust = 1) +
+          scale_x_continuous(breaks = c(1: length(Years2)), labels = Years3)+
+          xlab("Year")+
+          theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
+                panel.background = element_blank(), axis.line = element_line(colour="black"),
+                axis.text.x = element_text(vjust = 0.3))
+        
+      })
+    })  
   }
   
-
-##Events for Button inputs page 2 and 3======================  
+  
+  ##Events for Button inputs page 2 and 3======================  
   observeEvent(input$selAll2,
-    handlerExpr = {
-      updateCheckboxGroupInput(session = session,
-                               inputId = "grphs2",
-                               selected = unique(CPPdta$Indicator))
-    }, ignoreInit = TRUE 
-               )
+               handlerExpr = {
+                 updateCheckboxGroupInput(session = session,
+                                          inputId = "grphs2",
+                                          selected = unique(CPPdta$Indicator))
+               }, ignoreInit = TRUE 
+  )
   observeEvent(input$selNone2,
-      handlerExpr = {
-       updateCheckboxGroupInput(session = session,
-                                 inputId = "grphs2",
-              selected = NA)
-               },ignoreInit = TRUE      
-               )
+               handlerExpr = {
+                 updateCheckboxGroupInput(session = session,
+                                          inputId = "grphs2",
+                                          selected = NA)
+               }, ignoreInit = TRUE      
+  )
   observeEvent(input$selAll3,
                handlerExpr = {
                  updateCheckboxGroupInput(session = session,
@@ -174,33 +157,33 @@ shinyServer(function(input, output,session) {
     #need to create 2 statement to distinguish "between positve high values"High is Positive"
     #compares whether the value of the authority is higher than the comparator and whether the improvement rate is higher
     coloursDotPos <- if_else(((last(dtasubsetCPP1$value)) > (last(dtasubsetCPP2$value)) & 
-                            (last(dtasubsetCPP1$Improvement_Rate)) > (last(dtasubsetCPP2$Improvement_Rate))),
-                            "green",
-                     if_else(((last(dtasubsetCPP1$value)) > (last(dtasubsetCPP2$value)) &
-                            (last(dtasubsetCPP1$Improvement_Rate)) < (last(dtasubsetCPP2$Improvement_Rate))),
-                            "yellow",
-                     if_else(((last(dtasubsetCPP1$value)) < (last(dtasubsetCPP2$value)) &
-                            (last(dtasubsetCPP1$Improvement_Rate)) > (last(dtasubsetCPP2$Improvement_Rate))),
-                            "yellow",
-                     if_else(((last(dtasubsetCPP1$value)) < (last(dtasubsetCPP2$value)) &
-                            (last(dtasubsetCPP1$Improvement_Rate)) < (last(dtasubsetCPP2$Improvement_Rate))),
-                            "red",
-                            "black"))))
+                                (last(dtasubsetCPP1$Improvement_Rate)) > (last(dtasubsetCPP2$Improvement_Rate))),
+                             "green",
+                             if_else(((last(dtasubsetCPP1$value)) > (last(dtasubsetCPP2$value)) &
+                                        (last(dtasubsetCPP1$Improvement_Rate)) < (last(dtasubsetCPP2$Improvement_Rate))),
+                                     "yellow",
+                                     if_else(((last(dtasubsetCPP1$value)) < (last(dtasubsetCPP2$value)) &
+                                                (last(dtasubsetCPP1$Improvement_Rate)) > (last(dtasubsetCPP2$Improvement_Rate))),
+                                             "yellow",
+                                             if_else(((last(dtasubsetCPP1$value)) < (last(dtasubsetCPP2$value)) &
+                                                        (last(dtasubsetCPP1$Improvement_Rate)) < (last(dtasubsetCPP2$Improvement_Rate))),
+                                                     "red",
+                                                     "black"))))
     
     coloursDotNeg <- if_else(((last(dtasubsetCPP1$value)) > (last(dtasubsetCPP2$value)) & 
-                            (last(dtasubsetCPP1$Improvement_Rate)) > (last(dtasubsetCPP2$Improvement_Rate))),
-                            "red",
-                     if_else(((last(dtasubsetCPP1$value)) > (last(dtasubsetCPP2$value)) &
-                            (last(dtasubsetCPP1$Improvement_Rate)) < (last(dtasubsetCPP2$Improvement_Rate))),
-                            "yellow",
-                     if_else(((last(dtasubsetCPP1$value)) < (last(dtasubsetCPP2$value)) &
-                            (last(dtasubsetCPP1$Improvement_Rate)) > (last(dtasubsetCPP2$Improvement_Rate))),
-                            "yellow",
-                     if_else(((last(dtasubsetCPP1$value)) < (last(dtasubsetCPP2$value)) &
-                            (last(dtasubsetCPP1$Improvement_Rate)) < (last(dtasubsetCPP2$Improvement_Rate))),
-                            "green",
-                            "black"))))
-
+                                (last(dtasubsetCPP1$Improvement_Rate)) > (last(dtasubsetCPP2$Improvement_Rate))),
+                             "red",
+                             if_else(((last(dtasubsetCPP1$value)) > (last(dtasubsetCPP2$value)) &
+                                        (last(dtasubsetCPP1$Improvement_Rate)) < (last(dtasubsetCPP2$Improvement_Rate))),
+                                     "yellow",
+                                     if_else(((last(dtasubsetCPP1$value)) < (last(dtasubsetCPP2$value)) &
+                                                (last(dtasubsetCPP1$Improvement_Rate)) > (last(dtasubsetCPP2$Improvement_Rate))),
+                                             "yellow",
+                                             if_else(((last(dtasubsetCPP1$value)) < (last(dtasubsetCPP2$value)) &
+                                                        (last(dtasubsetCPP1$Improvement_Rate)) < (last(dtasubsetCPP2$Improvement_Rate))),
+                                                     "green",
+                                                     "black"))))
+    
     #add new "year2" column to the data to store numeirc values for year
     dtasubset <- arrange(dtasubset, CPP)
     #dtasubset <- ddply(dtasubset,. (CPP), transform, Year2 = (seq(1 : length(Year))))
@@ -217,88 +200,109 @@ shinyServer(function(input, output,session) {
     #store unique year3 values so that data length can be specified using these later
     Years3 <- filter(dtasubset, CPP == input$LA1)
     Years3 <- Years3$Year3    
-   
+    
     #store raw data to be used for solid line
     dtaRaw <- dtasubset[dtasubset$Type == "Raw data",]
- 
-            ggplot()+
-            geom_line(data = dtasubset,
-                      aes(x = Year2, y = value, group = CPP, colour = CPP, linetype = "2"), lwd = 1, show.legend = FALSE)+
-            geom_line(data = dtaRaw,
-                      aes(x = Year2, y = value, group = CPP, colour = CPP, linetype = "1"), lwd = 1, show.legend = FALSE)+
-            ggtitle(input$Indi1)+
-            annotate("text", x = Inf, y = Inf, label = sprintf('\U25CF'), size = 10,
-                     colour = (if_else(HighValue == "Yes", coloursDotPos, coloursDotNeg))
-                    , hjust = 1, vjust = 1)+
-            scale_x_continuous(breaks = c(1: length(Years2)), labels = Years3)+
-            xlab("Year")+
-            theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
-                  panel.background = element_blank(), axis.line = element_line(colour="black"),
-                  axis.text.x = element_text(vjust = 0.3))
+    
+    ggplot()+
+      geom_line(data = dtasubset,
+                aes(x = Year2, y = value, group = CPP, colour = CPP, linetype = "2"), lwd = 1, show.legend = FALSE)+
+      geom_line(data = dtaRaw,
+                aes(x = Year2, y = value, group = CPP, colour = CPP, linetype = "1"), lwd = 1, show.legend = FALSE)+
+      ggtitle(input$Indi1)+
+      annotate("text", x = Inf, y = Inf, label = sprintf('\U25CF'), size = 10,
+               colour = (if_else(HighValue == "Yes", coloursDotPos, coloursDotNeg))
+               , hjust = 1, vjust = 1)+
+      scale_x_continuous(breaks = c(1: length(Years2)), labels = Years3)+
+      xlab("Year")+
+      theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
+            panel.background = element_blank(), axis.line = element_line(colour="black"),
+            axis.text.x = element_text(vjust = 0.3))
   })
-
   
-##Create Ui Outputs for page 2 =================    
-  ##create all graphs that can be shown in Pages 2
+  
+  ##Create Ui Outputs for page 2 & 3 =================    
+  ##create all graphs that can be shown in Pages 3
   #These are then pulled through in the uiOutputs
-  indis <- unique(CPPdta$Indicator)
   for(i in 1:18){
     local({
       my.i <- i
       nms <- gsub(" ", "",unique(CPPdta$Indicator))[[my.i]]
       plotname <- paste("plot", nms, sep ="_")
       output[[plotname]] <- renderPlot({
+        indis <- unique(CPPdta$Indicator)
         slInd <- indis[[my.i]]
-        if(input$Similar == FALSE){
+        ##Need to get this to select most recent year, since indicators have different periods  
+        dat <- filter(CPPdta, Indicator == slInd & Year %in% c("2016/17", "2014-2016"))
+        dat$slct <- ifelse(dat$CPP == input$LA3, "Sel1", "Other") 
+        cmp <- filter(dat, CPP == input$CompLA3)$value
+        ggplot(data = dat) +
+          geom_bar(aes(x = reorder(CPP,-value), y = value, fill = slct), 
+                   stat = "identity", position = "dodge", width = 0.5) +
+          scale_fill_manual(values = c("blue","red"), breaks = c("Other", "Sel1")) +
+          guides(fill = FALSE) +
+          ggtitle(slInd)+
+          xlab("")+
+          ylab("")+
+          geom_hline(aes(yintercept = cmp)) +
+          theme_bw()+
+          theme(axis.text.x = element_text(angle =90, hjust =1, vjust = 0))
+      })
+    })  
+  }
+  
+  ##Create Graphs for Page 2 - Similar Councils Only
+  for(i in 1:18){
+    local({
+      my.i <- i
+      nms <- gsub(" ", "",unique(CPPdta$Indicator))[[my.i]]
+      plotnameFG <- paste("FGplot", nms, sep ="_")
+      output[[plotnameFG]] <- renderPlot({
+        indis <- unique(CPPdta$Indicator)
+        slInd <- indis[[my.i]]
+        #get family group of LA for looped indicator
+        FGNo <- unique(filter(CPPdta, Indicator == slInd &  CPP == input$LA2)[[6]])
         ##Need to get this to select most recent year, since indicators have different periods  
         dat <- filter(CPPdta, Indicator == slInd & Year %in% c("2016/17", "2014-2016"))
         dat$slct <- ifelse(dat$CPP == input$LA2, "Sel1", "Other") 
         cmp <- filter(dat, CPP == input$CompLA2)$value
-        }else{
-          #get family group of LA for looped indicator
-          FGNo <- unique(filter(CPPdta, Indicator == slInd &  CPP == input$LA2)[[6]])
-          ##Need to get this to select most recent year, since indicators have different periods  
-          dat <- filter(CPPdta, Indicator == slInd & Year %in% c("2016/17", "2014-2016"))
-          dat$slct <- ifelse(dat$CPP == input$LA2, "Sel1", "Other") 
-          cmp <- filter(dat, CPP == input$CompLA2)$value
-          dat <- filter(dat, FG == FGNo)
-        }
-          ggplot(data = dat) +
-            geom_bar(aes(x = reorder(CPP,-value), y = value, fill = slct), 
-                     stat = "identity", position = "dodge", width = 0.5) +
-            scale_fill_manual(values = c("blue","red"), breaks = c("Other", "Sel1")) +
-            guides(fill = FALSE) +
-            ggtitle(slInd)+
-            geom_hline(aes(yintercept = cmp))+
-            xlab("")+
-            ylab("")+
-            theme_bw()+
-            theme(axis.text.x = element_text(angle =90, hjust = 1, vjust = 0))
-          
-        })
+        dat <- filter(dat, FG == FGNo)
+        ggplot(data = dat) +
+          geom_bar(aes(x = reorder(CPP,-value), y = value, fill = slct), 
+                   stat = "identity", position = "dodge", width = 0.5) +
+          scale_fill_manual(values = c("blue","red"), breaks = c("Other", "Sel1")) +
+          guides(fill = FALSE) +
+          ggtitle(slInd)+
+          geom_hline(aes(yintercept = cmp))+
+          xlab("")+
+          ylab("")+
+          theme_bw()+
+          theme(axis.text.x = element_text(angle =90, hjust = 1, vjust = 0))
+      })
     })  
   }
-
-##Render a UI with a certain number of rows and columns based on selected graphs
-  output$uiPage2 <- renderUI({
-    slctd <- length(input$grphs2)
-#number of columns is 4, unless there are less than 3 graphs
+  
+  
+  ##Render a UI with a certain number of rows and columns based on selected graphs
+  output$uiPage3 <- renderUI({
+    slctd <- length(input$grphs3)
+    #number of columns is 4, unless there are less than 3 graphs
     cls <- if(slctd>3){4} else{slctd}
     #The percentage fo the space each columns will occupy
     pctCols <- 100/cls
     pctCols <- paste0(pctCols, "%")
- #number of rows is the number of graphs divided by 4 and rounded up eg 7 = 2 rows
+    #number of rows is the number of graphs divided by 4 and rounded up eg 7 = 2 rows
     rows <- ceiling(slctd/4)
- ##Dynamically create plot height  
+    ##Dynamically create plot height  
     pltheight <- ifelse(rows <2, "600px",ifelse(rows>4,"275px",paste0(900/rows, "px")))
-    inptLst <- as.list(gsub(" ", "",input$grphs2))
-##Create however many columns and then rows as needed
+    inptLst <- as.list(gsub(" ", "",input$grphs3))
+    ##Create however many columns and then rows as needed
     fluidRow(
- #split into columns based on no. selected indicators
+      #split into columns based on no. selected indicators
       column(12/cls,map(1, function(nc){
-  #This part selects graphs created above depending on the 
-   #number of indicators e.g if 12 the map function will pull out
-  #1,5,9 using the seq function
+        #This part selects graphs created above depending on the 
+        #number of indicators e.g if 12 the map function will pull out
+        #1,5,9 using the seq function
         plot_output_list1<- map(seq(from = nc,to = slctd,by = cls), function(x){
           tstNm1 <- inptLst[[x]]
           plotname <- paste("plot", tstNm1, sep = "_")
@@ -307,10 +311,10 @@ shinyServer(function(input, output,session) {
         do.call(tagList, plot_output_list1)         
       }) ),  
       column(12/cls,map(2, function(nc){
-   #this does the same thing as above, but selectes the next set of indicators
-   #e.g. with 12 it goes 2,6,10
-   #tryCatch is needed because there will be an error if the number of columns
-  #is less than 2 => I need it to return nothing in this case
+        #this does the same thing as above, but selectes the next set of indicators
+        #e.g. with 12 it goes 2,6,10
+        #tryCatch is needed because there will be an error if the number of columns
+        #is less than 2 => I need it to return nothing in this case
         plot_output_list2<- tryCatch(map(seq(from = nc,to = slctd,by = cls), function(x){
           tstNm2 <- inptLst[[x]]
           plotname <- paste("plot", tstNm2, sep = "_")
@@ -354,17 +358,95 @@ shinyServer(function(input, output,session) {
       )
       
     )  
-})
+  })
   
-#Create Ui ouputs for page 4 - My communities page=============  
-
+  ##Render a UI with a certain number of rows and columns based on selected graphs
+  ##Except this one is for page 2!  
+  output$uiPage2 <- renderUI({
+    slctd <- length(input$grphs2)
+    #number of columns is 4, unless there are less than 3 graphs
+    cls <- if(slctd>3){4} else{slctd}
+    #The percentage fo the space each columns will occupy
+    pctCols <- 100/cls
+    pctCols <- paste0(pctCols, "%")
+    #number of rows is the number of graphs divided by 4 and rounded up eg 7 = 2 rows
+    rows <- ceiling(slctd/4)
+    ##Dynamically create plot height  
+    pltheight <- ifelse(rows <2, "600px",ifelse(rows>4,"275px",paste0(900/rows, "px")))
+    inptLst <- as.list(gsub(" ", "",input$grphs2))
+    ##Create however many columns and then rows as needed
+    fluidRow(
+      #split into columns based on no. selected indicators
+      column(12/cls,map(1, function(nc){
+        #This part selects graphs created above depending on the 
+        #number of indicators e.g if 12 the map function will pull out
+        #1,5,9 using the seq function
+        plot_output_list1<- map(seq(from = nc,to = slctd,by = cls), function(x){
+          tstNm1 <- inptLst[[x]]
+          plotname <- paste("FGplot", tstNm1, sep = "_")
+          plotOutput(plotname, height = pltheight)
+        })
+        do.call(tagList, plot_output_list1)         
+      }) ),  
+      column(12/cls,map(2, function(nc){
+        #this does the same thing as above, but selectes the next set of indicators
+        #e.g. with 12 it goes 2,6,10
+        #tryCatch is needed because there will be an error if the number of columns
+        #is less than 2 => I need it to return nothing in this case
+        plot_output_list2<- tryCatch(map(seq(from = nc,to = slctd,by = cls), function(x){
+          tstNm2 <- inptLst[[x]]
+          plotname <- paste("FGplot", tstNm2, sep = "_")
+          plotOutput(plotname, height = pltheight)
+        }), 
+        error=function(cond) {
+          
+          return(list())
+        }
+        )
+        do.call(tagList, plot_output_list2)         
+      })
+      ),
+      column(12/cls,map(3, function(nc){
+        plot_output_list3<- tryCatch(map(seq(from = nc,to = slctd,by = cls), function(x){
+          tstNm3 <- inptLst[[x]]
+          plotname <- paste("FGplot", tstNm3, sep = "_")
+          plotOutput(plotname, height = pltheight)
+        }), 
+        error=function(cond) {
+          
+          return(list())
+        }
+        )
+        do.call(tagList, plot_output_list3)         
+      })
+      ),
+      column(12/cls,map(4, function(nc){
+        plot_output_list4<- tryCatch(map(seq(from = nc,to = slctd,by = cls), function(x){
+          tstNm4 <- inptLst[[x]]
+          plotname <- paste("FGplot", tstNm4, sep = "_")
+          plotOutput(plotname, height = pltheight)
+        }), 
+        error=function(cond) {
+          
+          return(list())
+        }
+        )
+        do.call(tagList, plot_output_list4)         
+      })
+      )
+      
+    )  
+  })
+  
+  #Create Ui ouputs for page 4 - My communities page=============  
+  
   #create reactive input that updates indicator selection to select all or clear all  
   observeEvent(eventExpr = input$IndiAll,
                handlerExpr = {
                  updateCheckboxGroupInput(session = session,
                                           inputId = "Indi4",
                                           selected = unique(IGZdta$Indicator))
-               }, ignoreInit = TRUE 
+               }
   )
   
   observe({
@@ -394,9 +476,10 @@ shinyServer(function(input, output,session) {
   selectedDisplay4 <- reactive({
     Display4 <- input$View
   })
-
+  
   ######Create table output 
   output$MyCommunitiesTbl <- DT::renderDataTable({
+    
     
     ###Create rankings for outcomes
     IGZBest <- selectedDta4a()
@@ -416,6 +499,7 @@ shinyServer(function(input, output,session) {
     #Create rankings for scores
     IGZBest$CPPScoreRank <- rank(IGZBest$CombinedCPPScore)
     IGZBest$TypeScoreRank <- rank(IGZBest$CombinedTypeScore)
+    
     
     ###Create rankingsfor improvement 
     IGZImprovement <- selectedDta4b()
@@ -507,7 +591,7 @@ shinyServer(function(input, output,session) {
     colours4 <- MyCommunitiesDta[,c(1,5)]
     colnames(colours4) <- c("Variable4", "Helper4")
     MyCommunitiesDta <- join(MyCommunitiesDta, colours4, by = "Variable4")
-   
+    
     #Store unique colour reference to use as intervals in styling
     Store_unique1 <- unique(MyCommunitiesDta$Helper1)
     Store_unique2 <- unique(MyCommunitiesDta$Helper2) %>% sort
@@ -526,15 +610,15 @@ shinyServer(function(input, output,session) {
                                            CPPName, " fare? (are they better or worse than expected?)")
     colnames(MyCommunitiesDta)[3] <- paste("Within ", CPPName, " which communities have improved the least?")
     colnames(MyCommunitiesDta)[4] <- paste("Within ", CPPName, "which communities have improved the least relative 
-    to other similar communities?")
-   
+                                           to other similar communities?")
+    
     ##Store Column Names
     Container1 <- paste("Within ", CPPName, " which communities have the poorest outcomes?")
     Container2 <- paste("Compared to other, similar communities, how do those in ", 
                         CPPName, " fare? (are they better or worse than expected?)")
     Container3 <- paste("Within ", CPPName, " which communities have improved the least?")
     Container4 <- paste("Within ", CPPName, "which communities have improved the least relative 
-    to other similar communities?")
+                        to other similar communities?")
     
     #####add 4 empty columns so that there is space in between each column in the table
     #order these bewteen each of the columns and ensure column name is blank
@@ -556,12 +640,12 @@ shinyServer(function(input, output,session) {
     
     #Create an if statement to determine how many rows to split by if CPP has small no. of IGZ
     Top10Rows <- if_else(NoIGZ<20,
-                        if_else((NoIGZ%%2)==0, NoIGZ/2, (NoIGZ/2)+0.5 ),
-                        10)
+                         if_else((NoIGZ%%2)==0, NoIGZ/2, (NoIGZ/2)+0.5 ),
+                         10)
     
     Bottom10Rows <- if_else(NoIGZ<20,
-                        if_else((NoIGZ%%2)==0, NoIGZ/2, (NoIGZ/2)-0.5 ),
-                        10)
+                            if_else((NoIGZ%%2)==0, NoIGZ/2, (NoIGZ/2)-0.5 ),
+                            10)
     
     #Create seperate table of top 10, add an empty row, then add to seperate table of bottom 10
     Top10 <- head(MyCommunitiesDta,Top10Rows)
@@ -571,12 +655,12 @@ shinyServer(function(input, output,session) {
     
     #Same for top and bottom 5
     Top5Rows <- if_else(NoIGZ<10,
-                         if_else((NoIGZ%%2)==0, NoIGZ/2, (NoIGZ/2)+0.5 ),
-                         5)
+                        if_else((NoIGZ%%2)==0, NoIGZ/2, (NoIGZ/2)+0.5 ),
+                        5)
     
     Bottom5Rows <- if_else(NoIGZ<10,
-                            if_else((NoIGZ%%2)==0, NoIGZ/2, (NoIGZ/2)-0.5 ),
-                            5)
+                           if_else((NoIGZ%%2)==0, NoIGZ/2, (NoIGZ/2)-0.5 ),
+                           5)
     
     Top5 <- head(MyCommunitiesDta,Top5Rows)
     Top5[nrow(Top5)+2,] <- NA
@@ -590,7 +674,7 @@ shinyServer(function(input, output,session) {
     if(Display == "Top/bottom 10") { MyCommunitiesDta <- TopBottom10}
     if(Display == "Top/bottom 5") {MyCommunitiesDta <- TopBottom5}
     
-   #Create custom HTML to allow column headers to span multiple columns
+    #Create custom HTML to allow column headers to span multiple columns
     sketch = htmltools::withTags(table(
       thead(
         tr(
@@ -602,20 +686,20 @@ shinyServer(function(input, output,session) {
         )
       )
     ))
-   
+    
     #Create table
     datatable(MyCommunitiesDta, options = list(
-    columnDefs =list(list(visible = FALSE, targets = c(7,8,9,10)),
-                     list(width = '400px', targets = c(0,2,4,6))),
-     pageLength = 136, 
-     dom = "t", 
-     ordering = F
-     ),
+      columnDefs =list(list(visible = FALSE, targets = c(7,8,9,10)),
+                       list(width = '400px', targets = c(0,2,4,6))),
+      pageLength = 136, 
+      dom = "t", 
+      ordering = F
+    ),
     container = sketch,
     class = 'compact',
     rownames = FALSE,
     selection = 'none')%>%
-     formatStyle(columns = 1, valueColumns = 8 ,backgroundColor = styleEqual(Store_unique1,ColourPal))%>%
+      formatStyle(columns = 1, valueColumns = 8 ,backgroundColor = styleEqual(Store_unique1,ColourPal))%>%
       formatStyle(columns = 3, valueColumns = 9 ,backgroundColor = styleEqual(Store_unique2,ColourPal))%>%
       formatStyle(columns = 5, valueColumns = 10,backgroundColor = styleEqual(Store_unique3,ColourPal))%>%
       formatStyle(columns = 7, valueColumns = 11,backgroundColor = styleEqual(Store_unique4,ColourPal))%>%
@@ -625,14 +709,14 @@ shinyServer(function(input, output,session) {
       formatStyle(columns = 7, valueColumns = 11, color = styleEqual(Store_unique1,TxtValue))
     
     
-
+    
   })
-
+  
   ##Create Leaflet Maps=============================
   output$IZUI <- renderUI({
     selectizeInput("IZ", "", choices = sort(unique(CPPMapDta[CPPMapDta$council == input$CPP, 11])),
-                options = list(placeholder = "Select a Community",
-                               onInitialize = I('function() { this.setValue(""); }')))
+                   options = list(placeholder = "Select a Community",
+                                  onInitialize = I('function() { this.setValue(""); }')))
   })
   
   clrs<-brewer.pal(7, "RdYlGn")
@@ -860,7 +944,7 @@ shinyServer(function(input, output,session) {
   })
   
   
-##Create Ui ouputs for page 5 - Community Profile=============    
+  ##Create Ui ouputs for page 5 - Community Profile=============    
   #Create reactive selection for community, filter to only show communities within the CPP
   output$Comm5 <- renderUI({
     IGZsubset <- filter(IGZdta, CPP == input$LA5)
@@ -881,7 +965,7 @@ shinyServer(function(input, output,session) {
     Indi <- first(IGZsubset$Indicator)
     Yr <- first(IGZsubset$Year)
     TypeSubset <- filter(IGZdta, Typology_Group == Typology & Indicator == Indi & Year == Yr)
-    Size <- nrow(TypeSubset)-1
+    Size <- nrow(TypeSubset) -1
     txt <- paste(Size, " other, similar communities in this group")
   })
   
@@ -904,7 +988,7 @@ shinyServer(function(input, output,session) {
     dta5b <- filter(IGZChange, Typology_Group == Typology & Indicator %in% input$Indi5)
   })
   
-
+  
   ###create table output
   output$CommunityProfileTbl <- DT::renderDataTable({
     
@@ -921,13 +1005,12 @@ shinyServer(function(input, output,session) {
     #IGZBest <- ddply(IGZBest,. (InterZone), transform, FilterRef = (first(Indicator)))
     IGZBest <- setDT(IGZBest)[,FilterRef := (first(Indicator)), by = InterZone]
     IGZBest <- filter(IGZBest, Indicator == FilterRef)
-  
+    
     #Create rankings for scores
     IGZBest$TypeScoreRank <- rank(IGZBest$CombinedTypeScore)
     
     #Concatenate CPP Names with Community Names
-    #IGZBest <- ddply(IGZBest,. (InterZone), transform, InterZone_Name = paste(CPP, "-",InterZone_Name))
-    IGZBest$InterZone_Name <-  paste(IGZBest$CPP, "-",IGZBest$InterZone_Name)
+    IGZBest$InterZone_Name <-  paste(IGZBest$CPP, "-",IGZBest$InterZone_Name)    #IGZBest <- setDT(IGZBest)[, InterZone_Name := paste(CPP, "-",InterZone_Name), by = InterZone]
     ##Create Rankings for Improvement
     IGZImprovement <- selectedDta5b()
     
@@ -950,7 +1033,7 @@ shinyServer(function(input, output,session) {
     Column1 <- select(IGZBest, c(InterZone_Name, TypeScoreRank)) %>%
       arrange(TypeScoreRank)
     colnames(Column1)[1] <- "Variable1"
-
+    
     Column2 <- select(IGZImprovement, c(InterZone_Name, TypeChangeRank)) %>%
       arrange(TypeChangeRank)
     colnames(Column2)[1] <- "Variable2"
@@ -1009,7 +1092,7 @@ shinyServer(function(input, output,session) {
     
     #Call CPP Name to be used in variable names
     CPPName <-  input$LA5
-      
+    
     ###Create helper column to determine which IGZ should be bold
     #call Community name
     Community <- input$Community5
@@ -1022,20 +1105,20 @@ shinyServer(function(input, output,session) {
     
     #If IGZ name matches the community selected set as yes, otherwise no
     CommunityProfileDta$Community1 <- if_else(CommunityProfileDta$Variable1 == CommunityProfileDta$Community,
-                                        "Yes","No")
+                                              "Yes","No")
     CommunityProfileDta$Community2 <- if_else(CommunityProfileDta$Variable2 == CommunityProfileDta$Community,
                                               "Yes","No")
     CommunityProfileDta <- select(CommunityProfileDta, -Community)
     
     #Store unique Yes No values for levels in style Equal
     fontlevels <- c("No", "Yes")
-
+    
     #Store values of font wanted
     fontvalues <- c('normal', 'bold')
-     
+    
     #Rename variables
     colnames(CommunityProfileDta)[1] <- paste("How does the selected community in  ", CPPName, 
-                                                " compare to similar communities in Scotland?")
+                                              " compare to similar communities in Scotland?")
     colnames(CommunityProfileDta)[2] <- paste("How does the improvement rate of the selected community in ", 
                                               CPPName, " compare to similar communities in Scotland?")
     
@@ -1155,8 +1238,8 @@ shinyServer(function(input, output,session) {
     Typology <- first(IGZsubset$Typology_Group)
     GrpAv <- filter(IGZdta, Typology_Group == Typology)
     #GrpAv <- select(GrpAv, -`High is Positive?`)
-    #GrpAv <- ddply(GrpAv,. (Indicator, Year), transform, GrpAver = mean(value))
-    GrpAv <- setDT(GrpAv)[,GrpAver := mean(value), by = list(Indicator, Year)]
+    GrpAv <- ddply(GrpAv,. (Indicator, Year), transform, GrpAver = mean(value))
+    #GrpAv <- setDT(GrpAv)[,GrpAver := mean(value), by = list(Indicator, Year)]
     GrpAv <- filter(GrpAv, InterZone_Name == input$Community5)
     GrpAv <- select(GrpAv, -value)
     colnames(GrpAv)[9] <- "value"
@@ -1171,65 +1254,65 @@ shinyServer(function(input, output,session) {
       my.i <- i
       plotname <- paste("5plot", my.i, sep ="_")
       output[[plotname]]<- renderPlot({
-    
-    #Call reactive data
-    Community <- CommunityChoice()
-    
-    LA <- LAChoice()
-    
-    Scotland <- ScotlandChoice()
-    
-    GrpAv <- GrpAvChoice()
-    
-    #Combine reactive data into one data set
-    LineChoiceDta <- rbind(Community, LA, Scotland, GrpAv)
-    #Add column to data to fix y axis labels
-    LineChoiceDta$YearLabels <- LineChoiceDta$Year
-    LineChoiceDta$YearLabels <- if_else(LineChoiceDta$Year == "2006/07","2006/07",
-                                        if_else(LineChoiceDta$Year == "2016/17", "2016/17",
-                                                if_else(LineChoiceDta$Year == "2020/21","2020/21","")))
-    #LineChoiceDta <- ddply(LineChoiceDta,. (Indicator, Identifier), transform, YearPoints = (seq(1 : length(Year))))
-    LineChoiceDta <- setDT(LineChoiceDta)[,YearPoints := seq(1 : length(Year)), by = list(Indicator, Identifier) ]
-    #filter this data to match choices selected
-    LineChoiceDta <- filter(LineChoiceDta, Identifier %in% input$Choices5)
-    
-    #Create if statement that filters data based on projection selection and plots based on this
-    if(input$Projections5 == "No") {LineChoiceDta <- filter(LineChoiceDta, Type != "Projected")} 
-
-    #Subset data to plot the selected indicator within the loop
-    loopdata <- filter(LineChoiceDta, Indicator == Indicators5[my.i])
-    #Store unique colour values
-    LineColours <- unique(loopdata$Colours)
-    #Store unique year values
-    YPoints <- unique(loopdata$YearPoints)
-    YPoints <- as.numeric(YPoints)
-    FilterRef <- first(loopdata$Identifier)
-    YLabels <- filter(loopdata, Identifier == FilterRef)
-    YLabels <- YLabels$YearLabels
-      
-    #Seperarate projected data so this can be plotted seperately
-    DashedLine <- loopdata
-    SolidLine <- filter(loopdata, Type != "Projected")
-  
-    
-    #Create Plot
-    ggplot()+
-      geom_line(data = DashedLine, 
-                aes(x = YearPoints, y = value, group = Identifier, colour = Identifier, linetype = "2"),lwd = 1, show.legend = FALSE)+
-      geom_line(data = SolidLine, 
-                aes(x = YearPoints, y = value, group = Identifier, colour = Identifier, linetype = "1"),lwd = 1, show.legend = FALSE)+
-      ggtitle(Indicators5[my.i])+
-      scale_colour_manual(breaks = LineColours, values = LineColours)+
-      scale_x_continuous(breaks = c(1: length(YPoints)), labels = YLabels)+
-      theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
-            panel.background = element_blank(), axis.line = element_line(colour="black"),
-            axis.text.x = element_text(vjust = 0.3))
-    
-  })
+        
+        #Call reactive data
+        Community <- CommunityChoice()
+        
+        LA <- LAChoice()
+        
+        Scotland <- ScotlandChoice()
+        
+        GrpAv <- GrpAvChoice()
+        
+        #Combine reactive data into one data set
+        LineChoiceDta <- rbind(Community, LA, Scotland, GrpAv)
+        #Add column to data to fix y axis labels
+        LineChoiceDta$YearLabels <- LineChoiceDta$Year
+        LineChoiceDta$YearLabels <- if_else(LineChoiceDta$Year == "2006/07","2006/07",
+                                            if_else(LineChoiceDta$Year == "2016/17", "2016/17",
+                                                    if_else(LineChoiceDta$Year == "2020/21","2020/21","")))
+        #LineChoiceDta <- ddply(LineChoiceDta,. (Indicator, Identifier), transform, YearPoints = (seq(1 : length(Year))))
+        LineChoiceDta <- setDT(LineChoiceDta)[,YearPoints := seq(1 : length(Year)), by = list(Indicator, Identifier) ]
+        #filter this data to match choices selected
+        LineChoiceDta <- filter(LineChoiceDta, Identifier %in% input$Choices5)
+        
+        #Create if statement that filters data based on projection selection and plots based on this
+        if(input$Projections5 == "No") {LineChoiceDta <- filter(LineChoiceDta, Type != "Projected")} 
+        
+        #Subset data to plot the selected indicator within the loop
+        loopdata <- filter(LineChoiceDta, Indicator == Indicators5[my.i])
+        #Store unique colour values
+        LineColours <- unique(loopdata$Colours)
+        #Store unique year values
+        YPoints <- unique(loopdata$YearPoints)
+        YPoints <- as.numeric(YPoints)
+        FilterRef <- first(loopdata$Identifier)
+        YLabels <- filter(loopdata, Identifier == FilterRef)
+        YLabels <- YLabels$YearLabels
+        
+        #Seperarate projected data so this can be plotted seperately
+        DashedLine <- loopdata
+        SolidLine <- filter(loopdata, Type != "Projected")
+        
+        
+        #Create Plot
+        ggplot()+
+          geom_line(data = DashedLine, 
+                    aes(x = YearPoints, y = value, group = Identifier, colour = Identifier, linetype = "2"),lwd = 1, show.legend = FALSE)+
+          geom_line(data = SolidLine, 
+                    aes(x = YearPoints, y = value, group = Identifier, colour = Identifier, linetype = "1"),lwd = 1, show.legend = FALSE)+
+          ggtitle(Indicators5[my.i])+
+          scale_colour_manual(breaks = LineColours, values = LineColours)+
+          scale_x_continuous(breaks = c(1: length(YPoints)), labels = YLabels)+
+          theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
+                panel.background = element_blank(), axis.line = element_line(colour="black"),
+                axis.text.x = element_text(vjust = 0.3))
+        
+      })
     })
   }
-
-      
+  
+  
   ##All communities per indicator==================================
   ##Firstly render all of the plots for filling in the UI rendered below 
   myheight <- function(){
@@ -1263,5 +1346,5 @@ shinyServer(function(input, output,session) {
   }, height = myheight)
   
   
-
+  
 })

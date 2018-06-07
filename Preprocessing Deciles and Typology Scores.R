@@ -173,3 +173,24 @@ saveRDS(SpPolysDF, "Files for Maps/Shapes_decs.rds")
 saveRDS(SpPolysIZ, "Files for Maps/IZshapes_decs.rds")
 write_csv(IGZChange,"IGZChangeTypology.csv")
 write_csv(IGZ1617,"IGZ1617Typology.csv")
+
+
+##########
+#Compute improvement rates and store data for plots on page 1
+
+#add new column to data so that line type can be specified
+CPPdtaCurrent <- CPPdta %>% mutate(Grouping=  paste(CPP, Type))  
+
+#add new column to show rate of improvement 
+CPPdtaCurrent <- filter(CPPdtaCurrent, Type != "Projected")
+#CPPdtaCurrent <- ddply(CPPdtaCurrent, .(CPP, Indicator), transform, Improvement_Rate = ((last(value)/first(value)-1)*100))
+CPPdtaCurrent <- setDT(CPPdtaCurrent)[, Improvement_Rate :=(last(value)/first(value)-1)*100,by = list(CPP, Indicator)]
+#add new column to show whether a high value represents a positive outcome
+CPPdtaCurrent <- CPPdtaCurrent %>% mutate(`High is Positive?` = "Yes")
+CPPdtaCurrent$`High is Positive?`[CPPdtaCurrent$Indicator %in% c("Dwelling Fires", "Unplanned Hospital Attendances",
+                                                                 "Fuel Poverty", "Fragility", "Carbon Emissions",
+                                                                 "Child Poverty", "Out Of Work Benefits",
+                                                                 "Crime Rate", "Emergency Admissions",
+                                                                 "Early Mortality")] <- "No"
+
+write_csv(CPPdtaCurrent, "ImpRateCPP.csv")
