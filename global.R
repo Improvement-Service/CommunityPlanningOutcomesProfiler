@@ -17,7 +17,7 @@ CPPdta <- read_csv("CPPcleandata.csv")
 IGZdta <- read_csv("IGZcleandata.csv")
 IGZ1617 <- read_csv("IGZ1617Typology.csv")
 IGZChange <- read_csv("IGZChangeTypology.csv")
-CPPdtaCurrent <- read_csv("ImprateCPP.csv")
+CPPdtaCurrent <- read_csv("ImpRateCPP.csv")
 
 ##create deciles for colours
 CPPMapDta <- SpPolysDF@data

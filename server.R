@@ -457,32 +457,12 @@ shinyServer(function(input, output,session) {
     }
   })  
   
-  #Create a reactive function to filter Best&Worst data based on CPP and indicators selected
-  selectedDta4a <- reactive({
-    dta4a <- filter(IGZ1617, CPP %in% input$LA4 & Indicator %in% input$Indi4)
-  })
-  
-  #Create a 2nd reactive function to filter Best&Worst change data based on CPP and indicators selected
-  selectedDta4b <- reactive({
-    dta4b <- filter(IGZChange, CPP %in% input$LA4 & Indicator %in% input$Indi4)
-  })
-  
-  #Create a reactive function to store name of council selected, to be used in variable names within the table
-  selectedCPP4 <- reactive({
-    CPP4 <- input$LA4
-  })
-  
-  #Create a reactive function to store display selection
-  selectedDisplay4 <- reactive({
-    Display4 <- input$View
-  })
-  
   ######Create table output 
   output$MyCommunitiesTbl <- DT::renderDataTable({
     
     
     ###Create rankings for outcomes
-    IGZBest <- selectedDta4a()
+    IGZBest <- filter(IGZ1617, CPP %in% input$LA4 & Indicator %in% input$Indi4)
     
     #Calculate combined CPP score and combined Type score by grouping by individial IGZ and summing scores
     #IGZBest <- ddply(IGZBest,. (InterZone), transform, CombinedCPPScore = (sum(CPPScore)))
@@ -502,7 +482,7 @@ shinyServer(function(input, output,session) {
     
     
     ###Create rankingsfor improvement 
-    IGZImprovement <- selectedDta4b()
+    IGZImprovement <- filter(IGZChange, CPP %in% input$LA4 & Indicator %in% input$Indi4)
     
     #Calculate combined CPP score and combined Type score by grouping by individial IGZ and summing scores
     #IGZImprovement <- ddply(IGZImprovement,. (InterZone), transform, CombinedCPPChangeScore = (sum(CPPChangeScore)))
@@ -602,7 +582,7 @@ shinyServer(function(input, output,session) {
     ColourPal <- brewer.pal(Clrs,"RdYlGn")
     
     #Call CPP Name to be used in variable names
-    CPPName <- selectedCPP4()
+    CPPName <- input$LA4
     
     #Rename variables
     colnames(MyCommunitiesDta)[1] <- paste("Within ", CPPName, " which communities have the poorest outcomes?")
@@ -668,7 +648,7 @@ shinyServer(function(input, output,session) {
     TopBottom5 <- rbind(Top5, Bottom5)
     
     #Call display input
-    Display <- selectedDisplay4()
+    Display <- input$View
     
     #Create if statements to select data based on display input
     if(Display == "Top/bottom 10") { MyCommunitiesDta <- TopBottom10}
@@ -910,13 +890,14 @@ shinyServer(function(input, output,session) {
   
   #Subset IZ Data
   IZPlys <- reactive({
-    sbst <- which(SpPolysIZ@data$council %in% input$CPPIZ)
-    dt <- SpPolysIZ[sbst,]
+    
   })
   
   #Create Community Map
   output$communityMap <- renderLeaflet({
-    cp <- leaflet(IZPlys()) %>%
+    sbst <- which(SpPolysIZ@data$council %in% input$CPPIZ)
+    dt <- SpPolysIZ[sbst,]
+    cp <- leaflet(dt) %>%
       addTiles() %>%
       addPolygons(smoothFactor = 0.5, weight = 1.5, fillOpacity = 0.7,
                   layerId = ~InterZone, fillColor = ~communityPal(`rank_decs`), color = "black")
@@ -969,33 +950,16 @@ shinyServer(function(input, output,session) {
     txt <- paste(Size, " other, similar communities in this group")
   })
   
-  ###create reactive data selections to be used in table
-  #Create a reactive function to store vaue of typology group selected
-  selectedType <- reactive({
-    IGZsubset <- filter(IGZdta, InterZone_Name == input$Community5)
-    Typology <- first(IGZsubset$Typology_Group)
-  })
-  
-  #Create a reactive function to filter Best&Worst data based on Typology and indicators selected
-  selectedDta5a <- reactive({
-    Typology <- selectedType()
-    dta5a <- filter(IGZ1617, Typology_Group == Typology & Indicator %in% input$Indi5)
-  })
-  
-  #Create a 2nd reactive function to filter Best&Worst change data based on Typology and indicators selected
-  selectedDta5b <- reactive({
-    Typology <- selectedType()
-    dta5b <- filter(IGZChange, Typology_Group == Typology & Indicator %in% input$Indi5)
-  })
-  
   
   ###create table output
   output$CommunityProfileTbl <- DT::renderDataTable({
     
-    ###Create rankings for table
+    IGZsubset <- filter(IGZdta, InterZone_Name == input$Community5)
+    Typology <- first(IGZsubset$Typology_Group)
     
+    ###Create rankings for table
     ##Create Rankings for Outcomes
-    IGZBest <- selectedDta5a()
+    IGZBest <- filter(IGZ1617, Typology_Group == Typology & Indicator %in% input$Indi5)
     
     #Calculate combined Type score by grouping by individial IGZ and summing scores
     #IGZBest <- ddply(IGZBest,. (InterZone), transform, CombinedTypeScore = (sum(TypeScore)))
@@ -1012,7 +976,7 @@ shinyServer(function(input, output,session) {
     #Concatenate CPP Names with Community Names
     IGZBest$InterZone_Name <-  paste(IGZBest$CPP, "-",IGZBest$InterZone_Name)    #IGZBest <- setDT(IGZBest)[, InterZone_Name := paste(CPP, "-",InterZone_Name), by = InterZone]
     ##Create Rankings for Improvement
-    IGZImprovement <- selectedDta5b()
+    IGZImprovement <- filter(IGZChange, Typology_Group == Typology & Indicator %in% input$Indi5)
     
     #Calculate combined Type score by grouping by individial IGZ and summing scores
     #IGZImprovement <- ddply(IGZImprovement,. (InterZone), transform, CombinedTypeChangeScore = (sum(TypeChangeScore)))
@@ -1192,17 +1156,10 @@ shinyServer(function(input, output,session) {
   })
   
   ####Create Graphs for Community Profile Page
-  
-  ##First create checkbox selections within a reactive function
-  LineChoices <- reactive({
-    LA <- input$LA5
-    Community <- input$Community5
-    Choices <- c(Community, LA, "Scotland", "Group Average")
-  })
-  
+
   #Create ui output for checkbox selection
   output$LineChoices5 <- renderUI({
-    Choices <- LineChoices()
+    Choices <- c(input$Community5, input$LA5, "Scotland", "Group Average")
     checkboxGroupInput("Choices5", "Select lines to plot", Choices, selected = Choices)
   })
   
@@ -1210,30 +1167,24 @@ shinyServer(function(input, output,session) {
   Indicators5 <- unique(IGZdta$Indicator)
   
   ##use reactive functions to store possible data selections
-  CommunityChoice <- reactive({
+  LineChoiceDta <- reactive({
     Community <- filter(IGZdta, InterZone_Name == input$Community5)
     Community$Identifier <- input$Community5
     Community$Colours <- "red"
     Community <- select(Community, c(-InterZone, -InterZone_Name, -CPP, -Typology_Group, -Typology_Name) )
-  })
-  
-  LAChoice <- reactive({
+ 
     Indicators <- unique(IGZdta$Indicator)
     LA <- filter(CPPdta, CPP == input$LA5 & Indicator %in% Indicators)
     LA$Identifier <- input$LA5
     LA$Colours <- "green"
     LA <- select(LA, c(-CPP, -FG))
-  })
-  
-  ScotlandChoice <- reactive({
+
     Indicators <- unique(IGZdta$Indicator)
     Scotland <- filter(CPPdta, CPP == "Scotland" & Indicator %in% Indicators)
     Scotland$Identifier <- "Scotland"
     Scotland$Colours <- "blue"
     Scotland <- select(Scotland, c(-CPP, -FG))
-  })
-  
-  GrpAvChoice <- reactive({
+
     IGZsubset <- filter(IGZdta, InterZone_Name == input$Community5)
     Typology <- first(IGZsubset$Typology_Group)
     GrpAv <- filter(IGZdta, Typology_Group == Typology)
@@ -1246,7 +1197,8 @@ shinyServer(function(input, output,session) {
     GrpAv$Identifier <- "Group Average"
     GrpAv$Colours <- "orange"
     GrpAv <- select(GrpAv, c(-InterZone, -InterZone_Name, -CPP, -Typology_Group, -Typology_Name))
-  })
+    LineChoiceDta <- rbind(Community, LA, Scotland, GrpAv)
+    })
   
   ###Create plot outputs
   for(i in seq_along(Indicators5)){
@@ -1255,17 +1207,8 @@ shinyServer(function(input, output,session) {
       plotname <- paste("5plot", my.i, sep ="_")
       output[[plotname]]<- renderPlot({
         
-        #Call reactive data
-        Community <- CommunityChoice()
-        
-        LA <- LAChoice()
-        
-        Scotland <- ScotlandChoice()
-        
-        GrpAv <- GrpAvChoice()
-        
         #Combine reactive data into one data set
-        LineChoiceDta <- rbind(Community, LA, Scotland, GrpAv)
+        LineChoiceDta <- LineChoiceDta()
         #Add column to data to fix y axis labels
         LineChoiceDta$YearLabels <- LineChoiceDta$Year
         LineChoiceDta$YearLabels <- if_else(LineChoiceDta$Year == "2006/07","2006/07",
@@ -1344,7 +1287,5 @@ shinyServer(function(input, output,session) {
     })
     do.call("plot_grid", c(plts, ncol = 4))
   }, height = myheight)
-  
-  
   
 })
