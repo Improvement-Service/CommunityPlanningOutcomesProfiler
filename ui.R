@@ -209,7 +209,7 @@ shinyUI(navbarPage("CPOP",
                        ),
                      fluidRow(
                        column(6,
-                              selectInput("LA4", "Select a Local Authority", unique(filter(IGZdta, CPP != "Scotland"))[[3]], 
+                              selectInput("LA4", "Select a Local Authority", unique(filter(IGZdta, CPP != "Scotland")[[3]]), 
                                           selected = 1, width = "600"),
                               radioButtons("View","Select Display",c("All", "Top/bottom 10", "Top/bottom 5"),inline = TRUE)),
                        column(5,
@@ -243,7 +243,7 @@ shinyUI(navbarPage("CPOP",
                    fluidPage(
                      fluidRow(
                        column(3,
-                              selectInput("LA5","Select a Local Authority", unique(filter(IGZdta, CPP != "Scotland"))[[3]],
+                              selectInput("LA5","Select a Local Authority", unique(filter(IGZdta, CPP != "Scotland")[[3]]),
                                           selected = 1),
                               uiOutput("Comm5"),
                               h3(textOutput("Descrip")),
