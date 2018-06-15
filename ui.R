@@ -266,11 +266,10 @@ shinyUI(navbarPage("CPOP",
                               radioButtons("View5", "Select Display", c("All", "Top/bottom 10", "Top/bottom 5"),inline = TRUE)
                        ),
                        column(3,
-                              uiOutput("LineChoices5"),
-                              radioButtons("Projections5", "Show projections?", c("Yes","No"), selected = "Yes", inline = TRUE)
+                              plotOutput("5plot_1")
                        ),
                        column(3,
-                              plotOutput("5plot_1")
+                              plotOutput("5plot_2")
                        )
                      ),
                      fluidRow(
@@ -281,13 +280,17 @@ shinyUI(navbarPage("CPOP",
                        column(1,
                               tags$img(src="Arrow4.png")),
                        column(3, 
-                              plotOutput("5plot_2"),
-                              plotOutput("5plot_4"),
-                              plotOutput("5plot_6")),
-                       column(3,
                               plotOutput("5plot_3"),
                               plotOutput("5plot_5"),
-                              plotOutput("5plot_7"))
+                              plotOutput("5plot_7"),
+                              uiOutput("LineChoices5")
+                              ),
+                       column(3,
+                              plotOutput("5plot_4"),
+                              plotOutput("5plot_6"),
+                              plotOutput("5plot_8"),
+                              radioButtons("Projections5", "Show projections?", c("Yes","No"), selected = "Yes", inline = TRUE)
+                              )
                      )
                      
                    )
