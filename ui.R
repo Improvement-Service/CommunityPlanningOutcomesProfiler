@@ -30,7 +30,7 @@ shinyUI(navbarPage("CPOP",
                                    }"))),
           includeHTML("CoverPage.html"),
           img(src = "http://www.improvementservice.org.uk/benchmarking/images/islogo.png", align = "top")),
-          tabPanel("CPP - Page1",
+          tabPanel("CPP - over time",
                    fluidPage(
                      fluidRow(
                        column(4,
@@ -89,29 +89,7 @@ shinyUI(navbarPage("CPOP",
                        )
                      )
                    )),
-          tabPanel("CPP -Page2",
-                   fluidPage(
-                     fluidRow(
-                       column(4,
-                              selectInput("LA2", "Select A Local Authority", unique(filter(CPPdta, CPP != "Scotland")[[1]]), 
-                                          selected = "Aberdeen City")
-                       ),
-                       column(4,
-                              selectInput("CompLA2", "Select Comparator", unique(CPPdta$CPP), selected = "Scotland"
-                              )
-                       ),
-                       column(4,
-                              actionButton("selAll2", "All"),
-                              actionButton("selNone2", "None")),
-                       column(12,div(class = "chckBx",
-                                     checkboxGroupInput("grphs2", unique(CPPdta$Indicator), inline = TRUE, label = NULL)
-                       )
-                       ) 
-                     ),
-                     hr(),
-                     uiOutput("uiPage2")
-                   )),
-          tabPanel("CPP - Page3",
+          tabPanel("CPP - all 32",
                    fluidPage(
                      fluidRow(
                        column(4,
@@ -135,6 +113,28 @@ shinyUI(navbarPage("CPOP",
                      uiOutput("uiPage3")
                    )
           ),
+          tabPanel("CPP - similar",
+                   fluidPage(
+                     fluidRow(
+                       column(4,
+                              selectInput("LA2", "Select A Local Authority", unique(filter(CPPdta, CPP != "Scotland")[[1]]), 
+                                          selected = "Aberdeen City")
+                       ),
+                       column(4,
+                              selectInput("CompLA2", "Select Comparator", unique(CPPdta$CPP), selected = "Scotland"
+                              )
+                       ),
+                       column(4,
+                              actionButton("selAll2", "All"),
+                              actionButton("selNone2", "None")),
+                       column(12,div(class = "chckBx",
+                                     checkboxGroupInput("grphs2", unique(CPPdta$Indicator), inline = TRUE, label = NULL)
+                       )
+                       ) 
+                     ),
+                     hr(),
+                     uiOutput("uiPage2")
+                   )),
           navbarMenu("Maps", icon = icon("globe"),
                      tabPanel("CPP Communities",
                               fluidPage(
@@ -189,7 +189,7 @@ shinyUI(navbarPage("CPOP",
                               )
                      )),
           
-          tabPanel("My Communities",
+          tabPanel("CPP - My Communities",
                    fluidPage(
                      tags$head(
                        tags$style(HTML("
@@ -282,7 +282,7 @@ shinyUI(navbarPage("CPOP",
           ),
           
           
-          tabPanel("All Communities",icon = icon("bath"),
+          tabPanel("All Communities by Outcome",icon = icon("bath"),
                    fluidPage(
                      fluidRow(column(6, selectInput("CPP-AllC","Select CPP", unique(IGZdta$CPP))),
                               column(6,selectInput("Indi-AllC", "Select Indicator", unique(IGZdta$Indicator)))),
