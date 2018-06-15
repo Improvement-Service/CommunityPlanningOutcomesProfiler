@@ -10,9 +10,13 @@ shinyServer(function(input, output,session) {
     dta <- filter(CPPdtaCurrent, CPP %in% c(input$LA1, input$CompLA1))
   })
   
-  #Create a list of all the indicators 
-  Indicators1 <- unique(CPPdtaCurrent$Indicator)
-  
+  #Create a list of all the indicators in the order these are to be presented
+  Indicators1 <- c("Healthy Birthweight", "Primary 1 Body Mass Index", "Child Poverty",
+                   "S4 Tariff Score", "Positive Destinations", "Employment Rate",
+                   "Median Earnings", "Out of Work Benefits", "Business Survival",
+                   "Crime Rate", "Dwelling Fires", "Carbon Emissions", 
+                   "Emergency Admissions", "Unplanned Hospital Attendances",
+                   "Early Mortality", "Fragility", "Well-being", "Fuel Poverty")
   
   ##########
   #Create a loop that creates a plot for the indicators selected 
