@@ -87,7 +87,10 @@ shinyServer(function(input, output,session) {
         
         #store unique year2 values and list of year3 values so that data length can be specified using these later
         Years3 <- filter(loopdata, CPP == input$LA1)
-        Years3 <- Years3$Year3    
+        Years3 <- Years3$Year3
+        
+        #Simplify axis labels so years are formatted 06/07 etc.
+        Years3 <- gsub("20", "", Years3)
         
         #store raw data to be used for solid line
         dtaRaw <- loopdata[loopdata$Type == "Raw data",]        
@@ -1225,9 +1228,9 @@ shinyServer(function(input, output,session) {
         LineChoiceDta <- LineChoiceDta()
         #Add column to data to fix y axis labels
         LineChoiceDta$YearLabels <- LineChoiceDta$Year
-        LineChoiceDta$YearLabels <- if_else(LineChoiceDta$Year == "2006/07","2006/07",
-                                            if_else(LineChoiceDta$Year == "2016/17", "2016/17",
-                                                    if_else(LineChoiceDta$Year == "2020/21","2020/21","")))
+        LineChoiceDta$YearLabels <- if_else(LineChoiceDta$Year == "2006/07","06/07",
+                                            if_else(LineChoiceDta$Year == "2016/17", "16/17",
+                                                    if_else(LineChoiceDta$Year == "2020/21","20/21","")))
         #LineChoiceDta <- ddply(LineChoiceDta,. (Indicator, Identifier), transform, YearPoints = (seq(1 : length(Year))))
         LineChoiceDta <- setDT(LineChoiceDta)[,YearPoints := seq(1 : length(Year)), by = list(Indicator, Identifier) ]
         #filter this data to match choices selected
