@@ -105,7 +105,13 @@ shinyUI(navbarPage("CPOP",
                               actionButton("selNone3", "None")),
                        column(12,
                               div(class = "chckBx",
-                                  checkboxGroupInput("grphs3",label = NULL, unique(CPPdta$Indicator), inline = TRUE)
+                                  checkboxGroupInput("grphs3",label = NULL, c("Healthy Birthweight", "Primary 1 Body Mass Index", "Child Poverty",
+                                                                              "S4 Tariff Score", "Positive Destinations", "Employment Rate",
+                                                                              "Median Earnings", "Out of Work Benefits", "Business Survival",
+                                                                              "Crime Rate", "Dwelling Fires", "Carbon Emissions", 
+                                                                              "Emergency Admissions", "Unplanned Hospital Attendances",
+                                                                              "Early Mortality", "Fragility", "Well-being", "Fuel Poverty")
+                                                     , inline = TRUE)
                               )
                        )
                      ),
@@ -128,7 +134,13 @@ shinyUI(navbarPage("CPOP",
                               actionButton("selAll2", "All"),
                               actionButton("selNone2", "None")),
                        column(12,div(class = "chckBx",
-                                     checkboxGroupInput("grphs2", unique(CPPdta$Indicator), inline = TRUE, label = NULL)
+                                     checkboxGroupInput("grphs2", c("Healthy Birthweight", "Primary 1 Body Mass Index", "Child Poverty",
+                                                                    "S4 Tariff Score", "Positive Destinations", "Employment Rate",
+                                                                    "Median Earnings", "Out of Work Benefits", "Business Survival",
+                                                                    "Crime Rate", "Dwelling Fires", "Carbon Emissions", 
+                                                                    "Emergency Admissions", "Unplanned Hospital Attendances",
+                                                                    "Early Mortality", "Fragility", "Well-being", "Fuel Poverty")
+                                                        , inline = TRUE, label = NULL)
                        )
                        ) 
                      ),

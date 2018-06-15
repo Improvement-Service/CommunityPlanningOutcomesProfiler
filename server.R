@@ -231,10 +231,15 @@ shinyServer(function(input, output,session) {
   for(i in 1:18){
     local({
       my.i <- i
-      nms <- gsub(" ", "",unique(CPPdta$Indicator))[[my.i]]
+      indis <- c("Healthy Birthweight", "Primary 1 Body Mass Index", "Child Poverty",
+                 "S4 Tariff Score", "Positive Destinations", "Employment Rate",
+                 "Median Earnings", "Out of Work Benefits", "Business Survival",
+                 "Crime Rate", "Dwelling Fires", "Carbon Emissions", 
+                 "Emergency Admissions", "Unplanned Hospital Attendances",
+                 "Early Mortality", "Fragility", "Well-being", "Fuel Poverty")
+      nms <- gsub(" ", "",indis)[[my.i]]
       plotname <- paste("plot", nms, sep ="_")
       output[[plotname]] <- renderPlot({
-        indis <- unique(CPPdta$Indicator)
         slInd <- indis[[my.i]]
         ##Need to get this to select most recent year, since indicators have different periods  
         dat <- filter(CPPdta, Indicator == slInd & Year %in% c("2016/17", "2014-2016"))
@@ -259,10 +264,15 @@ shinyServer(function(input, output,session) {
   for(i in 1:18){
     local({
       my.i <- i
-      nms <- gsub(" ", "",unique(CPPdta$Indicator))[[my.i]]
+      indis <- c("Healthy Birthweight", "Primary 1 Body Mass Index", "Child Poverty",
+                 "S4 Tariff Score", "Positive Destinations", "Employment Rate",
+                 "Median Earnings", "Out of Work Benefits", "Business Survival",
+                 "Crime Rate", "Dwelling Fires", "Carbon Emissions", 
+                 "Emergency Admissions", "Unplanned Hospital Attendances",
+                 "Early Mortality", "Fragility", "Well-being", "Fuel Poverty")
+      nms <- gsub(" ", "",indis)[[my.i]]
       plotnameFG <- paste("FGplot", nms, sep ="_")
       output[[plotnameFG]] <- renderPlot({
-        indis <- unique(CPPdta$Indicator)
         slInd <- indis[[my.i]]
         #get family group of LA for looped indicator
         FGNo <- unique(filter(CPPdta, Indicator == slInd &  CPP == input$LA2)[[6]])
