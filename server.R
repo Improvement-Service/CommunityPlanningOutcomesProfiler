@@ -103,10 +103,10 @@ shinyServer(function(input, output,session) {
                    colour = (if_else(HighValue == "Yes", coloursDotPos, coloursDotNeg))
                    , hjust = 1, vjust = 1) +
           scale_x_continuous(breaks = c(1: length(Years2)), labels = Years3)+
-          xlab("Year")+
           theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
                 panel.background = element_blank(), axis.line = element_line(colour="black"),
-                axis.text.x = element_text(vjust = 0.3))
+                axis.text.x = element_text(vjust = 0.3),axis.title.x = element_blank(),
+                axis.title.y = element_blank())
         
       })
     })  
@@ -1263,7 +1263,8 @@ shinyServer(function(input, output,session) {
           scale_x_continuous(breaks = c(1: length(YPoints)), labels = YLabels)+
           theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
                 panel.background = element_blank(), axis.line = element_line(colour="black"),
-                axis.text.x = element_text(vjust = 0.3))
+                axis.text.x = element_text(vjust = 0.3),
+                axis.title.x = element_blank(), axis.title.y = element_blank())
         
       })
     })
