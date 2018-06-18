@@ -1196,7 +1196,9 @@ shinyServer(function(input, output,session) {
   
   ##use reactive functions to store possible data selections
   LineChoiceDta <- reactive({
-    Community <- filter(IGZdta, InterZone_Name == input$Community5)
+    #First filter to selected CPP to avoid cases where the IGZ name has a duplicate in another CPP
+    Community <- filter(IGZdta, CPP == input$LA5)
+    Community <- filter(Community, InterZone_Name == input$Community5)
     Community$Identifier <- input$Community5
     Community$ColourRef <- "A"
     Community$Colours <- "red"
