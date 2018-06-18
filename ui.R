@@ -293,7 +293,7 @@ shinyUI(navbarPage("CPOP",
                      fluidRow(
                        column(6
                               ),
-                       column(1,
+                       column(2,
                               uiOutput("LineChoices5") 
                               ),
                        column(1,
