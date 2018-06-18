@@ -1198,18 +1198,21 @@ shinyServer(function(input, output,session) {
   LineChoiceDta <- reactive({
     Community <- filter(IGZdta, InterZone_Name == input$Community5)
     Community$Identifier <- input$Community5
+    Community$ColourRef <- "A"
     Community$Colours <- "red"
     Community <- select(Community, c(-InterZone, -InterZone_Name, -CPP, -Typology_Group, -Typology_Name) )
  
     Indicators <- unique(IGZdta$Indicator)
     LA <- filter(CPPdta, CPP == input$LA5 & Indicator %in% Indicators)
     LA$Identifier <- input$LA5
+    LA$ColourRef <- "B"
     LA$Colours <- "green"
     LA <- select(LA, c(-CPP, -FG))
 
     Indicators <- unique(IGZdta$Indicator)
     Scotland <- filter(CPPdta, CPP == "Scotland" & Indicator %in% Indicators)
     Scotland$Identifier <- "Scotland"
+    Scotland$ColourRef <- "C"
     Scotland$Colours <- "blue"
     Scotland <- select(Scotland, c(-CPP, -FG))
 
@@ -1223,6 +1226,7 @@ shinyServer(function(input, output,session) {
     GrpAv <- select(GrpAv, -value)
     colnames(GrpAv)[9] <- "value"
     GrpAv$Identifier <- "Group Average"
+    GrpAv$ColourRef <- "D"
     GrpAv$Colours <- "orange"
     GrpAv <- select(GrpAv, c(-InterZone, -InterZone_Name, -CPP, -Typology_Group, -Typology_Name))
     LineChoiceDta <- rbind(Community, LA, Scotland, GrpAv)
@@ -1234,6 +1238,15 @@ shinyServer(function(input, output,session) {
       my.i <- i
       plotname <- paste("5plot", my.i, sep ="_")
       output[[plotname]]<- renderPlot({
+        
+        #Calculate Y axis range by calculating max & min for each indicator
+        Ydta <- subset(IGZdta, IGZdta$Indicator == Indicators5[my.i])
+        Ymin <- min(Ydta$value, na.rm = TRUE)
+        Ymax <- max(Ydta$value, na.rm = TRUE)
+        Rnge <- Ymax - Ymin
+        Extra <- Rnge * 0.05
+        Ymin <- Ymin - Extra
+        Ymax <- Ymax + Extra
         
         #Combine reactive data into one data set
         LineChoiceDta <- LineChoiceDta()
@@ -1252,8 +1265,10 @@ shinyServer(function(input, output,session) {
         
         #Subset data to plot the selected indicator within the loop
         loopdata <- filter(LineChoiceDta, Indicator == Indicators5[my.i])
-        #Store unique colour values
+        #Store unique colour ref values
+        ColourRefPnts <- unique(loopdata$ColourRef)
         LineColours <- unique(loopdata$Colours)
+        
         #Store unique year values
         YPoints <- unique(loopdata$YearPoints)
         YPoints <- as.numeric(YPoints)
@@ -1269,12 +1284,13 @@ shinyServer(function(input, output,session) {
         #Create Plot
         ggplot()+
           geom_line(data = DashedLine, 
-                    aes(x = YearPoints, y = value, group = Identifier, colour = Identifier, linetype = "2"),lwd = 1, show.legend = FALSE)+
+                    aes(x = YearPoints, y = value, group = ColourRef, colour = ColourRef, linetype = "2"),lwd = 1, show.legend = FALSE)+
           geom_line(data = SolidLine, 
-                    aes(x = YearPoints, y = value, group = Identifier, colour = Identifier, linetype = "1"),lwd = 1, show.legend = FALSE)+
+                    aes(x = YearPoints, y = value, group = ColourRef, colour = ColourRef, linetype = "1"),lwd = 1, show.legend = FALSE)+
           ggtitle(Indicators5[my.i])+
-          scale_colour_manual(breaks = LineColours, values = LineColours)+
+          scale_colour_manual(breaks = ColourRefPnts, values = LineColours)+
           scale_x_continuous(breaks = c(1: length(YPoints)), labels = YLabels)+
+          ylim(Ymin, Ymax)+
           theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
                 panel.background = element_blank(), axis.line = element_line(colour="black"),
                 axis.text.x = element_text(vjust = 0.3),
