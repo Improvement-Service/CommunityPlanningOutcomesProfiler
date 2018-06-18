@@ -117,7 +117,7 @@ shinyServer(function(input, output,session) {
                    , hjust = 1, vjust = 1) +
           scale_x_continuous(breaks = c(1: length(Years2)), labels = Years3)+
           ylim(Ymin, Ymax)+
-          theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
+          theme(plot.title = element_text(size = 12), panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
                 panel.background = element_blank(), axis.line = element_line(colour="black"),
                 axis.text.x = element_text(vjust = 0.3),axis.title.x = element_blank(),
                 axis.title.y = element_blank())

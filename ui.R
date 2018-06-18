@@ -54,32 +54,28 @@ shinyUI(navbarPage("CPOP",
                      conditionalPanel(
                        condition = "input.Indi1 == 'All'",
                        fluidRow(
-                         column(3, plotOutput("plot_1")),
-                         column(3, plotOutput("plot_2")),
-                         column(3, plotOutput("plot_3")),
-                         column(3, plotOutput("plot_4"))
+                         column(2, plotOutput("plot_1", height = "225px")),
+                         column(2, plotOutput("plot_2", height = "225px")),
+                         column(2, plotOutput("plot_3", height = "225px")),
+                         column(2, plotOutput("plot_4", height = "225px")),
+                         column(2, plotOutput("plot_5", height = "225px")),
+                         column(2, plotOutput("plot_6", height = "225px"))
                        ),
                        fluidRow(
-                         column(3, plotOutput("plot_5")),
-                         column(3, plotOutput("plot_6")),
-                         column(3, plotOutput("plot_7")),
-                         column(3, plotOutput("plot_8"))
+                         column(2, plotOutput("plot_7", height = "225px")),
+                         column(2, plotOutput("plot_8", height = "225px")),
+                         column(2, plotOutput("plot_9", height = "225px")),
+                         column(2, plotOutput("plot_10",height = "225px")),
+                         column(2, plotOutput("plot_11",height = "225px")),
+                         column(2, plotOutput("plot_12",height = "225px"))
                        ),
                        fluidRow(
-                         column(3, plotOutput("plot_9")),
-                         column(3, plotOutput("plot_10")),
-                         column(3, plotOutput("plot_11")),
-                         column(3, plotOutput("plot_12"))
-                       ),
-                       fluidRow(
-                         column(3, plotOutput("plot_13")),
-                         column(3, plotOutput("plot_14")),
-                         column(3, plotOutput("plot_15")),
-                         column(3, plotOutput("plot_16"))
-                       ),
-                       fluidRow(
-                         column(3, plotOutput("plot_17")),
-                         column(3, plotOutput("plot_18"))
+                         column(2, plotOutput("plot_13",height = "225px")),
+                         column(2, plotOutput("plot_14",height = "225px")),
+                         column(2, plotOutput("plot_15",height = "225px")),
+                         column(2, plotOutput("plot_16",height = "225px")),
+                         column(2, plotOutput("plot_17",height = "225px")),
+                         column(2, plotOutput("plot_18",height = "225px"))
                        )
                      ),
                      conditionalPanel(
@@ -258,18 +254,24 @@ shinyUI(navbarPage("CPOP",
                               selectInput("LA5","Select a Local Authority", unique(filter(IGZdta, CPP != "Scotland")[[3]]),
                                           selected = 1),
                               uiOutput("Comm5"),
-                              h3(textOutput("Descrip")),
-                              h3(textOutput("GrpSize"))
+                              tags$style("#Descrip{
+                             font-size: 12px;
+                                         font-style: bold}"),
+                              div(textOutput("Descrip")),
+                              tags$style("#GrpSize{
+                             font-size: 12px;
+                                         font-style: bold}"),
+                              div(textOutput("GrpSize"))
                        ),
                        column(3,
                               checkboxGroupInput("Indi5", "Select Indicators",unique(IGZdta$Indicator),selected = unique(IGZdta$Indicator)),
                               radioButtons("View5", "Select Display", c("All", "Top/bottom 10", "Top/bottom 5"),inline = TRUE)
                        ),
                        column(3,
-                              plotOutput("5plot_1")
+                              plotOutput("5plot_1", height = "225px")
                        ),
                        column(3,
-                              plotOutput("5plot_2")
+                              plotOutput("5plot_2", height = "225px")
                        )
                      ),
                      fluidRow(
@@ -280,14 +282,14 @@ shinyUI(navbarPage("CPOP",
                        column(1,
                               tags$img(src="Arrow4.png")),
                        column(3, 
-                              plotOutput("5plot_3"),
-                              plotOutput("5plot_5"),
-                              plotOutput("5plot_7")
+                              plotOutput("5plot_3", height = "225px"),
+                              plotOutput("5plot_5", height = "225px"),
+                              plotOutput("5plot_7", height = "225px")
                               ),
                        column(3,
-                              plotOutput("5plot_4"),
-                              plotOutput("5plot_6"),
-                              plotOutput("5plot_8")
+                              plotOutput("5plot_4", height = "225px"),
+                              plotOutput("5plot_6", height = "225px"),
+                              plotOutput("5plot_8", height = "225px")
                               )
                      ),
                      fluidRow(
