@@ -1107,6 +1107,7 @@ shinyServer(function(input, output,session) {
     
     #Store values of font wanted
     fontvalues <- c('normal', 'bold')
+    bordervalues <- c("",'2px solid black')
     
     #Rename variables
     colnames(CommunityProfileDta)[1] <- paste("How does the selected community in  ", CPPName, 
@@ -1179,7 +1180,9 @@ shinyServer(function(input, output,session) {
       formatStyle(columns = 1, valueColumns = 4, color = styleEqual(Store_unique1,TxtValue))%>%
       formatStyle(columns = 3, valueColumns = 5, color = styleEqual(Store_unique1,TxtValue))%>%
       formatStyle(columns = 1, valueColumns = 6, fontWeight = styleEqual(fontlevels,fontvalues))%>%
-      formatStyle(columns = 3, valueColumns = 7, fontWeight = styleEqual(fontlevels,fontvalues))
+      formatStyle(columns = 3, valueColumns = 7, fontWeight = styleEqual(fontlevels,fontvalues))%>%
+      formatStyle(columns = 1, valueColumns = 6, border = styleEqual(fontlevels,bordervalues))%>%
+      formatStyle(columns = 3, valueColumns = 7, border = styleEqual(fontlevels,bordervalues))
     
   })
   
