@@ -43,11 +43,11 @@ shinyUI(navbarPage("CPOP",
                        column(4,
                               selectInput("Indi1", "Select Indicator", c("All", unique(CPPdta$Indicator)), selected = "All")
                        ),
-                       column(2, tags$hr(style="border-color: red;")
+                       column(2, tags$img(src = "RedLine.png")
                        ),
                        column(2
                        ),
-                       column(2, tags$hr(style="border-color: #48CCCD;")
+                       column(2, tags$img(src = "BlueLine.png")
                        )
                      ),
                      hr(),
@@ -282,14 +282,30 @@ shinyUI(navbarPage("CPOP",
                        column(3, 
                               plotOutput("5plot_3"),
                               plotOutput("5plot_5"),
-                              plotOutput("5plot_7"),
-                              uiOutput("LineChoices5")
+                              plotOutput("5plot_7")
                               ),
                        column(3,
                               plotOutput("5plot_4"),
                               plotOutput("5plot_6"),
-                              plotOutput("5plot_8"),
+                              plotOutput("5plot_8")
+                              )
+                     ),
+                     fluidRow(
+                       column(6
+                              ),
+                       column(1,
+                              uiOutput("LineChoices5") 
+                              ),
+                       column(1,
+                              tags$img(src = "ComPrflLgnd.png")
+                              ),
+                       column(1
+                              ),
+                       column(1,
                               radioButtons("Projections5", "Show projections?", c("Yes","No"), selected = "Yes", inline = TRUE)
+                              ),
+                       column(1,
+                              tags$img(src = "DashedLine.png")
                               )
                      )
                      
