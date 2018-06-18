@@ -1309,9 +1309,18 @@ shinyServer(function(input, output,session) {
     nrow(unique(IGZdta[IGZdta$CPP== input$`CPP-AllC`,"InterZone_Name"]))*60
   }
   output$AllCPlots <- renderPlot({
+    #Calculate Y axis range by calculating max & min across all IGZ
+    Ydta <- filter(IGZdta, IGZdta$Indicator==input$`Indi-AllC`&IGZdta$Type != "Projected")
+    Ymin <- min(Ydta$value, na.rm = TRUE)
+    Ymax <- max(Ydta$value, na.rm = TRUE)
+    Rnge <- Ymax - Ymin
+    Extra <- Rnge * 0.05
+    Ymin <- Ymin - Extra
+    Ymax <- Ymax + Extra
+    
     dta <- IGZdta[IGZdta$CPP== input$`CPP-AllC` & IGZdta$Indicator==input$`Indi-AllC`&IGZdta$Type != "Projected",c(2,8,9)]
     nComs <- length(unique(dta$InterZone_Name))
-    comList <- unique(dta$InterZone_Name)
+    comList <- unique(dta$InterZone_Name)%>% sort
     dta2 <- CPPdta[CPPdta$CPP %in% input$`CPP-AllC`& CPPdta$Indicator==input$`Indi-AllC`&CPPdta$Type != "Projected",c(1,4,5)]
     dta3 <- CPPdta[CPPdta$CPP %in% "Scotland"& CPPdta$Indicator==input$`Indi-AllC`&CPPdta$Type != "Projected",c(1,4,5)]
     colnames(dta2) <- colnames(dta)
@@ -1323,12 +1332,13 @@ shinyServer(function(input, output,session) {
     plts <- list()
     plts <-lapply(1:nComs, FUN = function(.x){
       ggplot(data = dta[dta$InterZone_Name %in% c(comList[.x], input$`CPP-AllC`, "Scotland"),])+
-        geom_line(aes(x = Year, y = value, group = colourscheme, colour = colourscheme), size = 1.5)+
+        geom_line(aes(x = Year, y = value, group = colourscheme, colour = colourscheme), size = 1)+
         theme_bw()+
         ggtitle(comList[.x])+
         theme(axis.text.x =  element_text(angle = 90, vjust = 0, hjust = 1))+
         ylab("")+xlab("")+
         scale_x_discrete(breaks = yrs, expand = c(0.01,0.01))+
+        ylim(Ymin, Ymax)+
         scale_color_manual(breaks = c("Com", "CPP", "Scot") ,values = c("red", "green","blue"))+
         guides(colour = FALSE)
     })
