@@ -29,6 +29,16 @@ shinyServer(function(input, output,session) {
         
         dtaAll <- selectedDta1()
         
+        #Calculate Y axis range by calculating max & min for each indicator
+        Ydta <- subset(CPPdtaCurrent, CPPdtaCurrent$Indicator == Indicators1[my.i])
+        Ymin <- min(Ydta$value, na.rm = TRUE)
+        Ymax <- max(Ydta$value, na.rm = TRUE)
+        Rnge <- Ymax - Ymin
+        Extra <- Rnge * 0.05
+        Ymin <- Ymin - Extra
+        Ymax <- Ymax + Extra
+        
+        
         #create a subset of the data for the particular indicator in the loop
         loopdata <- subset(dtaAll, dtaAll$Indicator == Indicators1[my.i])
         
@@ -106,6 +116,7 @@ shinyServer(function(input, output,session) {
                    colour = (if_else(HighValue == "Yes", coloursDotPos, coloursDotNeg))
                    , hjust = 1, vjust = 1) +
           scale_x_continuous(breaks = c(1: length(Years2)), labels = Years3)+
+          ylim(Ymin, Ymax)+
           theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
                 panel.background = element_blank(), axis.line = element_line(colour="black"),
                 axis.text.x = element_text(vjust = 0.3),axis.title.x = element_blank(),
@@ -1226,7 +1237,7 @@ shinyServer(function(input, output,session) {
         
         #Combine reactive data into one data set
         LineChoiceDta <- LineChoiceDta()
-        #Add column to data to fix y axis labels
+        #Add column to data to fix x axis labels
         LineChoiceDta$YearLabels <- LineChoiceDta$Year
         LineChoiceDta$YearLabels <- if_else(LineChoiceDta$Year == "2006/07","06/07",
                                             if_else(LineChoiceDta$Year == "2016/17", "16/17",
