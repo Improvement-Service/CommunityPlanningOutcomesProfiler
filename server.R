@@ -376,6 +376,10 @@ shinyServer(function(input, output,session) {
         dta$slct <- ifelse(dta$CPP == input$LA2, "Sel1", "Other") 
         cmp <- filter(dta, CPP == input$CompLA2)$value
         
+        #filter so that the Scotland value isn't a bar on the plot
+        
+        dta <- filter(dta, CPP != "Scotland")
+        
         # store direction so that right hand side of plot always shows best outcome
         
         direction <- first(dta$`High is Positive?`)
