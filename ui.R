@@ -89,36 +89,6 @@ shinyUI(navbarPage("CPOP",
                    fluidPage(
                      fluidRow(
                        column(4,
-                              selectInput("LA3", "Select A Local Authority", unique(filter(CPPdta, CPP != "Scotland")[[1]]), 
-                                          selected = "Aberdeen City")
-                       ),
-                       column(4,
-                              selectInput("CompLA3", "Select Comparator", unique(CPPdta$CPP), selected = "Scotland"
-                              )
-                       ),
-                       column(4,
-                              actionButton("selAll3", "All"),
-                              actionButton("selNone3", "None")),
-                       column(12,
-                              div(class = "chckBx",
-                                  checkboxGroupInput("grphs3",label = NULL, c("Healthy Birthweight", "Primary 1 Body Mass Index", "Child Poverty",
-                                                                              "S4 Tariff Score", "Positive Destinations", "Employment Rate",
-                                                                              "Median Earnings", "Out of Work Benefits", "Business Survival",
-                                                                              "Crime Rate", "Dwelling Fires", "Carbon Emissions", 
-                                                                              "Emergency Admissions", "Unplanned Hospital Attendances",
-                                                                              "Early Mortality", "Fragility", "Well-being", "Fuel Poverty")
-                                                     , inline = TRUE)
-                              )
-                       )
-                     ),
-                     hr(),
-                     uiOutput("uiPage3")
-                   )
-          ),
-          tabPanel("CPP - similar",
-                   fluidPage(
-                     fluidRow(
-                       column(4,
                               selectInput("LA2", "Select A Local Authority", unique(filter(CPPdta, CPP != "Scotland")[[1]]), 
                                           selected = "Aberdeen City")
                        ),
@@ -129,8 +99,38 @@ shinyUI(navbarPage("CPOP",
                        column(4,
                               actionButton("selAll2", "All"),
                               actionButton("selNone2", "None")),
+                       column(12,
+                              div(class = "chckBx",
+                                  checkboxGroupInput("grphs2",label = NULL, c("Healthy Birthweight", "Primary 1 Body Mass Index", "Child Poverty",
+                                                                              "S4 Tariff Score", "Positive Destinations", "Employment Rate",
+                                                                              "Median Earnings", "Out of Work Benefits", "Business Survival",
+                                                                              "Crime Rate", "Dwelling Fires", "Carbon Emissions", 
+                                                                              "Emergency Admissions", "Unplanned Hospital Attendances",
+                                                                              "Early Mortality", "Fragility", "Well-being", "Fuel Poverty")
+                                                     , inline = TRUE)
+                              )
+                       )
+                     ),
+                     hr(),
+                     uiOutput("uiPage2")
+                   )
+          ),
+          tabPanel("CPP - similar",
+                   fluidPage(
+                     fluidRow(
+                       column(4,
+                              selectInput("LA3", "Select A Local Authority", unique(filter(CPPdta, CPP != "Scotland")[[1]]), 
+                                          selected = "Aberdeen City")
+                       ),
+                       column(4,
+                              selectInput("CompLA3", "Select Comparator", unique(CPPdta$CPP), selected = "Scotland"
+                              )
+                       ),
+                       column(4,
+                              actionButton("selAll3", "All"),
+                              actionButton("selNone3", "None")),
                        column(12,div(class = "chckBx",
-                                     checkboxGroupInput("grphs2", c("Healthy Birthweight", "Primary 1 Body Mass Index", "Child Poverty",
+                                     checkboxGroupInput("grphs3", c("Healthy Birthweight", "Primary 1 Body Mass Index", "Child Poverty",
                                                                     "S4 Tariff Score", "Positive Destinations", "Employment Rate",
                                                                     "Median Earnings", "Out of Work Benefits", "Business Survival",
                                                                     "Crime Rate", "Dwelling Fires", "Carbon Emissions", 
@@ -141,7 +141,7 @@ shinyUI(navbarPage("CPOP",
                        ) 
                      ),
                      hr(),
-                     uiOutput("uiPage2")
+                     uiOutput("uiPage3")
                    )),
           navbarMenu("Maps", icon = icon("globe"),
                      tabPanel("CPP Communities",
