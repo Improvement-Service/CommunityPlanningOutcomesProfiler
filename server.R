@@ -498,7 +498,9 @@ shinyServer(function(input, output,session) {
   })
   
   
-  ##Create Graphs for Page 2 - Similar Councils Only
+  # Create Graphs for CPP similar - PAGE3----------------------------------------------------------------
+  
+  
   for(i in 1:18){
     local({
       my.i <- i
@@ -508,20 +510,40 @@ shinyServer(function(input, output,session) {
                  "Crime Rate", "Dwelling Fires", "Carbon Emissions", 
                  "Emergency Admissions", "Unplanned Hospital Attendances",
                  "Early Mortality", "Fragility", "Well-being", "Fuel Poverty")
+      
       nms <- gsub(" ", "",indis)[[my.i]]
       plotnameFG <- paste("FGplot", nms, sep ="_")
+      
       output[[plotnameFG]] <- renderPlot({
         slInd <- indis[[my.i]]
-        #get family group of LA for looped indicator
-        FGNo <- unique(filter(CPPdta, Indicator == slInd &  CPP == input$LA2)[[6]])
-        ##Need to get this to select most recent year, since indicators have different periods  
+        
+        # get family group of LA for looped indicator
+        
+        FGNo <- unique(filter(CPPdta, Indicator == slInd &  CPP == input$LA3)[[6]])
+        
+        # Need this to select most recent year, since indicators have different periods  
+        
         dta <- filter(CPPdta, Indicator == slInd & Year %in% c("2016/17", "2014-2016"))
-        dta$slct <- ifelse(dta$CPP == input$LA2, "Sel1", "Other") 
-        cmp <- filter(dta, CPP == input$CompLA2)$value
+        dta$slct <- ifelse(dta$CPP == input$LA3, "Sel1", "Other") 
+        cmp <- filter(dta, CPP == input$CompLA3)$value
         dta <- filter(dta, FG == FGNo)
-        ggplot(dtaa = dta) +
-          geom_bar(aes(x = reorder(CPP,-value), y = value, fill = slct), 
-                   stat = "identity", position = "dodge", width = 0.5) +
+        
+        #filter so that the Scotland value isn't a bar on the plot
+        
+        dta <- filter(dta, CPP != "Scotland")
+        
+        # store direction so that right hand side of plot always shows best outcome
+        
+        direction <- first(dta$`High is Positive?`)
+        
+        ggplot(data = dta) +
+          geom_bar(aes(
+            x = if(direction == "Yes"){reorder(CPP, value)}else{reorder(CPP, -value)}, 
+            y = value, 
+            fill = slct), 
+            stat = "identity", 
+            position = "dodge", 
+            width = 0.5) +
           scale_fill_manual(values = c("blue","red"), breaks = c("Other", "Sel1")) +
           guides(fill = FALSE) +
           ggtitle(slInd)+
@@ -534,75 +556,87 @@ shinyServer(function(input, output,session) {
     })  
   }
   
+  # Render a UI with a certain number of rows and columns based on selected graphs
   
-  
-  ##Render a UI with a certain number of rows and columns based on selected graphs
   output$uiPage3 <- renderUI({
     slctd <- length(input$grphs3)
-    #number of columns is 4, unless there are less than 3 graphs
-    colmns <- if(slctd>3){4} else{slctd}
-    #The percentage fo the space each columns will occupy
-    pctCols <- 100/colmns
+    
+    # number of columns is 4, unless there are less than 3 graphs
+    
+    colmns <- if(slctd > 3){4} else{slctd}
+    
+    # The percentage fo the space each columns will occupy
+    
+    pctCols <- 100 / colmns
     pctCols <- paste0(pctCols, "%")
-    #number of rows is the number of graphs divided by 4 and rounded up eg 7 = 2 rows
-    rows <- ceiling(slctd/4)
-    ##Dynamically create plot height  
-    plot_height <- ifelse(rows <2, "600px",ifelse(rows>4,"275px",paste0(900/rows, "px")))
-    inptLst <- as.list(gsub(" ", "",input$grphs3))
-    ##Create however many columns and then rows as needed
+    
+    # number of rows is the number of graphs divided by 4 and rounded up eg 7 = 2 rows
+    
+    rows <- ceiling(slctd / 4)
+    
+    # Dynamically create plot height  
+    
+    plot_height <- ifelse(rows < 2, "600px", ifelse(rows > 4, "275px", paste0(900 / rows, "px")))
+    inptLst <- as.list(gsub(" ", "", input$grphs3))
+    
+    # Create however many columns and then rows as needed
+    
     fluidRow(
-      #split into columns based on no. selected indicators
-      column(12/colmns,map(1, function(nc){
+      
+      # split into columns based on no. selected indicators
+      
+      column(12 / colmns, map(1, function(nc){
+        
         #This part selects graphs created above depending on the 
         #number of indicators e.g if 12 the map function will pull out
         #1,5,9 using the seq function
-        plot_output_list1<- map(seq(from = nc,to = slctd,by = colmns), function(x){
+        
+        plot_output_list1 <- map(seq(from = nc, to = slctd, by = colmns), function(x){
           tstNm1 <- inptLst[[x]]
-          plotname <- paste("plot", tstNm1, sep = "_")
+          plotname <- paste("FGplot", tstNm1, sep = "_")
           plotOutput(plotname, height = plot_height)
         })
         do.call(tagList, plot_output_list1)         
       }) ),  
-      column(12/colmns,map(2, function(nc){
+      column(12 / colmns, map(2, function(nc){
+        
         #this does the same thing as above, but selectes the next set of indicators
         #e.g. with 12 it goes 2,6,10
         #tryCatch is needed because there will be an error if the number of columns
         #is less than 2 => I need it to return nothing in this case
-        plot_output_list2<- tryCatch(map(seq(from = nc,to = slctd,by = colmns), function(x){
+        
+        plot_output_list2<- tryCatch(map(seq(from = nc, to = slctd, by = colmns), function(x){
           tstNm2 <- inptLst[[x]]
-          plotname <- paste("plot", tstNm2, sep = "_")
+          plotname <- paste("FGplot", tstNm2, sep = "_")
           plotOutput(plotname, height = plot_height)
         }), 
         error=function(cond) {
-          
           return(list())
         }
         )
         do.call(tagList, plot_output_list2)         
-      })
-      ),
-      column(12/colmns,map(3, function(nc){
-        plot_output_list3<- tryCatch(map(seq(from = nc,to = slctd,by = colmns), function(x){
+      })),
+      
+      column(12 / colmns, map(3, function(nc){
+        plot_output_list3<- tryCatch(map(seq(from = nc, to = slctd, by = colmns), function(x){
           tstNm3 <- inptLst[[x]]
-          plotname <- paste("plot", tstNm3, sep = "_")
+          plotname <- paste("FGplot", tstNm3, sep = "_")
           plotOutput(plotname, height = plot_height)
         }), 
         error=function(cond) {
-          
           return(list())
         }
         )
         do.call(tagList, plot_output_list3)         
-      })
-      ),
-      column(12/colmns,map(4, function(nc){
-        plot_output_list4<- tryCatch(map(seq(from = nc,to = slctd,by = colmns), function(x){
+      })),
+      
+      column(12 / colmns,map(4, function(nc){
+        plot_output_list4 <- tryCatch(map(seq(from = nc, to = slctd, by = colmns), function(x){
           tstNm4 <- inptLst[[x]]
-          plotname <- paste("plot", tstNm4, sep = "_")
+          plotname <- paste("FGplot", tstNm4, sep = "_")
           plotOutput(plotname, height = plot_height)
         }), 
         error=function(cond) {
-          
           return(list())
         }
         )
