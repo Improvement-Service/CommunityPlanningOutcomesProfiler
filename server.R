@@ -528,10 +528,6 @@ shinyServer(function(input, output,session) {
         cmp <- filter(dta, CPP == input$CompLA3)$value
         dta <- filter(dta, FG == FGNo)
         
-        #filter so that the Scotland value isn't a bar on the plot
-        
-        dta <- filter(dta, CPP != "Scotland")
-        
         # store direction so that right hand side of plot always shows best outcome
         
         direction <- first(dta$`High is Positive?`)
@@ -646,12 +642,11 @@ shinyServer(function(input, output,session) {
       
     )  
   })
+
   
+  # Create Ui ouputs for My Communities Page - PAGE4-----------------------------------------------------
   
-  
-  #Create Ui ouputs for page 4 - My communities page=============  
-  
-  #create reactive input that updates indicator selection to select all or clear all  
+   
   observeEvent(eventExpr = input$IndiAll,
                handlerExpr = {
                  updateCheckboxGroupInput(session = session,
@@ -668,51 +663,40 @@ shinyServer(function(input, output,session) {
     }
   })  
   
-  ######Create table output 
+  # Table output 
+  
   output$MyCommunitiesTbl <- DT::renderDataTable({
     
     
-    ###Create rankings for outcomes
-    IGZBest <- filter(IGZ_latest, CPP %in% input$LA4 & Indicator %in% input$Indi4)
+    # rankings for outcomes
     
-    #Calculate combined CPP score and combined Type score by grouping by individial IGZ and summing scores
-    #IGZBest <- ddply(IGZBest,. (InterZone), transform, CombinedCPPScore = (sum(CPPScore)))
+    IGZBest <- filter(IGZ_latest, CPP %in% input$LA4 & Indicator %in% input$Indi4)
     IGZBest <-setDT(IGZBest)[, CombinedCPPScore := sum(CPPScore), by = InterZone]
-    #IGZBest <- ddply(IGZBest,. (InterZone), transform, CombinedTypeScore = (sum(TypeScore)))
     IGZBest <-setDT(IGZBest)[, CombinedTypeScore := sum(TypeScore), by = InterZone]
     
-    #Filter data so that combined scores are only displayed once for each IGZ
-    #add column which displays the name of the 1st indicator selected, then filter where data equals this
-    #IGZBest <- ddply(IGZBest,. (InterZone), transform, FilterRef = (first(Indicator)))
+    # Filter data so that combined scores are only displayed once for each IGZ
+    
     IGZBest <- setDT(IGZBest)[, FilterRef:= first(Indicator), by = InterZone]
     IGZBest <- filter(IGZBest, Indicator == FilterRef)
     
-    #Create rankings for scores
     IGZBest$CPPScoreRank <- rank(IGZBest$CombinedCPPScore)
     IGZBest$TypeScoreRank <- rank(IGZBest$CombinedTypeScore)
     
+    # rankings for improvement 
     
-    ###Create rankingsfor improvement 
     IGZImprovement <- filter(IGZ_change, CPP %in% input$LA4 & Indicator %in% input$Indi4)
-    
-    #Calculate combined CPP score and combined Type score by grouping by individial IGZ and summing scores
-    #IGZImprovement <- ddply(IGZImprovement,. (InterZone), transform, CombinedCPPChangeScore = (sum(CPPChangeScore)))
     IGZImprovement <- setDT(IGZImprovement)[,CombinedCPPChangeScore := sum(CPPChangeScore), by = InterZone]
-    #IGZImprovement <- ddply(IGZImprovement,. (InterZone), transform, CombinedTypeChangeScore = (sum(TypeChangeScore)))
     IGZImprovement <- setDT(IGZImprovement)[,CombinedTypeChangeScore := sum(TypeChangeScore), by = InterZone]
     
-    #Filter data so that combined scores are only displayed once for each IGZ
-    #add column which displays the name of the 1st indicator selected, then filter where data equals this
-    #IGZImprovement <- ddply(IGZImprovement,. (InterZone), transform, FilterRef = (first(Indicator)))
+    # Filter data so that combined scores are only displayed once for each IGZ
+
     IGZImprovement <- setDT(IGZImprovement)[, FilterRef := first(Indicator), by = InterZone]
     IGZImprovement <-filter(IGZImprovement, Indicator == FilterRef)
     
-    #Create rankings for scores
     IGZImprovement$CPPChangeRank <- rank(IGZImprovement$CombinedCPPChangeScore)
     IGZImprovement$TypeChangeRank <- rank(IGZImprovement$CombinedTypeChangeScore)
     
-    
-    ###Split Data into 4 individual DataTables for each ranking, then combine into 1 table
+    # Split Data into 4 individual DataTables for each ranking, then combine into 1 table
     
     Column1 <- select(IGZBest, c(InterZone_Name, CPPScoreRank)) %>% 
       arrange(CPPScoreRank) 
@@ -733,44 +717,43 @@ shinyServer(function(input, output,session) {
     MyCommunitiesDta <- cbind(Column1, Column2, Column3, Column4) %>%
       select(c(-CPPScoreRank, -TypeScoreRank, -CPPChangeRank, -TypeChangeRank))
     
-    ###Calculate References for Colours
-    #Store the number of IGZ
+    # Calculate References for Colours
+    
     NoIGZ <- nrow(MyCommunitiesDta)
     NoIGZ <- as.numeric(NoIGZ)
     
-    #select the number of colours required
     Clrs <- if_else((NoIGZ < 11),NoIGZ,11)
-    
-    #Divide the number of IGZ by the number of colours being used to determine how many times to repeat colour 
     groupings <- round(NoIGZ/Clrs)
-    #Create a number sequence for the different colours
     Number_seq <- rep(1:Clrs, each = groupings)
-    #Check the length of this colour sequence to determine whether more needs to be added or some need to be removed
+    
+    # Check the length of this colour sequence to determine 
+    # whether more needs to be added or some need to be removed
+    
     length_seq <- length(Number_seq)
     Diff_seq <- NoIGZ - length_seq
     
-    ##Add in if statement that checks whether Diff_seq is negative 
-    #if difference is negative have a smaller number within each grouping
+    # if difference is negative have a smaller number within each grouping
     if(Diff_seq < 0) {groupings <- groupings -1}
     
-    #Create the number sequence again on this bases
+    # Create the number sequence again on this bases
+    
     Number_seq2 <- rep(1:Clrs, each = groupings)
     length_seq2 <- length(Number_seq2)
     Diff_seq2 <- NoIGZ - length_seq2
     
-    #distribute a roughly equal proportion of the colours
+    # distribute a roughly equal proportion of the colours
+    
     extra <- seq.int(from = 2, to = Clrs, length.out = Diff_seq2)
     extra <- round(extra)
     
-    #add this to the overall sequence, order it and add to the data set
     Complete_seq <- c(Number_seq2,extra)
     Complete_seq <- sort(Complete_seq)
     MyCommunitiesDta$Helper1 <- Complete_seq
     
-    ####Create colours for the remaining columns
-    #Filter the namesin column 1 and the colour references of these
-    #rename the columns and join these back up with the relevant column in the original table
-    #This will keep the order of the original column but match the colour references to the IGZ name
+    # colours for the remaining columns
+    # seperate out the helper column then join this back up, matching with the other columns so that 
+    # the colours take on the order of these variables
+    
     colours2 <- MyCommunitiesDta[,c(1,5)]
     colnames(colours2) <- c("Variable2", "Helper2")
     MyCommunitiesDta <- join(MyCommunitiesDta, colours2, by = "Variable2")
@@ -784,88 +767,109 @@ shinyServer(function(input, output,session) {
     MyCommunitiesDta <- join(MyCommunitiesDta, colours4, by = "Variable4")
     
     #Store unique colour reference to use as intervals in styling
+    
     Store_unique1 <- unique(MyCommunitiesDta$Helper1)
     Store_unique2 <- unique(MyCommunitiesDta$Helper2) %>% sort
     Store_unique3 <- unique(MyCommunitiesDta$Helper3) %>% sort
     Store_unique4 <- unique(MyCommunitiesDta$Helper4) %>% sort
     
-    #Store colours to be used
     ColourPal <- brewer.pal(Clrs,"RdYlGn")
-    
-    #Call CPP Name to be used in variable names
     CPPName <- input$LA4
     
-    #Rename variables
-    colnames(MyCommunitiesDta)[1] <- paste("Within ", CPPName, " which communities have the poorest outcomes?")
-    colnames(MyCommunitiesDta)[2] <- paste("Compared to other, similar communities, how do those in ", 
-                                           CPPName, " fare? (are they better or worse than expected?)")
-    colnames(MyCommunitiesDta)[3] <- paste("Within ", CPPName, " which communities have improved the least?")
-    colnames(MyCommunitiesDta)[4] <- paste("Within ", CPPName, "which communities have improved the least relative 
-                                           to other similar communities?")
+    Container1 <- paste(
+      "Within ", 
+      CPPName, 
+      " which communities have the poorest outcomes?")
+    Container2 <- paste(
+      "Compared to other, similar communities, how do those in ", 
+      CPPName, 
+      " fare? (are they better or worse than expected?)")
+    Container3 <- paste(
+      "Within ", 
+      CPPName, 
+      " which communities have improved the least?")
+    Container4 <- paste(
+      "Within ", 
+      CPPName, 
+      "which communities have improved the least relative to other similar communities?")
     
-    ##Store Column Names
-    Container1 <- paste("Within ", CPPName, " which communities have the poorest outcomes?")
-    Container2 <- paste("Compared to other, similar communities, how do those in ", 
-                        CPPName, " fare? (are they better or worse than expected?)")
-    Container3 <- paste("Within ", CPPName, " which communities have improved the least?")
-    Container4 <- paste("Within ", CPPName, "which communities have improved the least relative 
-                        to other similar communities?")
+    # add 4 empty columns so that there is space in between each column in the table
     
-    #####add 4 empty columns so that there is space in between each column in the table
-    #order these bewteen each of the columns and ensure column name is blank
-    MyCommunitiesDta[,ncol(MyCommunitiesDta)+1] <- NA
+    MyCommunitiesDta[,ncol(MyCommunitiesDta) + 1] <- NA
     MyCommunitiesDta <- MyCommunitiesDta[,c(1,9,2,3,4,5,6,7,8)]
-    MyCommunitiesDta[,ncol(MyCommunitiesDta)+1] <- NA
+    
+    MyCommunitiesDta[,ncol(MyCommunitiesDta) +1] <- NA
     MyCommunitiesDta <- MyCommunitiesDta[,c(1,2,3,10,4,5,6,7,8,9)]
-    MyCommunitiesDta[,ncol(MyCommunitiesDta)+1] <- NA
+    
+    MyCommunitiesDta[,ncol(MyCommunitiesDta) + 1] <- NA
     MyCommunitiesDta <- MyCommunitiesDta[,c(1,2,3,4,5,11,6,7,8,9,10)]
+    
     colnames(MyCommunitiesDta)[c(2,4,6)] <- ""
     
+    # Store values of the colours which need to have white text
     
-    #Store values of the colours which need to have white text
     WhiteTxt <- c(head(Store_unique1,2),tail(Store_unique1,2))
     TxtValue <- Store_unique1
     TxtValue <- if_else(TxtValue %in% WhiteTxt, "White", "Black")
     
-    #####Allow table to be split into top/bottom 10 and top/bottom 5
+    # Allow table to be split into top/bottom 10 and top/bottom 5
     
-    #Create an if statement to determine how many rows to split by if CPP has small no. of IGZ
-    Top10Rows <- if_else(NoIGZ<20,
-                         if_else((NoIGZ%%2)==0, NoIGZ/2, (NoIGZ/2)+0.5 ),
-                         10)
+    Top10Rows <- if_else(
+      NoIGZ < 20,
+      if_else(
+        (NoIGZ %% 2) == 0, 
+        NoIGZ / 2, 
+        (NoIGZ / 2) + 0.5
+        ),
+      10
+      )
     
-    Bottom10Rows <- if_else(NoIGZ<20,
-                            if_else((NoIGZ%%2)==0, NoIGZ/2, (NoIGZ/2)-0.5 ),
-                            10)
+    Bottom10Rows <- if_else(
+      NoIGZ < 20,
+      if_else(
+        (NoIGZ %% 2) == 0,
+        NoIGZ / 2,
+        (NoIGZ / 2) - 0.5 
+      ),
+      10
+    )
     
-    #Create seperate table of top 10, add an empty row, then add to seperate table of bottom 10
-    Top10 <- head(MyCommunitiesDta,Top10Rows)
-    Top10[nrow(Top10)+2,] <- NA
+    Top10 <- head(MyCommunitiesDta, Top10Rows)
+    Top10[nrow(Top10) + 2,] <- NA
     Bottom10 <- tail(MyCommunitiesDta, Bottom10Rows)
     TopBottom10 <- rbind(Top10, Bottom10)
     
-    #Same for top and bottom 5
-    Top5Rows <- if_else(NoIGZ<10,
-                        if_else((NoIGZ%%2)==0, NoIGZ/2, (NoIGZ/2)+0.5 ),
-                        5)
+    Top5Rows <- if_else(
+      NoIGZ < 10,
+      if_else(
+        (NoIGZ %% 2) == 0,
+        NoIGZ / 2, 
+        (NoIGZ / 2) + 0.5
+      ),
+      5
+    )
     
-    Bottom5Rows <- if_else(NoIGZ<10,
-                           if_else((NoIGZ%%2)==0, NoIGZ/2, (NoIGZ/2)-0.5 ),
-                           5)
+    Bottom5Rows <- if_else(
+      NoIGZ < 10,
+      if_else(
+        (NoIGZ %% 2) == 0, 
+        NoIGZ / 2, 
+        (NoIGZ / 2) - 0.5 
+      ),
+      5
+    )
     
     Top5 <- head(MyCommunitiesDta,Top5Rows)
     Top5[nrow(Top5)+2,] <- NA
     Bottom5 <- tail(MyCommunitiesDta, Bottom5Rows)
     TopBottom5 <- rbind(Top5, Bottom5)
     
-    #Call display input
     Display <- input$View
-    
-    #Create if statements to select data based on display input
     if(Display == "Top/bottom 10") { MyCommunitiesDta <- TopBottom10}
     if(Display == "Top/bottom 5") {MyCommunitiesDta <- TopBottom5}
     
-    #Create custom HTML to allow column headers to span multiple columns
+    # HTML to allow column headers to span multiple columns
+    
     sketch = htmltools::withTags(table(
       thead(
         tr(
@@ -878,10 +882,11 @@ shinyServer(function(input, output,session) {
       )
     ))
     
-    #Create table
+    # Create table
+    
     datatable(MyCommunitiesDta, options = list(
-      columnDefs =list(list(visible = FALSE, targets = c(7,8,9,10)),
-                       list(width = '400px', targets = c(0,2,4,6))),
+      columnDefs = list(list(visible = FALSE, targets = c(7,8,9,10)),
+                        list(width = '400px', targets = c(0,2,4,6))),
       pageLength = 136, 
       dom = "t", 
       ordering = F
@@ -898,9 +903,6 @@ shinyServer(function(input, output,session) {
       formatStyle(columns = 3, valueColumns = 9, color = styleEqual(Store_unique1,TxtValue))%>%
       formatStyle(columns = 5, valueColumns = 10, color = styleEqual(Store_unique1,TxtValue))%>%
       formatStyle(columns = 7, valueColumns = 11, color = styleEqual(Store_unique1,TxtValue))
-    
-    
-    
   })
   
   ##Create Leaflet Maps=============================
