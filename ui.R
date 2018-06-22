@@ -221,7 +221,7 @@ shinyUI(navbarPage("CPOP",
                                           selected = 1, width = "600"),
                               radioButtons("View","Select Display",c("All", "Top/bottom 10", "Top/bottom 5"),inline = TRUE)),
                        column(5,
-                              tags$div(class = "multicol",checkboxGroupInput("Indi4","Select Indicators", unique(IGZdta$Indicator),selected = unique(IGZdta$Indicator)))),
+                              tags$div(class = "multicol",checkboxGroupInput("Indi5","Select Indicators", unique(IGZdta$Indicator),selected = unique(IGZdta$Indicator)))),
                        column(1,
                               actionButton("IndiAll","Select All"),
                               actionButton("IndiClear", "Clear All"))
@@ -264,8 +264,8 @@ shinyUI(navbarPage("CPOP",
                               div(textOutput("GrpSize"))
                        ),
                        column(3,
-                              checkboxGroupInput("Indi5", "Select Indicators",unique(IGZdta$Indicator),selected = unique(IGZdta$Indicator)),
-                              radioButtons("View5", "Select Display", c("All", "Top/bottom 10", "Top/bottom 5"),inline = TRUE)
+                              checkboxGroupInput("Indi6", "Select Indicators",unique(IGZdta$Indicator),selected = unique(IGZdta$Indicator)),
+                              radioButtons("View6", "Select Display", c("All", "Top/bottom 10", "Top/bottom 5"),inline = TRUE)
                        ),
                        column(3,
                               plotOutput("5plot_1", height = "225px")
@@ -304,7 +304,7 @@ shinyUI(navbarPage("CPOP",
                        column(1
                               ),
                        column(1,
-                              radioButtons("Projections5", "Show projections?", c("Yes","No"), selected = "Yes", inline = TRUE)
+                              radioButtons("Projections6", "Show projections?", c("Yes","No"), selected = "Yes", inline = TRUE)
                               ),
                        column(1,
                               tags$img(src = "DashedLine.png")
