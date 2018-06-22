@@ -644,6 +644,346 @@ shinyServer(function(input, output,session) {
   })
 
   
+  # Create Ui outputs for Maps - PAGE4--------------------------------------------------
+
+  
+  output$IZUI <- renderUI({
+    selectizeInput(
+      "IZ", 
+      "", 
+      choices = sort(unique(CPPMapDta[CPPMapDta$council == input$LA4, 11])),
+      options = list(
+        placeholder = "Select a Community",
+        onInitialize = I('function() { this.setValue(""); }'))
+      )
+  })
+  
+  clrs      <- brewer.pal(7, "RdYlGn")
+  povPal    <- colorBin(rev(clrs), SpPolysDF@data$povDecs)
+  tariffPal <- colorBin(clrs, SpPolysDF@data$tariffDecs)
+  posPal    <- colorBin(clrs, SpPolysDF@data$posDecs)
+  benPal    <- colorBin(rev(clrs), SpPolysDF@data$benDecs)
+  crimePal  <- colorBin(rev(clrs), SpPolysDF@data$crimeDecs)
+  admisPal  <- colorBin(rev(clrs), SpPolysDF@data$admisDecs)
+  
+  plydata <- reactive({
+    desIZ <- which(CPPMapDta$council %in% input$LA4 & CPPMapDta$IZname %in% input$IZ)
+    IZ_dzs <- SpPolysDF[desIZ,]
+  })
+  
+  # create the map
+  
+  output$newplot<-renderLeaflet({
+    p <- leaflet(plydata())%>%
+      
+      # addProviderTiles("OpenStreetMap.HOT")%>% #Humanitarian OpenStreetMap if desired
+      
+      addTiles()%>%
+      addPolygons(
+        smoothFactor = 0.5, 
+        weight = 1.5, 
+        fillOpacity = 0.7,
+        layerId = ~DataZone, 
+        fillColor = ~povPal(`povDecs`), 
+        color = "black"
+        )
+    
+    return(p)
+  })
+  
+  output$newplot2 <- renderLeaflet({
+    p <- leaflet(plydata())%>%
+      addTiles()%>%
+      addPolygons(
+        smoothFactor = 0.5, 
+        weight = 1.5, 
+        fillOpacity = 0.7,
+        layerId = ~DataZone, 
+        fillColor = ~tariffPal(`tariffDecs`),  
+        color = "black"
+        )
+    
+    return(p)
+  })
+  
+  output$newplot3 <- renderLeaflet({
+    p <- leaflet(plydata())%>%
+      addTiles()%>%
+      addPolygons(
+        smoothFactor = 0.5, 
+        weight = 1.5, 
+        fillOpacity = 0.7,
+        layerId = ~DataZone, 
+        fillColor = ~posPal(`posDecs`), 
+        color = "black"
+        )
+    
+    return(p)
+  })
+  
+  output$newplot4 <- renderLeaflet({
+    p <- leaflet(plydata())%>%
+      addTiles()%>%
+      addPolygons(
+        smoothFactor = 0.5, 
+        weight = 1.5, 
+        fillOpacity = 0.7,
+        layerId = ~DataZone, 
+        fillColor = ~benPal(`benDecs`), 
+        color = "black"
+        )
+    
+    return(p)
+  })
+  
+  output$newplot5 <- renderLeaflet({
+    p <- leaflet(plydata())%>%
+      addTiles()%>%
+      addPolygons(
+        smoothFactor = 0.5, 
+        weight = 1.5, 
+        fillOpacity = 0.7,
+        layerId = ~DataZone, 
+        fillColor = ~crimePal(`crimeDecs`), 
+        color = "black"
+        )
+    
+    return(p)
+  })
+  
+  output$newplot6 <- renderLeaflet({
+    p <- leaflet(plydata())%>%
+      addTiles()%>%
+      addPolygons(
+        smoothFactor = 0.5, 
+        weight = 1.5, 
+        fillOpacity = 0.7,
+        layerId = ~DataZone, 
+        fillColor = ~admisPal(`admisDecs`), 
+        color = "black"
+        )
+    
+    return(p)
+  })
+  
+  # Clickable popups for map1
+  
+  showDZPopup <- function(group, lat, lng) {
+    selectedDZ <- CPPMapDta[CPPMapDta$DataZone == group,]
+    content <- as.character(tagList(
+      tags$h4(as.character(unique(selectedDZ$DataZone))),
+      sprintf(
+        "%s: %s",
+        "Children in Poverty (%)", 
+        round(unique(selectedDZ[13]),2)
+        ), 
+      tags$br()
+    ))
+    leafletProxy("newplot") %>% addPopups(lng, lat, content, layerId = group)
+  }
+  
+  # Makes the popups appear and clears old popups
+  
+  observe({
+    leafletProxy("newplot") %>% clearPopups()
+    event <- input$newplot_shape_click
+    if (is.null(event))
+      return()
+    isolate({
+      showDZPopup(event$id, event$lat, event$lng)
+    })
+  })
+  
+  # Clickable popups for map2
+  
+  showDZPopup2 <- function(group, lat, lng) {
+    selectedDZ <- CPPMapDta[CPPMapDta$DataZone == group,]
+    content <- as.character(tagList(
+      tags$h4(as.character(unique(selectedDZ$DataZone))),
+      sprintf(
+        "%s: %s\n",
+        "Tariff Score", 
+        round(unique(selectedDZ[14]),2)
+        ), 
+      tags$br()
+    ))
+    leafletProxy("newplot2") %>% addPopups(lng, lat, content, layerId = group)
+  }
+  
+  # Makes the popups appear and clears old popups
+  
+  observe({
+    leafletProxy("newplot2") %>% clearPopups()
+    event <- input$newplot2_shape_click
+    if (is.null(event))
+      return()
+    isolate({
+      showDZPopup2(event$id, event$lat, event$lng)
+    })
+  })
+  
+  # Clickable popups for map3
+  
+  showDZPopup3 <- function(group, lat, lng) {
+    selectedDZ <- CPPMapDta[CPPMapDta$DataZone == group,]
+    content <- as.character(tagList(
+      tags$h4(as.character(unique(selectedDZ$DataZone))),
+      sprintf(
+        "%s: %s\n",
+        "Positive Destinations (%)", 
+        round(unique(selectedDZ[15]),2)
+        ), 
+      tags$br()
+    ))
+    leafletProxy("newplot3") %>% addPopups(lng, lat, content, layerId = group)
+  }
+  
+  # Makes the popups appear and clears old popups
+  
+  observe({
+    leafletProxy("newplot3") %>% clearPopups()
+    event <- input$newplot3_shape_click
+    if (is.null(event))
+      return()
+    isolate({
+      showDZPopup3(event$id, event$lat, event$lng)
+    })
+  })
+  
+  # Clickable popups for map4
+  
+  showDZPopup4 <- function(group, lat, lng) {
+    selectedDZ <- CPPMapDta[CPPMapDta$DataZone == group,]
+    content <- as.character(tagList(
+      tags$h4(as.character(unique(selectedDZ$DataZone))),
+      sprintf(
+        "%s: %s\n",
+        "Out of Work Benefits (%)", 
+        round(unique(selectedDZ[16]),2)
+        ), 
+      tags$br()
+    ))
+    leafletProxy("newplot4") %>% addPopups(lng, lat, content, layerId = group)
+  }
+  
+  # Makes the popups appear and clears old popups
+  
+  observe({
+    leafletProxy("newplot4") %>% clearPopups()
+    event <- input$newplot4_shape_click
+    if (is.null(event))
+      return()
+    isolate({
+      showDZPopup4(event$id, event$lat, event$lng)
+    })
+  })
+  
+  # Clickable popups for map5
+  
+  showDZPopup5 <- function(group, lat, lng) {
+    selectedDZ <- CPPMapDta[CPPMapDta$DataZone == group,]
+    content <- as.character(tagList(
+      tags$h4(as.character(unique(selectedDZ$DataZone))),
+      sprintf(
+        "%s: %s\n",
+        "SIMD Crimes per 10,000", 
+        round(unique(selectedDZ[17]),2)
+        ), 
+      tags$br()
+    ))
+    leafletProxy("newplot5") %>% addPopups(lng, lat, content, layerId = group)
+  }
+  
+  # Makes the popups appear and clears old popups
+  
+  observe({
+    leafletProxy("newplot5") %>% clearPopups()
+    event <- input$newplot5_shape_click
+    if (is.null(event))
+      return()
+    isolate({
+      showDZPopup5(event$id, event$lat, event$lng)
+    })
+  })
+  
+  # Clickable popups for map6
+  
+  showDZPopup6 <- function(group, lat, lng) {
+    selectedDZ <- CPPMapDta[CPPMapDta$DataZone == group,]
+    content <- as.character(tagList(
+      tags$h4(as.character(unique(selectedDZ$DataZone))),
+      sprintf(
+        "%s: %s\n",
+        "Emergency Admissions per 100,000", 
+        round(unique(selectedDZ[18]),2)
+        ), 
+      tags$br()
+    ))
+    leafletProxy("newplot6") %>% addPopups(lng, lat, content, layerId = group)
+  }
+  
+  # Makes the popups appear and clears old popups
+  
+  observe({
+    leafletProxy("newplot6") %>% clearPopups()
+    event <- input$newplot6_shape_click
+    if (is.null(event))
+      return()
+    isolate({
+      showDZPopup6(event$id, event$lat, event$lng)
+    })
+  })
+  
+  # Colours for Community Map
+  
+  communityPal <- colorBin(clrs, SpPolysIZ@data$rank_decs)
+  
+  #Subset IZ Data
+  IZPlys <- reactive({
+    
+  })
+  
+  # Create Community Map
+  
+  output$communityMap <- renderLeaflet({
+    sbst <- which(SpPolysIZ@data$council %in% input$CPPIZ)
+    dt <- SpPolysIZ[sbst,]
+    cp <- leaflet(dt) %>%
+      addTiles() %>%
+      addPolygons(
+        smoothFactor = 0.5, 
+        weight = 1.5, 
+        fillOpacity = 0.7,
+        layerId = ~InterZone, 
+        fillColor = ~communityPal(`rank_decs`), 
+        color = "black"
+        )
+  })
+  
+  # Add click function
+  
+  showIZPopup <- function(group, lat, lng){
+    selectedIZ <- SpPolysIZ@data[SpPolysIZ@data$InterZone == group,]
+    content <- as.character(tagList(
+      tags$h4(as.character(unique(selectedIZ$`IGZ name`))),
+      paste("Intermediate Geography Ranking:", as.character(unique(selectedIZ[14]))),
+      tags$br()
+    ))
+    leafletProxy("communityMap") %>% addPopups(lng, lat, content, layerId = group)
+  }
+  
+  # Make popup appear and clear old popups
+  
+  observe({
+    leafletProxy("communityMap") %>% clearPopups()
+    event <- input$communityMap_shape_click
+    if(is.null(event)){
+      return()}
+    isolate({
+      showIZPopup(event$id, event$lat, event$lng)
+    })
+  })
+  
   # Create Ui ouputs for My Communities Page - PAGE4-----------------------------------------------------
   
    
@@ -670,7 +1010,7 @@ shinyServer(function(input, output,session) {
     
     # rankings for outcomes
     
-    IGZBest <- filter(IGZ_latest, CPP %in% input$LA4 & Indicator %in% input$Indi4)
+    IGZBest <- filter(IGZ_latest, CPP %in% input$LA5 & Indicator %in% input$Indi4)
     IGZBest <-setDT(IGZBest)[, CombinedCPPScore := sum(CPPScore), by = InterZone]
     IGZBest <-setDT(IGZBest)[, CombinedTypeScore := sum(TypeScore), by = InterZone]
     
@@ -684,7 +1024,7 @@ shinyServer(function(input, output,session) {
     
     # rankings for improvement 
     
-    IGZImprovement <- filter(IGZ_change, CPP %in% input$LA4 & Indicator %in% input$Indi4)
+    IGZImprovement <- filter(IGZ_change, CPP %in% input$LA5 & Indicator %in% input$Indi4)
     IGZImprovement <- setDT(IGZImprovement)[,CombinedCPPChangeScore := sum(CPPChangeScore), by = InterZone]
     IGZImprovement <- setDT(IGZImprovement)[,CombinedTypeChangeScore := sum(TypeChangeScore), by = InterZone]
     
@@ -774,7 +1114,7 @@ shinyServer(function(input, output,session) {
     Store_unique4 <- unique(MyCommunitiesDta$Helper4) %>% sort
     
     ColourPal <- brewer.pal(Clrs,"RdYlGn")
-    CPPName <- input$LA4
+    CPPName <- input$LA5
     
     Container1 <- paste(
       "Within ", 
@@ -905,243 +1245,13 @@ shinyServer(function(input, output,session) {
       formatStyle(columns = 7, valueColumns = 11, color = styleEqual(Store_unique1,TxtValue))
   })
   
-  ##Create Leaflet Maps=============================
-  output$IZUI <- renderUI({
-    selectizeInput("IZ", "", choices = sort(unique(CPPMapDta[CPPMapDta$council == input$CPP, 11])),
-                   options = list(placeholder = "Select a Community",
-                                  onInitialize = I('function() { this.setValue(""); }')))
-  })
   
-  clrs<-brewer.pal(7, "RdYlGn")
-  povPal <- colorBin(rev(clrs), SpPolysDF@data$povDecs)
-  tariffPal <- colorBin(clrs, SpPolysDF@data$tariffDecs)
-  posPal <- colorBin(clrs, SpPolysDF@data$posDecs)
-  benPal <- colorBin(rev(clrs), SpPolysDF@data$benDecs)
-  crimePal <- colorBin(rev(clrs), SpPolysDF@data$crimeDecs)
-  admisPal <- colorBin(rev(clrs), SpPolysDF@data$admisDecs)
-  
-  plydata<-reactive({
-    desIZ<- which(CPPMapDta$council %in% input$CPP & CPPMapDta$IZname %in% input$IZ)
-    IZ_dzs<-SpPolysDF[desIZ,]
-  })
-  
-  #create the map
-  output$newplot<-renderLeaflet({
-    p<-leaflet(plydata())%>%
-      # addProviderTiles("OpenStreetMap.HOT")%>% #Humanitarian OpenStreetMap if desired
-      addTiles()%>%
-      addPolygons(smoothFactor = 0.5, weight = 1.5, fillOpacity = 0.7,
-                  layerId = ~DataZone, fillColor = ~povPal(`povDecs`), color = "black")
-    return(p)
-  })
-  output$newplot2<-renderLeaflet({
-    p<-leaflet(plydata())%>%
-      addTiles()%>%
-      addPolygons(smoothFactor = 0.5, weight = 1.5, fillOpacity = 0.7,
-                  layerId = ~DataZone, fillColor = ~tariffPal(`tariffDecs`),  color = "black")
-    return(p)
-  })
-  output$newplot3<-renderLeaflet({
-    p<-leaflet(plydata())%>%
-      addTiles()%>%
-      addPolygons(smoothFactor = 0.5, weight = 1.5, fillOpacity = 0.7,
-                  layerId = ~DataZone, fillColor = ~posPal(`posDecs`), color = "black")
-    return(p)
-  })
-  output$newplot4<-renderLeaflet({
-    p<-leaflet(plydata())%>%
-      addTiles()%>%
-      addPolygons(smoothFactor = 0.5, weight = 1.5, fillOpacity = 0.7,
-                  layerId = ~DataZone, fillColor = ~benPal(`benDecs`), color = "black")
-    return(p)
-  })
-  output$newplot5<-renderLeaflet({
-    p<-leaflet(plydata())%>%
-      addTiles()%>%
-      addPolygons(smoothFactor = 0.5, weight = 1.5, fillOpacity = 0.7,
-                  layerId = ~DataZone, fillColor = ~crimePal(`crimeDecs`), color = "black")
-    return(p)
-  })
-  output$newplot6<-renderLeaflet({
-    p<-leaflet(plydata())%>%
-      addTiles()%>%
-      addPolygons(smoothFactor = 0.5, weight = 1.5, fillOpacity = 0.7,
-                  layerId = ~DataZone, fillColor = ~admisPal(`admisDecs`), color = "black")
-    return(p)
-  })
-  
-  ##Clickable popups for map1
-  showDZPopup <- function(group, lat, lng) {
-    selectedDZ <- CPPMapDta[CPPMapDta$DataZone == group,]
-    content <- as.character(tagList(
-      tags$h4(as.character(unique(selectedDZ$DataZone))),
-      sprintf("%s: %s",
-              "Children in Poverty (%)", round(unique(selectedDZ[13]),2)), tags$br()
-    ))
-    leafletProxy("newplot") %>% addPopups(lng, lat, content, layerId = group)
-  }
-  
-  #Makes the popups appear and clears old popups
-  observe({
-    leafletProxy("newplot") %>% clearPopups()
-    event <- input$newplot_shape_click
-    if (is.null(event))
-      return()
-    isolate({
-      showDZPopup(event$id, event$lat, event$lng)
-    })
-  })
-  
-  ##Clickable popups for map2
-  showDZPopup2 <- function(group, lat, lng) {
-    selectedDZ <- CPPMapDta[CPPMapDta$DataZone == group,]
-    content <- as.character(tagList(
-      tags$h4(as.character(unique(selectedDZ$DataZone))),
-      sprintf("%s: %s\n",
-              "Tariff Score", round(unique(selectedDZ[14]),2)), tags$br()
-    ))
-    leafletProxy("newplot2") %>% addPopups(lng, lat, content, layerId = group)
-  }
-  
-  #Makes the popups appear and clears old popups
-  observe({
-    leafletProxy("newplot2") %>% clearPopups()
-    event <- input$newplot2_shape_click
-    if (is.null(event))
-      return()
-    isolate({
-      showDZPopup2(event$id, event$lat, event$lng)
-    })
-  })
-  ##Clickable popups for map3
-  showDZPopup3 <- function(group, lat, lng) {
-    selectedDZ <- CPPMapDta[CPPMapDta$DataZone == group,]
-    content <- as.character(tagList(
-      tags$h4(as.character(unique(selectedDZ$DataZone))),
-      sprintf("%s: %s\n",
-              "Positive Destinations (%)", round(unique(selectedDZ[15]),2)), tags$br()
-    ))
-    leafletProxy("newplot3") %>% addPopups(lng, lat, content, layerId = group)
-  }
-  
-  #Makes the popups appear and clears old popups
-  observe({
-    leafletProxy("newplot3") %>% clearPopups()
-    event <- input$newplot3_shape_click
-    if (is.null(event))
-      return()
-    isolate({
-      showDZPopup3(event$id, event$lat, event$lng)
-    })
-  })
-  ##Clickable popups for map4
-  showDZPopup4 <- function(group, lat, lng) {
-    selectedDZ <- CPPMapDta[CPPMapDta$DataZone == group,]
-    content <- as.character(tagList(
-      tags$h4(as.character(unique(selectedDZ$DataZone))),
-      sprintf("%s: %s\n",
-              "Out of Work Benefits (%)", round(unique(selectedDZ[16]),2)), tags$br()
-    ))
-    leafletProxy("newplot4") %>% addPopups(lng, lat, content, layerId = group)
-  }
-  
-  #Makes the popups appear and clears old popups
-  observe({
-    leafletProxy("newplot4") %>% clearPopups()
-    event <- input$newplot4_shape_click
-    if (is.null(event))
-      return()
-    isolate({
-      showDZPopup4(event$id, event$lat, event$lng)
-    })
-  })
-  ##Clickable popups for map5
-  showDZPopup5 <- function(group, lat, lng) {
-    selectedDZ <- CPPMapDta[CPPMapDta$DataZone == group,]
-    content <- as.character(tagList(
-      tags$h4(as.character(unique(selectedDZ$DataZone))),
-      sprintf("%s: %s\n",
-              "SIMD Crimes per 10,000", round(unique(selectedDZ[17]),2)), tags$br()
-    ))
-    leafletProxy("newplot5") %>% addPopups(lng, lat, content, layerId = group)
-  }
-  
-  #Makes the popups appear and clears old popups
-  observe({
-    leafletProxy("newplot5") %>% clearPopups()
-    event <- input$newplot5_shape_click
-    if (is.null(event))
-      return()
-    isolate({
-      showDZPopup5(event$id, event$lat, event$lng)
-    })
-  })
-  ##Clickable popups for map6
-  showDZPopup6 <- function(group, lat, lng) {
-    selectedDZ <- CPPMapDta[CPPMapDta$DataZone == group,]
-    content <- as.character(tagList(
-      tags$h4(as.character(unique(selectedDZ$DataZone))),
-      sprintf("%s: %s\n",
-              "Emergency Admissions per 100,000", round(unique(selectedDZ[18]),2)), tags$br()
-    ))
-    leafletProxy("newplot6") %>% addPopups(lng, lat, content, layerId = group)
-  }
-  
-  #Makes the popups appear and clears old popups
-  observe({
-    leafletProxy("newplot6") %>% clearPopups()
-    event <- input$newplot6_shape_click
-    if (is.null(event))
-      return()
-    isolate({
-      showDZPopup6(event$id, event$lat, event$lng)
-    })
-  })
-  
-  #Colours for Community Map
-  communityPal <- colorBin(clrs, SpPolysIZ@data$rank_decs)
-  
-  #Subset IZ Data
-  IZPlys <- reactive({
-    
-  })
-  
-  #Create Community Map
-  output$communityMap <- renderLeaflet({
-    sbst <- which(SpPolysIZ@data$council %in% input$CPPIZ)
-    dt <- SpPolysIZ[sbst,]
-    cp <- leaflet(dt) %>%
-      addTiles() %>%
-      addPolygons(smoothFactor = 0.5, weight = 1.5, fillOpacity = 0.7,
-                  layerId = ~InterZone, fillColor = ~communityPal(`rank_decs`), color = "black")
-  })
-  #Add click function
-  showIZPopup <- function(group, lat, lng){
-    selectedIZ <- SpPolysIZ@data[SpPolysIZ@data$InterZone == group,]
-    content <- as.character(tagList(
-      tags$h4(as.character(unique(selectedIZ$`IGZ name`))),
-      paste("Intermediate Geography Ranking:", as.character(unique(selectedIZ[14]))),
-      tags$br()
-    ))
-    leafletProxy("communityMap") %>% addPopups(lng, lat, content, layerId = group)
-  }
-  #Make popup appear and clear old popups
-  observe({
-    leafletProxy("communityMap") %>% clearPopups()
-    event <- input$communityMap_shape_click
-    if(is.null(event)){
-      return()}
-    isolate({
-      showIZPopup(event$id, event$lat, event$lng)
-    })
-    
-  })
   
   
   ##Create Ui ouputs for page 5 - Community Profile=============    
   #Create reactive selection for community, filter to only show communities within the CPP
-  output$Comm5 <- renderUI({
-    IGZsubset <- filter(IGZdta, CPP == input$LA5)
+  output$Comm6 <- renderUI({
+    IGZsubset <- filter(IGZdta, CPP == input$LA6)
     selectInput("Community5", "Select a Community", sort(unique(IGZsubset$InterZone_Name)))
   })
   
@@ -1268,7 +1378,7 @@ shinyServer(function(input, output,session) {
     ColourPal <- brewer.pal(Clrs,"RdYlGn")
     
     #Call CPP Name to be used in variable names
-    CPPName <-  input$LA5
+    CPPName <-  input$LA6
     
     ###Create helper column to determine which IGZ should be bold
     #call Community name
@@ -1375,7 +1485,7 @@ shinyServer(function(input, output,session) {
 
   #Create ui output for checkbox selection
   output$LineChoices5 <- renderUI({
-    Choices <- c(input$Community5, input$LA5, "Scotland", "Group Average")
+    Choices <- c(input$Community5, input$LA6, "Scotland", "Group Average")
     checkboxGroupInput("Choices5", "Select lines to plot", Choices, selected = Choices)
   })
   
@@ -1385,7 +1495,7 @@ shinyServer(function(input, output,session) {
   ##use reactive functions to store possible data selections
   LineChoiceDta <- reactive({
     #First filter to selected CPP to avoid cases where the IGZ name has a duplicate in another CPP
-    Community <- filter(IGZdta, CPP == input$LA5)
+    Community <- filter(IGZdta, CPP == input$LA6)
     Community <- filter(Community, InterZone_Name == input$Community5)
     Community$Identifier <- input$Community5
     Community$ColourRef <- "A"
@@ -1393,8 +1503,8 @@ shinyServer(function(input, output,session) {
     Community <- select(Community, c(-InterZone, -InterZone_Name, -CPP, -Typology_Group, -Typology_Name) )
  
     Indicators <- unique(IGZdta$Indicator)
-    LA <- filter(CPPdta, CPP == input$LA5 & Indicator %in% Indicators)
-    LA$Identifier <- input$LA5
+    LA <- filter(CPPdta, CPP == input$LA6 & Indicator %in% Indicators)
+    LA$Identifier <- input$LA6
     LA$ColourRef <- "B"
     LA$Colours <- "green"
     LA <- select(LA, c(-CPP, -FG))

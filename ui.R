@@ -164,7 +164,7 @@ shinyUI(navbarPage("CPOP",
                                               wellPanel(
                                                 div(class = "row",
                                                     div(class = "span4",style = "padding-right:6vh; padding-left:6vh", 
-                                                        selectizeInput("CPP", "",
+                                                        selectizeInput("LA4", "",
                                                                        choices = unique(CPPMapDta$council), options = list(placeholder = "Select a CPP",
                                                                                                                            onInitialize = I('function() { this.setValue(""); }')))
                                                     ),
@@ -217,7 +217,7 @@ shinyUI(navbarPage("CPOP",
                        ),
                      fluidRow(
                        column(6,
-                              selectInput("LA4", "Select a Local Authority", unique(filter(IGZdta, CPP != "Scotland")[[3]]), 
+                              selectInput("LA5", "Select a Local Authority", unique(filter(IGZdta, CPP != "Scotland")[[3]]), 
                                           selected = 1, width = "600"),
                               radioButtons("View","Select Display",c("All", "Top/bottom 10", "Top/bottom 5"),inline = TRUE)),
                        column(5,
@@ -251,9 +251,9 @@ shinyUI(navbarPage("CPOP",
                    fluidPage(
                      fluidRow(
                        column(3,
-                              selectInput("LA5","Select a Local Authority", unique(filter(IGZdta, CPP != "Scotland")[[3]]),
+                              selectInput("LA6","Select a Local Authority", unique(filter(IGZdta, CPP != "Scotland")[[3]]),
                                           selected = 1),
-                              uiOutput("Comm5"),
+                              uiOutput("Comm6"),
                               tags$style("#Descrip{
                              font-size: 12px;
                                          font-style: bold}"),
