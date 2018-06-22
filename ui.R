@@ -29,180 +29,296 @@ shinyUI(navbarPage("CPOP",
                                    font-weight: bold
                                    }"))),
           includeHTML("CoverPage.html"),
-          img(src = "http://www.improvementservice.org.uk/benchmarking/images/islogo.png", align = "top")),
-          tabPanel("CPP - over time",
-                   fluidPage(
-                     fluidRow(
-                       column(4,
-                              selectInput("LA1", "Select A Local Authority", unique(filter(CPPdta, CPP != "Scotland"))[[1]], 
-                                          selected = 1)
-                       ),
-                       column(4,
-                              selectInput("CompLA1", "Select Comparator", unique(CPPdta$CPP), selected = "Scotland")
-                       ),
-                       column(4,
-                              selectInput("Indi1", "Select Indicator", c("All", unique(CPPdta$Indicator)), selected = "All")
-                       ),
-                       column(2, tags$img(src = "RedLine.png")
-                       ),
-                       column(2
-                       ),
-                       column(2, tags$img(src = "BlueLine.png")
-                       )
-                     ),
-                     hr(),
-                     conditionalPanel(
-                       condition = "input.Indi1 == 'All'",
-                       fluidRow(
-                         column(2, plotOutput("plot_1", height = "225px")),
-                         column(2, plotOutput("plot_2", height = "225px")),
-                         column(2, plotOutput("plot_3", height = "225px")),
-                         column(2, plotOutput("plot_4", height = "225px")),
-                         column(2, plotOutput("plot_5", height = "225px")),
-                         column(2, plotOutput("plot_6", height = "225px"))
-                       ),
-                       fluidRow(
-                         column(2, plotOutput("plot_7", height = "225px")),
-                         column(2, plotOutput("plot_8", height = "225px")),
-                         column(2, plotOutput("plot_9", height = "225px")),
-                         column(2, plotOutput("plot_10",height = "225px")),
-                         column(2, plotOutput("plot_11",height = "225px")),
-                         column(2, plotOutput("plot_12",height = "225px"))
-                       ),
-                       fluidRow(
-                         column(2, plotOutput("plot_13",height = "225px")),
-                         column(2, plotOutput("plot_14",height = "225px")),
-                         column(2, plotOutput("plot_15",height = "225px")),
-                         column(2, plotOutput("plot_16",height = "225px")),
-                         column(2, plotOutput("plot_17",height = "225px")),
-                         column(2, plotOutput("plot_18",height = "225px"))
-                       )
-                     ),
-                     conditionalPanel(
-                       condition = "input.Indi1 != 'All'",
-                       mainPanel(
-                         plotOutput("Indi1Plot")
-                       )
-                     )
-                   )),
-          tabPanel("CPP - all 32",
-                   fluidPage(
-                     fluidRow(
-                       column(4,
-                              selectInput("LA2", "Select A Local Authority", unique(filter(CPPdta, CPP != "Scotland")[[1]]), 
-                                          selected = "Aberdeen City")
-                       ),
-                       column(4,
-                              selectInput("CompLA2", "Select Comparator", unique(CPPdta$CPP), selected = "Scotland"
-                              )
-                       ),
-                       column(4,
-                              actionButton("selAll2", "All"),
-                              actionButton("selNone2", "None")),
-                       column(12,
-                              div(class = "chckBx",
-                                  checkboxGroupInput("grphs2",label = NULL, c("Healthy Birthweight", "Primary 1 Body Mass Index", "Child Poverty",
-                                                                              "S4 Tariff Score", "Positive Destinations", "Employment Rate",
-                                                                              "Median Earnings", "Out of Work Benefits", "Business Survival",
-                                                                              "Crime Rate", "Dwelling Fires", "Carbon Emissions", 
-                                                                              "Emergency Admissions", "Unplanned Hospital Attendances",
-                                                                              "Early Mortality", "Fragility", "Well-being", "Fuel Poverty")
-                                                     , inline = TRUE)
-                              )
-                       )
-                     ),
-                     hr(),
-                     uiOutput("uiPage2")
-                   )
+          img(
+            src = "http://www.improvementservice.org.uk/benchmarking/images/islogo.png", 
+            align = "top")
           ),
-          tabPanel("CPP - similar",
-                   fluidPage(
-                     fluidRow(
-                       column(4,
-                              selectInput("LA3", "Select A Local Authority", unique(filter(CPPdta, CPP != "Scotland")[[1]]), 
-                                          selected = "Aberdeen City")
-                       ),
-                       column(4,
-                              selectInput("CompLA3", "Select Comparator", unique(CPPdta$CPP), selected = "Scotland"
-                              )
-                       ),
-                       column(4,
-                              actionButton("selAll3", "All"),
-                              actionButton("selNone3", "None")),
-                       column(12,div(class = "chckBx",
-                                     checkboxGroupInput("grphs3", c("Healthy Birthweight", "Primary 1 Body Mass Index", "Child Poverty",
-                                                                    "S4 Tariff Score", "Positive Destinations", "Employment Rate",
-                                                                    "Median Earnings", "Out of Work Benefits", "Business Survival",
-                                                                    "Crime Rate", "Dwelling Fires", "Carbon Emissions", 
-                                                                    "Emergency Admissions", "Unplanned Hospital Attendances",
-                                                                    "Early Mortality", "Fragility", "Well-being", "Fuel Poverty")
-                                                        , inline = TRUE, label = NULL)
-                       )
-                       ) 
-                     ),
-                     hr(),
-                     uiOutput("uiPage3")
-                   )),
-          navbarMenu("Maps", icon = icon("globe"),
-                     tabPanel("CPP Communities",
-                              fluidPage(
-                                absolutePanel(fixed = FALSE, draggable = FALSE, top = "28px", left = 0, right = 0,
-                                              bottom = 0, width = "100%", height = "0px", 
-                                              wellPanel(div(class = "span4",style = "padding-left:6vh", 
-                                                            selectizeInput("CPPIZ", "", unique(CPPMapDta$council),
-                                                                           options = list(placeholder = "Select a CPP",
-                                                                                          onInitialize = I('function() { this.setValue(""); }')), 
-                                                                           width = "350px")))),
-                                fluidRow(div(class = "row-fluid", leafletOutput("communityMap")))
-                              )
-                     ),
-                     tabPanel("Data Zones",
-                              fluidPage(
-                                absolutePanel(fixed = FALSE,
-                                              draggable = FALSE, top = "28px", left = 0, right = 0, bottom = 0,
-                                              width = "100%", height = "0px", style = "opacity:1",
-                                              wellPanel(
-                                                div(class = "row",
-                                                    div(class = "span4",style = "padding-right:6vh; padding-left:6vh", 
-                                                        selectizeInput("LA4", "",
-                                                                       choices = unique(CPPMapDta$council), options = list(placeholder = "Select a CPP",
-                                                                                                                           onInitialize = I('function() { this.setValue(""); }')))
-                                                    ),
-                                                    div(class = "span4",
-                                                        uiOutput("IZUI")))
-                                              )),
-                                conditionalPanel("input.CPP != 'Select a CPP'", div(class = "row-fluid",
-                                                                                    fluidRow(splitLayout(cellWidths = c("33%", "33%", "33%"),
-                                                                                                         h4("Percentage of Children in Poverty"), h4("S4 Average Tariff Score"), h4("% School Leavers Entering Positive Destinations"))
-                                                                                    ),
-                                                                                    fluidRow(splitLayout(cellWidths = c("33%", "33%", "33%"),
-                                                                                                         leafletOutput("newplot"), leafletOutput("newplot2"), 
-                                                                                                         leafletOutput("newplot3")))
-                                ), 
-                                hr(style = "margin-bottom:0.3vh; margin-top:0.5vh")),
-                                conditionalPanel("input.CPP != 'Select a CPP'",
-                                                 fluidRow(
-                                                   splitLayout(cellWidths = c("33%", "33%", "33%"),
-                                                               h4("% Aged 16-64 Receiving Out of Work Benefits"), 
-                                                               h4("Number of SIMD Crimes per 10,000 People"), 
-                                                               h4("Emergency Admissions (65+) per 100,000 People"))
-                                                 ),  
-                                                 fluidRow(
-                                                   splitLayout(cellWidths = c("33%", "33%", "33%"),
-                                                               leafletOutput("newplot4"), 
-                                                               leafletOutput("newplot5"), 
-                                                               leafletOutput("newplot6")))
-                                )
-                                
-                              )
-                     )),
-          
-          tabPanel("CPP - My Communities",
-                   fluidPage(
-                     tags$head(
-                       tags$style(HTML("
-                                       
-                                       .multicol {
+          tabPanel(
+            "CPP - over time", 
+            fluidPage(
+              fluidRow(
+                column(
+                  4, 
+                  selectInput(
+                    "LA1", 
+                    "Select A Local Authority", 
+                    unique(filter(CPPdta, CPP != "Scotland"))[[1]],
+                    selected = 1
+                    )
+                ),
+                column(
+                  4,
+                  selectInput(
+                    "CompLA1", 
+                    "Select Comparator", 
+                    unique(CPPdta$CPP), 
+                    selected = "Scotland"
+                    )
+                ),
+                column(
+                  4,
+                  selectInput(
+                    "Indi1", 
+                    "Select Indicator", 
+                    c("All", unique(CPPdta$Indicator)), 
+                    selected = "All"
+                  )
+                ),
+                column(
+                  2, 
+                  tags$img(src = "RedLine.png")
+                ),
+                column(2),
+                column(
+                  2, 
+                  tags$img(src = "BlueLine.png")
+                )
+              ),
+              hr(),
+              conditionalPanel(
+                condition = "input.Indi1 == 'All'",
+                fluidRow(
+                  column(2, plotOutput("plot_1", height = "225px")),
+                  column(2, plotOutput("plot_2", height = "225px")),
+                  column(2, plotOutput("plot_3", height = "225px")),
+                  column(2, plotOutput("plot_4", height = "225px")),
+                  column(2, plotOutput("plot_5", height = "225px")),
+                  column(2, plotOutput("plot_6", height = "225px"))
+                ),
+                fluidRow(
+                  column(2, plotOutput("plot_7", height = "225px")),
+                  column(2, plotOutput("plot_8", height = "225px")),
+                  column(2, plotOutput("plot_9", height = "225px")),
+                  column(2, plotOutput("plot_10",height = "225px")),
+                  column(2, plotOutput("plot_11",height = "225px")),
+                  column(2, plotOutput("plot_12",height = "225px"))
+                ),
+                fluidRow(
+                  column(2, plotOutput("plot_13",height = "225px")),
+                  column(2, plotOutput("plot_14",height = "225px")),
+                  column(2, plotOutput("plot_15",height = "225px")),
+                  column(2, plotOutput("plot_16",height = "225px")),
+                  column(2, plotOutput("plot_17",height = "225px")),
+                  column(2, plotOutput("plot_18",height = "225px"))
+                )
+              ),
+              conditionalPanel(
+                condition = "input.Indi1 != 'All'",
+                mainPanel(plotOutput("Indi1Plot"))
+              )
+          )),
+          tabPanel(
+            "CPP - all 32",
+            fluidPage(
+              fluidRow(
+                column(
+                  4,
+                  selectInput(
+                    "LA2", 
+                    "Select A Local Authority", 
+                    unique(filter(CPPdta, CPP != "Scotland")[[1]]), 
+                    selected = "Aberdeen City")
+                  ),
+                column(
+                  4, 
+                  selectInput(
+                    "CompLA2", 
+                    "Select Comparator", 
+                    unique(CPPdta$CPP), 
+                    selected = "Scotland"
+                  )
+                ),
+                column(
+                  4,
+                  actionButton("selAll2", "All"),
+                  actionButton("selNone2", "None")),
+                column(
+                  12,
+                  div(
+                    class = "chckBx",
+                    checkboxGroupInput(
+                      "grphs2",
+                      label = NULL, 
+                      c("Healthy Birthweight", "Primary 1 Body Mass Index", 
+                        "Child Poverty","S4 Tariff Score", "Positive Destinations", 
+                        "Employment Rate", "Median Earnings", "Out of Work Benefits", 
+                        "Business Survival","Crime Rate", "Dwelling Fires", 
+                        "Carbon Emissions", "Emergency Admissions", 
+                        "Unplanned Hospital Attendances", "Early Mortality", "Fragility", 
+                        "Well-being", "Fuel Poverty"), 
+                      inline = TRUE
+                    )
+                  )
+                )
+              ),
+              hr(),
+              uiOutput("uiPage2")
+            )
+          ),
+          tabPanel(
+            "CPP - similar",
+            fluidPage(
+              fluidRow(
+                column(
+                  4,
+                  selectInput(
+                    "LA3", 
+                    "Select A Local Authority", 
+                    unique(filter(CPPdta, CPP != "Scotland")[[1]]), 
+                    selected = "Aberdeen City")
+                  ),
+                column(
+                  4,
+                  selectInput(
+                    "CompLA3", 
+                    "Select Comparator", 
+                    unique(CPPdta$CPP), 
+                    selected = "Scotland"
+                  )
+                ),
+                column(
+                  4,
+                  actionButton("selAll3", "All"),
+                  actionButton("selNone3", "None")
+                ),
+                column(
+                  12,
+                  div(
+                    class = "chckBx",
+                    checkboxGroupInput(
+                      "grphs3", 
+                      c("Healthy Birthweight", "Primary 1 Body Mass Index", 
+                        "Child Poverty", "S4 Tariff Score", "Positive Destinations", 
+                        "Employment Rate","Median Earnings", "Out of Work Benefits", 
+                        "Business Survival", "Crime Rate", "Dwelling Fires", 
+                        "Carbon Emissions", "Emergency Admissions", 
+                        "Unplanned Hospital Attendances", "Early Mortality","Fragility", 
+                        "Well-being", "Fuel Poverty"), 
+                      inline = TRUE, 
+                      label = NULL
+                    )
+                  )
+                ) 
+              ),
+              hr(),
+              uiOutput("uiPage3")
+          )),
+          navbarMenu(
+            "Maps", 
+            icon = icon("globe"),
+            tabPanel(
+              "CPP Communities",
+              fluidPage(
+                absolutePanel(
+                  fixed = FALSE, 
+                  draggable = FALSE, 
+                  top = "28px", 
+                  left = 0, 
+                  right = 0,
+                  bottom = 0, 
+                  width = "100%", 
+                  height = "0px", 
+                  wellPanel(
+                    div(
+                      class = "span4",
+                      style = "padding-left:6vh", 
+                      selectizeInput(
+                        "CPPIZ", 
+                        "", 
+                        unique(CPPMapDta$council),
+                        options = list(
+                          placeholder = "Select a CPP",
+                          onInitialize = I('function() { this.setValue(""); }')
+                        ), 
+                        width = "350px"
+                      )
+                    )
+                  )
+                ),
+                fluidRow(div(class = "row-fluid", leafletOutput("communityMap")))
+              )
+            ),
+            tabPanel(
+              "Data Zones",
+              fluidPage(
+                absolutePanel(
+                  fixed = FALSE,
+                  draggable = FALSE, 
+                  top = "28px", 
+                  left = 0, 
+                  right = 0, 
+                  bottom = 0,
+                  width = "100%", 
+                  height = "0px", 
+                  style = "opacity:1",
+                  wellPanel(
+                    div(
+                      class = "row",
+                        div(
+                          class = "span4",
+                          style = "padding-right:6vh; padding-left:6vh", 
+                          selectizeInput(
+                            "LA4", 
+                            "",
+                            choices = unique(CPPMapDta$council), 
+                            options = list(
+                              placeholder = "Select a CPP",
+                              onInitialize = I('function() { this.setValue(""); }')
+                            )
+                          )
+                        ),
+                        div(class = "span4", uiOutput("IZUI"))
+                    )
+                  )
+                ),
+                conditionalPanel(
+                  "input.CPP != 'Select a CPP'", 
+                  div(
+                    class = "row-fluid",
+                    fluidRow(
+                      splitLayout(
+                        cellWidths = c("33%", "33%", "33%"),
+                        h4("Percentage of Children in Poverty"), 
+                        h4("S4 Average Tariff Score"), 
+                        h4("% School Leavers Entering Positive Destinations")
+                      )
+                    ),
+                    fluidRow(
+                      splitLayout(
+                        cellWidths = c("33%", "33%", "33%"),
+                        leafletOutput("newplot"), 
+                        leafletOutput("newplot2"), 
+                        leafletOutput("newplot3")
+                      )
+                    )
+                  ), 
+                  hr(style = "margin-bottom:0.3vh; margin-top:0.5vh")
+                ),
+                conditionalPanel(
+                  "input.CPP != 'Select a CPP'",
+                  fluidRow(
+                    splitLayout(
+                      cellWidths = c("33%", "33%", "33%"),
+                      h4("% Aged 16-64 Receiving Out of Work Benefits"), 
+                      h4("Number of SIMD Crimes per 10,000 People"), 
+                      h4("Emergency Admissions (65+) per 100,000 People"))
+                    ),  
+                  fluidRow(
+                    splitLayout(
+                      cellWidths = c("33%", "33%", "33%"),
+                      leafletOutput("newplot4"), 
+                      leafletOutput("newplot5"), 
+                      leafletOutput("newplot6")
+                    )
+                  )
+                ) 
+              )
+            )
+          ),
+          tabPanel(
+            "CPP - My Communities",
+            fluidPage(
+              tags$head(tags$style(HTML(".multicol {
                                        
                                        -webkit-column-count: 3; /* Chrome, Safari, Opera */
                                        
@@ -213,114 +329,151 @@ shinyUI(navbarPage("CPOP",
                                        }
                                        
                                        "))
-                       
-                       ),
-                     fluidRow(
-                       column(6,
-                              selectInput("LA5", "Select a Local Authority", unique(filter(IGZdta, CPP != "Scotland")[[3]]), 
-                                          selected = 1, width = "600"),
-                              radioButtons("View","Select Display",c("All", "Top/bottom 10", "Top/bottom 5"),inline = TRUE)),
-                       column(5,
-                              tags$div(class = "multicol",checkboxGroupInput("Indi5","Select Indicators", unique(IGZdta$Indicator),selected = unique(IGZdta$Indicator)))),
-                       column(1,
-                              actionButton("IndiAll","Select All"),
-                              actionButton("IndiClear", "Clear All"))
-                     ),
-                     fluidPage(
-                       fluidRow(
-                         column(1,
-                                tags$img(src = "Arrow1.png")),
-                         column(10,
-                                DT::dataTableOutput("MyCommunitiesTbl")
-                         ),
-                         column(1,
-                                tags$img(src = "Arrow2.png"))
-                       )
-                       
-                     )
-                     
-                       )        
-                   
-                   
-                   
-                   
-                   
-                       ),
-          
-          tabPanel("Community Profile",
-                   fluidPage(
-                     fluidRow(
-                       column(3,
-                              selectInput("LA6","Select a Local Authority", unique(filter(IGZdta, CPP != "Scotland")[[3]]),
-                                          selected = 1),
-                              uiOutput("Comm6"),
-                              tags$style("#Descrip{
-                             font-size: 12px;
-                                         font-style: bold}"),
-                              div(textOutput("Descrip")),
-                              tags$style("#GrpSize{
-                             font-size: 12px;
-                                         font-style: bold}"),
-                              div(textOutput("GrpSize"))
-                       ),
-                       column(3,
-                              checkboxGroupInput("Indi6", "Select Indicators",unique(IGZdta$Indicator),selected = unique(IGZdta$Indicator)),
-                              radioButtons("View6", "Select Display", c("All", "Top/bottom 10", "Top/bottom 5"),inline = TRUE)
-                       ),
-                       column(3,
-                              plotOutput("5plot_1", height = "225px")
-                       ),
-                       column(3,
-                              plotOutput("5plot_2", height = "225px")
-                       )
-                     ),
-                     fluidRow(
-                       column(1,
-                              tags$img(src="Arrow3.png")),
-                       column(4,
-                              DT::dataTableOutput("CommunityProfileTbl")),
-                       column(1,
-                              tags$img(src="Arrow4.png")),
-                       column(3, 
-                              plotOutput("5plot_3", height = "225px"),
-                              plotOutput("5plot_5", height = "225px"),
-                              plotOutput("5plot_7", height = "225px")
-                              ),
-                       column(3,
-                              plotOutput("5plot_4", height = "225px"),
-                              plotOutput("5plot_6", height = "225px"),
-                              plotOutput("5plot_8", height = "225px")
-                              )
-                     ),
-                     fluidRow(
-                       column(6
-                              ),
-                       column(2,
-                              uiOutput("LineChoices5") 
-                              ),
-                       column(1,
-                              tags$img(src = "ComPrflLgnd.png")
-                              ),
-                       column(1
-                              ),
-                       column(1,
-                              radioButtons("Projections6", "Show projections?", c("Yes","No"), selected = "Yes", inline = TRUE)
-                              ),
-                       column(1,
-                              tags$img(src = "DashedLine.png")
-                              )
-                     )
-                     
-                   )
+               ),
+              fluidRow(
+                column(
+                  6,
+                  selectInput(
+                    "LA5", 
+                    "Select a Local Authority", 
+                    unique(filter(IGZdta, CPP != "Scotland")[[3]]), 
+                    selected = 1, 
+                    width = "600"
+                  ),
+                  radioButtons(
+                    "View",
+                    "Select Display",
+                    c("All", "Top/bottom 10", "Top/bottom 5"),
+                    inline = TRUE)
+                  ),
+                column(
+                  5,
+                  tags$div(
+                    class = "multicol",
+                    checkboxGroupInput(
+                      "Indi5",
+                      "Select Indicators", 
+                      unique(IGZdta$Indicator),
+                      selected = unique(IGZdta$Indicator)
+                    )
+                  )
+                ),
+                column(
+                  1,
+                  actionButton("IndiAll","Select All"),
+                  actionButton("IndiClear", "Clear All")
+                )
+              ),
+              fluidPage(
+                fluidRow(
+                  column(
+                    1,
+                    tags$img(src = "Arrow1.png")
+                  ),
+                  column(
+                    10,
+                    DT::dataTableOutput("MyCommunitiesTbl")
+                  ),
+                  column(
+                    1,
+                    tags$img(src = "Arrow2.png")
+                  )
+                )
+              )
+            )
           ),
-          
-          
-          tabPanel("All Communities by Outcome",icon = icon("bath"),
-                   fluidPage(
-                     fluidRow(column(6, selectInput("CPP-AllC","Select CPP", unique(IGZdta$CPP))),
-                              column(6,selectInput("Indi-AllC", "Select Indicator", unique(IGZdta$Indicator)))),
-                     hr(),
-                     plotOutput("AllCPlots")
-                   )
+          tabPanel(
+            "Community Profile",
+            fluidPage(
+              fluidRow(
+                column(
+                  3,
+                  selectInput(
+                    "LA6",
+                    "Select a Local Authority", 
+                    unique(filter(IGZdta, CPP != "Scotland")[[3]]),
+                    selected = 1
+                  ),
+                  uiOutput("Comm6"),
+                  tags$style("#Descrip{
+                            font-size: 12px;
+                            font-style: bold}"),
+                  div(textOutput("Descrip")),
+                  tags$style("#GrpSize{
+                            font-size: 12px;
+                            font-style: bold}"),
+                  div(textOutput("GrpSize"))
+                ),
+                column(
+                  3,
+                  checkboxGroupInput(
+                    "Indi6", 
+                    "Select Indicators",
+                    unique(IGZdta$Indicator),
+                    selected = unique(IGZdta$Indicator)
+                  ),
+                  radioButtons(
+                    "View6", 
+                    "Select Display", 
+                    c("All", "Top/bottom 10", "Top/bottom 5"),
+                    inline = TRUE
+                  )
+                ),
+                column(3,plotOutput("6plot_1", height = "225px")),
+                column(3,plotOutput("6plot_2", height = "225px"))
+              ),
+              fluidRow(
+                column(1,tags$img(src="Arrow3.png")),
+                column(4,DT::dataTableOutput("CommunityProfileTbl")),
+                column(1,tags$img(src="Arrow4.png")),
+                column(
+                  3, 
+                  plotOutput("6plot_3", height = "225px"),
+                  plotOutput("6plot_5", height = "225px"),
+                  plotOutput("6plot_7", height = "225px")
+                ),
+                column(
+                  3,
+                  plotOutput("6plot_4", height = "225px"),
+                  plotOutput("6plot_6", height = "225px"),
+                  plotOutput("6plot_8", height = "225px")
+                )
+              ),
+              fluidRow(
+                column(6),
+                column(2,uiOutput("LineChoices6")),
+                column(1,tags$img(src = "ComPrflLgnd.png")),
+                column(1),
+                column(
+                  1,
+                  radioButtons(
+                    "Projections6", 
+                    "Show projections?", 
+                    c("Yes","No"), 
+                    selected = "Yes", 
+                    inline = TRUE
+                  )
+                ),
+                column(
+                  1,
+                  tags$img(src = "DashedLine.png")
+                )
+              )
+            )
+          ),
+          tabPanel(
+            "All Communities by Outcome",
+            icon = icon("bath"),
+            fluidPage(
+              fluidRow(
+                column(6, selectInput("LA7","Select CPP", unique(IGZdta$CPP))),
+                column(
+                  6,
+                  selectInput("Indi7", "Select Indicator", unique(IGZdta$Indicator))
+                )
+              ),
+              hr(),
+              plotOutput("AllCPlots")
+            )
           )
-                   ))
+))

@@ -5,8 +5,8 @@ shinyServer(function(input, output,session) {
   
   
   selected_dta_1 <- reactive({
-    CPPdta$colourscheme <- ifelse(CPPdta$CPP == input$LA1,"A","B")
-    dta <- filter(CPPdta, CPP %in% c(input$LA1, input$CompLA1))
+    CPP_Imp$colourscheme <- ifelse(CPP_Imp$CPP == input$LA1,"A","B")
+    dta <- filter(CPP_Imp, CPP %in% c(input$LA1, input$CompLA1))
   })
   
   # List indicators in the order these are to be presented
@@ -31,7 +31,7 @@ shinyServer(function(input, output,session) {
         
         # Y Axis Range for each plot, based on range of full data set
         
-        y_rnge_dta <- subset(CPPdta, CPPdta$Indicator == indicators_1[my.i])
+        y_rnge_dta <- subset(CPP_Imp, CPP_Imp$Indicator == indicators_1[my.i])
         y_min <- min(y_rnge_dta$value, na.rm = TRUE)
         y_max <- max(y_rnge_dta$value, na.rm = TRUE)
         Rnge <- y_max - y_min
@@ -179,7 +179,7 @@ shinyServer(function(input, output,session) {
     
     # Y Axis Range for plot, based on indicator
     
-    y_rnge_dta <- subset(CPPdta, CPPdta$Indicator == input$Indi1)
+    y_rnge_dta <- subset(CPP_Imp, CPP_Imp$Indicator == input$Indi1)
     y_min <- min(y_rnge_dta$value, na.rm = TRUE)
     y_max <- max(y_rnge_dta$value, na.rm = TRUE)
     Rnge <- y_max - y_min
@@ -316,7 +316,7 @@ shinyServer(function(input, output,session) {
                handlerExpr = {
                  updateCheckboxGroupInput(session = session,
                                           inputId = "grphs2",
-                                          selected = unique(CPPdta$Indicator))
+                                          selected = unique(CPP_Imp$Indicator))
                }, ignoreInit = TRUE 
   )
   
@@ -332,7 +332,7 @@ shinyServer(function(input, output,session) {
                handlerExpr = {
                  updateCheckboxGroupInput(session = session,
                                           inputId = "grphs3",
-                                          selected = unique(CPPdta$Indicator))
+                                          selected = unique(CPP_Imp$Indicator))
                }, ignoreInit = TRUE  
   )
   
@@ -372,7 +372,7 @@ shinyServer(function(input, output,session) {
         
         # Need to manually select most recent year, since indicators have different periods  
         
-        dta <- filter(CPPdta, Indicator == slInd & Year %in% c("2016/17", "2014-2016"))
+        dta <- filter(CPP_Imp, Indicator == slInd & Year %in% c("2016/17", "2014-2016"))
         dta$slct <- ifelse(dta$CPP == input$LA2, "Sel1", "Other") 
         cmp <- filter(dta, CPP == input$CompLA2)$value
         
@@ -519,11 +519,11 @@ shinyServer(function(input, output,session) {
         
         # get family group of LA for looped indicator
         
-        FGNo <- unique(filter(CPPdta, Indicator == slInd &  CPP == input$LA3)[[6]])
+        FGNo <- unique(filter(CPP_Imp, Indicator == slInd &  CPP == input$LA3)[[6]])
         
         # Need this to select most recent year, since indicators have different periods  
         
-        dta <- filter(CPPdta, Indicator == slInd & Year %in% c("2016/17", "2014-2016"))
+        dta <- filter(CPP_Imp, Indicator == slInd & Year %in% c("2016/17", "2014-2016"))
         dta$slct <- ifelse(dta$CPP == input$LA3, "Sel1", "Other") 
         cmp <- filter(dta, CPP == input$CompLA3)$value
         dta <- filter(dta, FG == FGNo)
@@ -1519,66 +1519,73 @@ shinyServer(function(input, output,session) {
     formatStyle(columns = 3, valueColumns = 7, border = styleEqual(fontlevels,bordervalues))
   })
   
-  ####Create Graphs for Community Profile Page
+  # Graphs for Community Profile Page
 
-  #Create ui output for checkbox selection
-  output$LineChoices5 <- renderUI({
+  output$LineChoices6 <- renderUI({
     Choices <- c(input$Community6, input$LA6, "Scotland", "Group Average")
-    checkboxGroupInput("Choices5", "Select lines to plot", Choices, selected = Choices)
+    checkboxGroupInput("Choices6", "Select lines to plot", Choices, selected = Choices)
   })
   
-  #Store indicators to be plotted
-  Indicators5 <- unique(IGZdta$Indicator)
+  Indicators6 <- unique(IGZdta$Indicator)
   
-  ##use reactive functions to store possible data selections
   LineChoiceDta <- reactive({
-    #First filter to selected CPP to avoid cases where the IGZ name has a duplicate in another CPP
-    Community <- filter(IGZdta, CPP == input$LA6)
-    Community <- filter(Community, InterZone_Name == input$Community6)
+    
+    # need to filter to selected CPP to avoid cases where the 
+    #IGZ name has a duplicate in another CPP
+    
+    Community            <- filter(IGZdta, CPP == input$LA6)
+    Community            <- filter(Community, InterZone_Name == input$Community6)
     Community$Identifier <- input$Community6
-    Community$ColourRef <- "A"
-    Community$Colours <- "red"
-    Community <- select(Community, c(-InterZone, -InterZone_Name, -CPP, -Typology_Group, -Typology_Name) )
- 
-    Indicators <- unique(IGZdta$Indicator)
-    LA <- filter(CPPdta, CPP == input$LA6 & Indicator %in% Indicators)
+    Community$ColourRef  <- "A"
+    Community$Colours    <- "red"
+    Community            <- select(
+      Community, c(-InterZone, -InterZone_Name, -CPP, -Typology_Group, -Typology_Name) 
+    )
+    
+    Indicators    <- unique(IGZdta$Indicator)
+    LA            <- filter(CPPdta, CPP == input$LA6 & Indicator %in% Indicators)
     LA$Identifier <- input$LA6
-    LA$ColourRef <- "B"
-    LA$Colours <- "green"
-    LA <- select(LA, c(-CPP, -FG))
+    LA$ColourRef  <- "B"
+    LA$Colours    <- "green"
+    LA            <- select(LA, c(-CPP, -FG))
 
-    Indicators <- unique(IGZdta$Indicator)
-    Scotland <- filter(CPPdta, CPP == "Scotland" & Indicator %in% Indicators)
+    Indicators          <- unique(IGZdta$Indicator)
+    Scotland            <- filter(CPPdta, CPP == "Scotland" & Indicator %in% Indicators)
     Scotland$Identifier <- "Scotland"
-    Scotland$ColourRef <- "C"
-    Scotland$Colours <- "blue"
-    Scotland <- select(Scotland, c(-CPP, -FG))
+    Scotland$ColourRef  <- "C"
+    Scotland$Colours    <- "blue"
+    Scotland            <- select(Scotland, c(-CPP, -FG))
 
-    IGZsubset <- filter(IGZdta, InterZone_Name == input$Community6)
-    Typology <- first(IGZsubset$Typology_Group)
-    GrpAv <- filter(IGZdta, Typology_Group == Typology)
-    #GrpAv <- select(GrpAv, -`High is Positive?`)
+    IGZsubset         <- filter(IGZdta, InterZone_Name == input$Community6)
+    Typology          <- first(IGZsubset$Typology_Group)
+    GrpAv             <- filter(IGZdta, Typology_Group == Typology)
     GrpAv <- ddply(GrpAv,. (Indicator, Year), transform, GrpAver = mean(value))
-    #GrpAv <- setDT(GrpAv)[,GrpAver := mean(value), by = list(Indicator, Year)]
-    GrpAv <- filter(GrpAv, InterZone_Name == input$Community6)
-    GrpAv <- select(GrpAv, -value)
+    GrpAv              <- filter(GrpAv, InterZone_Name == input$Community6)
+    GrpAv              <- select(GrpAv, -value)
     colnames(GrpAv)[9] <- "value"
-    GrpAv$Identifier <- "Group Average"
-    GrpAv$ColourRef <- "D"
-    GrpAv$Colours <- "orange"
-    GrpAv <- select(GrpAv, c(-InterZone, -InterZone_Name, -CPP, -Typology_Group, -Typology_Name))
+    GrpAv$Identifier   <- "Group Average"
+    GrpAv$ColourRef    <- "D"
+    GrpAv$Colours      <- "orange"
+    GrpAv              <- select(
+      GrpAv, c(-InterZone, -InterZone_Name, -CPP, -Typology_Group, -Typology_Name)
+    )
+    
     LineChoiceDta <- rbind(Community, LA, Scotland, GrpAv)
-    })
+  })
   
-  ###Create plot outputs
-  for(i in seq_along(Indicators5)){
+  # Create plot outputs
+  
+  for(i in seq_along(Indicators6)){
     local({
       my.i <- i
-      plotname <- paste("5plot", my.i, sep ="_")
+      plotname <- paste("6plot", my.i, sep ="_")
       output[[plotname]]<- renderPlot({
         
-        #Calculate Y axis range by calculating max & min for each indicator
-        y_rnge_dta <- subset(IGZdta, IGZdta$Indicator == Indicators5[my.i])
+        LineChoiceDta <- LineChoiceDta()
+        
+        # Y axis 
+        
+        y_rnge_dta <- subset(IGZdta, IGZdta$Indicator == Indicators6[my.i])
         y_min <- min(y_rnge_dta$value, na.rm = TRUE)
         y_max <- max(y_rnge_dta$value, na.rm = TRUE)
         Rnge <- y_max - y_min
@@ -1586,67 +1593,114 @@ shinyServer(function(input, output,session) {
         y_min <- y_min - Extra
         y_max <- y_max + Extra
         
-        #Combine reactive data into one data set
-        LineChoiceDta <- LineChoiceDta()
-        #Add column to data to fix x axis labels
+        # set x axis labels on plots
+        # need a column which stores a numeric series to be used as the break points
+        # need an additional column which specifies the labels, allowing middle years to be blank
+        # the numeric column is also used as a reactive reference point for setting the labels
+        
         LineChoiceDta$YearLabels <- LineChoiceDta$Year
-        LineChoiceDta$YearLabels <- if_else(LineChoiceDta$Year == "2006/07","06/07",
-                                            if_else(LineChoiceDta$Year == "2016/17", "16/17",
-                                                    if_else(LineChoiceDta$Year == "2020/21","20/21","")))
-        #LineChoiceDta <- ddply(LineChoiceDta,. (Indicator, Identifier), transform, YearPoints = (seq(1 : length(Year))))
+        LineChoiceDta$YearLabels <- if_else(
+          LineChoiceDta$Year == "2006/07",
+          "06/07",
+          if_else(
+            LineChoiceDta$Year == "2016/17", 
+            "16/17",
+            if_else(
+              LineChoiceDta$Year == "2020/21",
+              "20/21",
+              ""
+              )
+          )
+        )
+        
+        
         LineChoiceDta <- setDT(LineChoiceDta)[,YearPoints := seq(1 : length(Year)), by = list(Indicator, Identifier) ]
-        #filter this data to match choices selected
-        LineChoiceDta <- filter(LineChoiceDta, Identifier %in% input$Choices5)
         
-        #Create if statement that filters data based on projection selection and plots based on this
-        if(input$Projections6 == "No") {LineChoiceDta <- filter(LineChoiceDta, Type != "Projected")} 
+        # filter data to selection and individual indicator
         
-        #Subset data to plot the selected indicator within the loop
-        loopdata <- filter(LineChoiceDta, Indicator == Indicators5[my.i])
-        #Store unique colour ref values
+        LineChoiceDta <- filter(LineChoiceDta, Identifier %in% input$Choices6)
+        
+        if(input$Projections6 == "No"){LineChoiceDta <- filter(
+          LineChoiceDta, Type != "Projected")} 
+        
+        loopdata <- filter(LineChoiceDta, Indicator == Indicators6[my.i])
+        
         ColourRefPnts <- unique(loopdata$ColourRef)
         LineColours <- unique(loopdata$Colours)
         
-        #Store unique year values
         YPoints <- unique(loopdata$YearPoints)
         YPoints <- as.numeric(YPoints)
         FilterRef <- first(loopdata$Identifier)
         YLabels <- filter(loopdata, Identifier == FilterRef)
         YLabels <- YLabels$YearLabels
         
-        #Seperarate projected data so this can be plotted seperately
+        # Seperarate projected data so this can be plotted seperately
+        
         DashedLine <- loopdata
         SolidLine <- filter(loopdata, Type != "Projected")
         
+        # Create Plot
         
-        #Create Plot
         ggplot()+
-          geom_line(data = DashedLine, 
-                    aes(x = YearPoints, y = value, group = ColourRef, colour = ColourRef, linetype = "2"),lwd = 1, show.legend = FALSE)+
-          geom_line(data = SolidLine, 
-                    aes(x = YearPoints, y = value, group = ColourRef, colour = ColourRef, linetype = "1"),lwd = 1, show.legend = FALSE)+
-          ggtitle(Indicators5[my.i])+
+          geom_line(
+            data = DashedLine, 
+            aes(
+              x = YearPoints, 
+              y = value, 
+              group = ColourRef, 
+              colour = ColourRef, 
+              linetype = "2"
+            ),
+            lwd = 1, 
+            show.legend = FALSE
+          )+
+          geom_line(
+            data = SolidLine, 
+            aes(
+              x = YearPoints, 
+              y = value, 
+              group = ColourRef, 
+              colour = ColourRef, 
+              linetype = "1"
+            ),
+            lwd = 1, 
+            show.legend = FALSE
+          )+
+          ggtitle(Indicators6[my.i])+
           scale_colour_manual(breaks = ColourRefPnts, values = LineColours)+
           scale_x_continuous(breaks = c(1: length(YPoints)), labels = YLabels)+
           ylim(y_min, y_max)+
-          theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
-                panel.background = element_blank(), axis.line = element_line(colour="black"),
-                axis.text.x = element_text(vjust = 0.3),
-                axis.title.x = element_blank(), axis.title.y = element_blank())
-        
+          theme(
+            panel.grid.major = element_blank(), 
+            panel.grid.minor = element_blank(), 
+            panel.background = element_blank(), 
+            axis.line = element_line(colour="black"),
+            axis.text.x = element_text(vjust = 0.3),
+            axis.title.x = element_blank(), 
+            axis.title.y = element_blank()
+          )
       })
     })
   }
   
   
-  ##All communities per indicator==================================
-  ##Firstly render all of the plots for filling in the UI rendered below 
+  # Create Ui Outputs for All Communities Page - PAGE7----------------------------------
+  
+  
+  # render plots
+  
   myheight <- function(){
-    nrow(unique(IGZdta[IGZdta$CPP== input$`CPP-AllC`,"InterZone_Name"]))*60
+    nrow(unique(IGZdta[IGZdta$CPP == input$LA7,"InterZone_Name"]))*60
   }
+  
   output$AllCPlots <- renderPlot({
-    #Calculate Y axis range by calculating max & min across all IGZ
-    y_rnge_dta <- filter(IGZdta, IGZdta$Indicator==input$`Indi-AllC`&IGZdta$Type != "Projected")
+    
+    # Y axis range 
+    y_rnge_dta <- filter(
+      IGZdta, 
+      IGZdta$Indicator == input$Indi7 & 
+      IGZdta$Type != "Projected"
+    )
     y_min <- min(y_rnge_dta$value, na.rm = TRUE)
     y_max <- max(y_rnge_dta$value, na.rm = TRUE)
     Rnge <- y_max - y_min
@@ -1654,28 +1708,62 @@ shinyServer(function(input, output,session) {
     y_min <- y_min - Extra
     y_max <- y_max + Extra
     
-    dta <- IGZdta[IGZdta$CPP== input$`CPP-AllC` & IGZdta$Indicator==input$`Indi-AllC`&IGZdta$Type != "Projected",c(2,8,9)]
+    dta <- IGZdta[IGZdta$CPP == input$LA7 & 
+                  IGZdta$Indicator == input$Indi7 &
+                  IGZdta$Type != "Projected",
+                  c(2,8,9)
+                 ]
+    
     nComs <- length(unique(dta$InterZone_Name))
     comList <- unique(dta$InterZone_Name)%>% sort
-    dta2 <- CPPdta[CPPdta$CPP %in% input$`CPP-AllC`& CPPdta$Indicator==input$`Indi-AllC`&CPPdta$Type != "Projected",c(1,4,5)]
-    dta3 <- CPPdta[CPPdta$CPP %in% "Scotland"& CPPdta$Indicator==input$`Indi-AllC`&CPPdta$Type != "Projected",c(1,4,5)]
+    dta2 <- CPPdta[CPPdta$CPP %in% input$LA7 & 
+                   CPPdta$Indicator == input$Indi7 & 
+                   CPPdta$Type != "Projected",
+                   c(1,4,5)
+                  ]
+    dta3 <- CPPdta[CPPdta$CPP %in% "Scotland"& 
+                   CPPdta$Indicator == input$Indi7 &
+                   CPPdta$Type != "Projected",
+                   c(1,4,5)
+                   ]
+    
     colnames(dta2) <- colnames(dta)
     colnames(dta3) <- colnames(dta)
-    dta <- rbind(dta, dta2, dta3)
-    dta$colourscheme <-ifelse(dta$InterZone_Name == "Scotland","Scot",ifelse(dta$InterZone_Name == input$`CPP-AllC`,"CPP","Com"))
+    dta            <- rbind(dta, dta2, dta3)
+    
+    dta$colourscheme <-ifelse(
+      dta$InterZone_Name == "Scotland",
+      "Scot",
+      ifelse(
+        dta$InterZone_Name == input$LA7,
+        "CPP",
+        "Com"
+      )
+    )
+    
     yrs <- c(dta$Year[[1]], dta$Year[[length(dta$Year)]])
-    ##lapply to generate plots
+    
+    # lapply to generate plots
+    
     plts <- list()
     plts <-lapply(1:nComs, FUN = function(.x){
-      ggplot(data = dta[dta$InterZone_Name %in% c(comList[.x], input$`CPP-AllC`, "Scotland"),])+
-        geom_line(aes(x = Year, y = value, group = colourscheme, colour = colourscheme), size = 1)+
+      ggplot(
+        data = dta[dta$InterZone_Name %in% c(comList[.x], input$LA7, "Scotland"),])+
+        geom_line(
+          aes(x = Year, y = value, group = colourscheme, colour = colourscheme), 
+          size = 1
+        )+
         theme_bw()+
         ggtitle(comList[.x])+
         theme(axis.text.x =  element_text(angle = 90, vjust = 0, hjust = 1))+
-        ylab("")+xlab("")+
+        ylab("")+
+        xlab("")+
         scale_x_discrete(breaks = yrs, expand = c(0.01,0.01))+
         ylim(y_min, y_max)+
-        scale_color_manual(breaks = c("Com", "CPP", "Scot") ,values = c("red", "green","blue"))+
+        scale_color_manual(
+          breaks = c("Com", "CPP", "Scot"), 
+          values = c("red", "green","blue")
+        )+
         guides(colour = FALSE)
     })
     do.call("plot_grid", c(plts, ncol = 4))
