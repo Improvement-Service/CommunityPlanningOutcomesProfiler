@@ -30,8 +30,6 @@ CPPMapDta[[15]] <- as.numeric(CPPMapDta[[15]])
 CPPMapDta[[14]] <- as.numeric(CPPMapDta[[14]])
 
 #Calculate percentiles for map colours------------
-
-
 povDecs <- c()
 for(i in unique(SpPolysDF@data$council)){
   x <- ntile(SpPolysDF@data[SpPolysDF@data$council == i, 13], 7)
