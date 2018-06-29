@@ -5,9 +5,9 @@ account: isresearchnc
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 309477
-bundleId: 1416431
+bundleId: 1456373
 url: https://isresearchnc.shinyapps.io/CommunityPlanningOutcomesProfiler/
-when: 1528365499.63519
+when: 1530282822.66574
 asMultiple: FALSE
 asStatic: FALSE
-ignoredFiles: DZcleandata.csv
+ignoredFiles: AddFGtoData.R|Clean data.R|DZcleandata.csv|Preprocessing Deciles and Typology Scores.R|Files for Maps/ShapefilesCode.R|Other Code/AddFGtoData.R|Other Code/Clean data.R|Other Code/Preprocessing Deciles and Typology Scores.R

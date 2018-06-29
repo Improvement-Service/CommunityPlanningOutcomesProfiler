@@ -30,7 +30,7 @@ shinyUI(navbarPage("CPOP",
                                    }"))),
           includeHTML("CoverPage.html"),
           img(
-            src = "http://www.improvementservice.org.uk/benchmarking/images/islogo.png", 
+            src = "http://www.improvementservice.org.uk/benchmarking/images/islogo.PNG", 
             align = "top")
           ),
           tabPanel(
@@ -66,12 +66,12 @@ shinyUI(navbarPage("CPOP",
                 ),
                 column(
                   2, 
-                  tags$img(src = "RedLine.png")
+                  tags$img(src = "RedLine.PNG")
                 ),
                 column(2),
                 column(
                   2, 
-                  tags$img(src = "BlueLine.png")
+                  tags$img(src = "BlueLine.PNG")
                 )
               ),
               hr(),
@@ -368,7 +368,7 @@ shinyUI(navbarPage("CPOP",
                 fluidRow(
                   column(
                     1,
-                    tags$img(src = "Arrow1.png")
+                    tags$img(src = "Arrow1.PNG")
                   ),
                   column(
                     10,
@@ -376,7 +376,7 @@ shinyUI(navbarPage("CPOP",
                   ),
                   column(
                     1,
-                    tags$img(src = "Arrow2.png")
+                    tags$img(src = "Arrow2.PNG")
                   )
                 )
               )
@@ -423,9 +423,9 @@ shinyUI(navbarPage("CPOP",
                 column(3,plotOutput("6plot_2", height = "225px"))
               ),
               fluidRow(
-                column(1,tags$img(src="Arrow3.png")),
+                column(1,tags$img(src="Arrow3.PNG")),
                 column(4,DT::dataTableOutput("CommunityProfileTbl")),
-                column(1,tags$img(src="Arrow4.png")),
+                column(1,tags$img(src="Arrow4.PNG")),
                 column(
                   3, 
                   plotOutput("6plot_3", height = "225px"),
@@ -442,7 +442,7 @@ shinyUI(navbarPage("CPOP",
               fluidRow(
                 column(6),
                 column(2,uiOutput("LineChoices6")),
-                column(1,tags$img(src = "ComPrflLgnd.png")),
+                column(1,tags$img(src = "ComPrflLgnd.PNG")),
                 column(1),
                 column(
                   1,
@@ -456,7 +456,7 @@ shinyUI(navbarPage("CPOP",
                 ),
                 column(
                   1,
-                  tags$img(src = "DashedLine.png")
+                  tags$img(src = "DashedLine.PNG")
                 )
               )
             )
