@@ -21,11 +21,9 @@ IGZ_change <- read_csv("IGZ_change.csv")
 
 
 # create deciles for colours
-
 CPPMapDta <- SpPolysDF@data
 
 # convert to numeric
-
 CPPMapDta[[15]] <- as.numeric(CPPMapDta[[15]])
 CPPMapDta[[14]] <- as.numeric(CPPMapDta[[14]])
 
